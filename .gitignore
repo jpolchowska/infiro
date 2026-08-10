@@ -1,0 +1,26 @@
+# Zmienne środowiskowe i klucze (BARDZO WAŻNE!)
+.env
+.env*.local
+*.pem
+
+# Zależności i paczki
+node_modules/
+__pycache__/
+*.pyc
+
+# Pliki budowania (Build Output)
+dist/
+build/
+.next/
+*.so
+
+# Dzienniki i logi
+*.log
+npm-debug.log*
+
+# Pliki środowiskowe / Docker / Narzędziowe
+.venv/
+venv/
+.DS_Store
+.idea/
+.vscode/!
