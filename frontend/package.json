@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.35",
     "expo-constants": "~18.0.13",
     "expo-linking": "~8.0.12",
@@ -24,6 +25,9 @@
   "devDependencies": {
     "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
+  },
+  "overrides": {
+    "react-dom": "19.1.0"
   },
   "private": true
 }
