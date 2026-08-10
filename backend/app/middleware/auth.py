@@ -20,8 +20,29 @@ def authenticate_token(f):
 
         token = auth_header.split(" ", 1)[1]
 
+        request.user = {
+            "roles": ["STUDENT"]
+        }
+
         print(f"Received token: {token}")
 
         return f(*args, **kwargs)
 
     return decorated
+
+def require_role(role):
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            user_roles = getattr(request, "user", {}).get("roles", [])
+
+            if role not in user_roles:
+                return jsonify({
+                    "message": f"Brak wymaganej roli: {role}"
+                }), 403
+
+            return f(*args, **kwargs)
+
+        return decorated
+
+    return decorator
