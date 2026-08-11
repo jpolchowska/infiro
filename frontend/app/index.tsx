@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +10,7 @@ export default function LoginScreen() {
   const handleLogin = () => {
     // TODO: integrate with Keycloak once auth service is ready
     console.log('login attempt', { login, password });
+    router.replace('/home');
   };
 
   return (
