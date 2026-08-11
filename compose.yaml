@@ -1,0 +1,32 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.0 
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    expose:
+      - "8080"
+    volumes:
+      - ./infrastructure/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+    networks:
+      - backend-net
+      - frontend-net
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./infrastructure/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - keycloak
+    networks:
+      - frontend-net
+
+
+networks:
+  frontend-net:
+    driver: bridge
+  backend-net:
+    driver: bridge
