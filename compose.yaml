@@ -10,8 +10,8 @@ services:
     volumes:
       - ./infrastructure/realm-export.json:/opt/keycloak/data/import/realm.json:ro
     networks:
-      - backend-net
       - frontend-net
+      - backend-net
 
   nginx:
     image: nginx:alpine
@@ -23,7 +23,6 @@ services:
       - keycloak
     networks:
       - frontend-net
-
   backend:
     build:
       context: ./backend/
@@ -40,8 +39,10 @@ services:
             - __pycache__/
             - "*.pyc"
       - action: rebuild
-        path: ./backend/package.json
-
+        path: ./backend/requirements.txt
+    networks:
+      - frontend-net
+      - backend-net
 
 networks:
   frontend-net:
