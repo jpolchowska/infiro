@@ -24,6 +24,24 @@ services:
     networks:
       - frontend-net
 
+  backend:
+    build:
+      context: ./backend/
+    expose:
+      - "5000"
+    develop:
+      watch:
+      - action: sync+restart
+        path: ./backend
+        target: /app/
+        ignore:
+            - .venv/
+            - venv/
+            - __pycache__/
+            - "*.pyc"
+      - action: rebuild
+        path: ./backend/package.json
+
 
 networks:
   frontend-net:
