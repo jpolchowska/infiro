@@ -9,7 +9,7 @@ student_bp = Blueprint("student", __name__)
 
 @student_bp.route("/api/student", methods=["GET"])
 @authenticate_token
-@require_role("STUDENT")
+@require_role("Uczeń")
 def student():
     return jsonify({
         "message": "Witaj"
