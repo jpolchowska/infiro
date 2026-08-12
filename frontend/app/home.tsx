@@ -1,14 +1,23 @@
 import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import * as SecureStore from 'expo-secure-store';
 export default function HomeScreen() {
   const handleStart = () => {
     console.log('start learning');
   };
 
-  const handleLogout = () => {
-    router.replace('/');
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync('access_token');
+      await SecureStore.deleteItemAsync('refresh_token');
+
+      console.log('✅ Tokeny zostały usunięte z SecureStore');
+
+      router.replace('/');
+    } catch (error) {
+      console.error('❌ Błąd podczas wylogowywania:', error);
+    }
   };
 
   return (
