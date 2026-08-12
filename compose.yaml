@@ -23,6 +23,7 @@ services:
       - keycloak
     networks:
       - frontend-net
+      
   backend:
     build:
       context: ./backend/
