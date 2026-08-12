@@ -10,6 +10,7 @@ docker compose watch
 
 # Running Frontend
 
+# set up .env in frontend, use .env.example for reference
 # Have android studio installed
 npx expo start
 # then press "a" on keyboard
