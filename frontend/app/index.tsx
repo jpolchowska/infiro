@@ -1,56 +1,75 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+import * as SecureStore from 'expo-secure-store';
+import { useEffect } from 'react';
+import { Pressable, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function LoginScreen() {
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
+WebBrowser.maybeCompleteAuthSession();
 
-  const handleLogin = () => {
-    // TODO: integrate with Keycloak once auth service is ready
-    console.log('login attempt', { login, password });
-    router.replace('/home');
-  };
+const KEYCLOAK_URL = process.env.EXPO_PUBLIC_KEYCLOAK_URL; 
+const REALM = 'matematyka-app';
+const CLIENT_ID = 'matematyka-mobile';
+
+export default function LoginScreen() {
+  const discovery = AuthSession.useAutoDiscovery(`${KEYCLOAK_URL}/realms/${REALM}`);
+
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: 'infiro', 
+  });
+
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: CLIENT_ID,
+      redirectUri,
+      scopes: ['openid', 'profile', 'email'],
+    },
+    discovery
+  );
+
+  useEffect(() => {
+    const handleAuthResponse = async () => {
+      if (response?.type === 'success' && response.params.code && discovery) {
+        try {
+          const tokenResult = await AuthSession.exchangeCodeAsync(
+            {
+              clientId: CLIENT_ID,
+              code: response.params.code,
+              redirectUri,
+              extraParams: {
+                code_verifier: request?.codeVerifier || '',
+              },
+            },
+            discovery
+          );
+
+          await SecureStore.setItemAsync('access_token', tokenResult.accessToken);
+          if (tokenResult.refreshToken) {
+            await SecureStore.setItemAsync('refresh_token', tokenResult.refreshToken);
+          }
+
+          console.log('✅ Zalogowano pomyślnie!');
+          router.replace('/home');
+        } catch (error) {
+          console.error('❌ Błąd wymiany kodu na tokeny:', error);
+        }
+      }
+    };
+
+    handleAuthResponse();
+  }, [response]);
 
   return (
     <SafeAreaView className="flex-1 bg-infiro-navy">
       <View className="flex-1 justify-center px-6">
-        <Text className="text-infiro-white text-4xl font-extrabold leading-tight mb-3">
+        <Text className="text-infiro-white text-4xl font-extrabold leading-tight mb-6">
           Cześć!{'\n'}Zaloguj się.
         </Text>
-        <Text className="text-infiro-white/70 text-base mb-10">
-          Podaj login i hasło, aby przejść do nauki.
-        </Text>
-
-        <View className="bg-infiro-white/10 rounded-2xl px-4 pt-3 pb-3 mb-4">
-          <Text className="text-infiro-white/50 text-xs font-semibold tracking-wider mb-1">
-            LOGIN
-          </Text>
-          <TextInput
-            value={login}
-            onChangeText={setLogin}
-            autoCapitalize="none"
-            underlineColorAndroid="transparent"
-            className="text-infiro-white text-lg p-0"
-          />
-        </View>
-
-        <View className="bg-infiro-white/10 rounded-2xl px-4 pt-3 pb-3 mb-8">
-          <Text className="text-infiro-white/50 text-xs font-semibold tracking-wider mb-1">
-            HASŁO
-          </Text>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            underlineColorAndroid="transparent"
-            className="text-infiro-white text-lg p-0"
-          />
-        </View>
 
         <Pressable
-          onPress={handleLogin}
+          onPress={() => promptAsync()}
+          disabled={!request}
           className="bg-infiro-coral rounded-2xl py-4 items-center active:opacity-80"
           style={{
             shadowColor: '#ff5f55',
@@ -60,7 +79,13 @@ export default function LoginScreen() {
             elevation: 8,
           }}
         >
-          <Text className="text-infiro-white font-semibold text-base">Zaloguj się</Text>
+          {!request ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text className="text-infiro-white font-semibold text-base">
+              Zaloguj się przez Keycloak 🚀
+            </Text>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
