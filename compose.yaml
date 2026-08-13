@@ -5,6 +5,11 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      # envirement varaibles for expo go
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME: $KC_DOMAIN
     expose:
       - "8080"
     volumes:
@@ -23,6 +28,7 @@ services:
       - keycloak
     networks:
       - frontend-net
+      
   backend:
     build:
       context: ./backend/
