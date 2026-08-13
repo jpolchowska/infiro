@@ -10,7 +10,12 @@ docker compose watch
 
 ## Running Frontend
 
-## set up .env in frontend, use .env.example for reference
-## Have android studio installed
+## !!! set up .env in frontend, use .env.example for reference !!!
+
+## Have android studio (RECCOMENDED)
 npx expo start
 ## then press "a" on keyboard
+
+## Have expo go (NOT RECCOMENDED)
+npx expo start
+## scan qr code
