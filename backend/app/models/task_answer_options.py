@@ -11,5 +11,5 @@ class TaskAnswerOption(db.Model):
         nullable=False
     )
     option_text = db.Column(db.Text, nullable=False)
-    is_correct = db.Column(db.Integer, nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False)
     order_index = db.Column(db.Integer, nullable=False)
