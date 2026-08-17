@@ -25,6 +25,6 @@ class StudentAnswer(db.Model):
     )
 
     answer_text = db.Column(db.Text, nullable=True)
-    is_correct = db.Column(db.Integer, nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False)
     attempt_number = db.Column(db.Integer, nullable=False)
-    submitted_at = db.Column(db.Text, nullable=False)
+    submitted_at = db.Column(db.DateTime, nullable=False)
