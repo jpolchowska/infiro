@@ -9,7 +9,6 @@ services:
       KC_PROXY_HEADERS: xforwarded
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
-      KC_HOSTNAME: $KC_DOMAIN
     expose:
       - "8080"
     volumes:
@@ -32,6 +31,11 @@ services:
   backend:
     build:
       context: ./backend/
+    environment:
+      DB_USER: $DB_USER
+      DB_NAME: $DB_NAME
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
     expose:
       - "5000"
     develop:
@@ -49,6 +53,33 @@ services:
     networks:
       - frontend-net
       - backend-net
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_NAME
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - backend-net
+    secrets:
+      - db_password
+
+volumes:
+  postgres_data:
+
+secrets:
+  db_password:
+    file: infrastructure/secrets/db_password.txt
 
 networks:
   frontend-net:
