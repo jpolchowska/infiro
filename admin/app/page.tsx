@@ -16,25 +16,27 @@ export default async function Home() {
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={sections.length} label="Sekcje kursu" />
-        <StatTile value={totalSubsections} label="Podsekcje" />
-        <StatTile value={totalTasks} label="Zadania" />
-        <StatTile value={students.length} label="Uczniowie z dostępem" />
+        <StatTile value={sections.length} label="Sekcje kursu" accent="navy" />
+        <StatTile value={totalSubsections} label="Podsekcje" accent="coral" />
+        <StatTile value={totalTasks} label="Zadania" accent="peach" />
+        <StatTile value={students.length} label="Uczniowie z dostępem" accent="purple" />
       </div>
 
-      <h2 className="mt-10 text-sm font-medium text-gray-500">
-        Sekcje kursu
-        <span className="ml-2 font-normal text-gray-400">
-          {totalSubsections} podsekcji, {totalTasks} zadań
+      <div className="mt-10 flex items-baseline justify-between">
+        <h2 className="text-xl font-semibold text-infiro-navy">Sekcje kursu</h2>
+        <span className="flex items-center gap-3 text-sm text-gray-500">
+          <span>{totalSubsections} podsekcji</span>
+          <span className="text-gray-300">|</span>
+          <span>{totalTasks} zadań</span>
         </span>
-      </h2>
+      </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sections.map((section, index) => (
           <Link
             key={section.id}
             href={`/sections/${section.id}`}
-            className="rounded-md border border-gray-200 bg-white p-5 hover:border-infiro-navy"
+            className="flex flex-col rounded-sm border border-gray-200 bg-white p-5 hover:border-infiro-navy"
           >
             <span className="text-xs font-medium text-gray-400">
               {String(index + 1).padStart(2, "0")}
@@ -42,18 +44,18 @@ export default async function Home() {
             <h3 className="mt-1 text-base font-semibold text-infiro-navy">
               {section.title}
             </h3>
-            <p className="mt-1 text-sm text-gray-600">{section.description}</p>
-            <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+            <p className="mt-1 line-clamp-2 min-h-10 text-sm text-gray-600">{section.description}</p>
+            <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 text-xs text-gray-500">
               <span>
                 {section.subsectionCount} podsekcji &middot; {section.taskCount} zadań
               </span>
-              <span className="font-medium text-infiro-navy">Otwórz</span>
+              <span className="font-medium text-infiro-navy">Otwórz &rarr;</span>
             </div>
           </Link>
         ))}
         <Link
           href="/sections/new"
-          className="flex min-h-33 flex-col items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
+          className="flex flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
         >
           <span className="text-2xl leading-none">+</span>
           <span className="text-sm font-medium">Dodaj sekcję</span>

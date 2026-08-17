@@ -1,11 +1,18 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 export function LogoutButton() {
+  const router = useRouter();
+
   return (
     <button
       type="button"
-      onClick={() => console.log("logout")}
-      className="flex items-center gap-2 rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-infiro-navy hover:text-infiro-navy"
+      onClick={() => {
+        console.log("logout");
+        router.push("/login");
+      }}
+      className="flex items-center gap-2 rounded-sm border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-infiro-navy hover:text-infiro-navy"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

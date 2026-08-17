@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
+import { HeaderNav } from "@/components/HeaderNav";
 import { LogoutButton } from "@/components/LogoutButton";
 import "./globals.css";
 
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Panel administratora",
-  description: "Panel administratora Infiro",
+  description: "Panel administratora",
 };
 
 export default function RootLayout({
@@ -33,17 +33,7 @@ export default function RootLayout({
               Panel administratora
             </span>
             <div className="flex items-center gap-8">
-              <nav className="flex items-center gap-6 text-sm font-medium">
-                <Link href="/" className="text-infiro-navy hover:opacity-70">
-                  Sekcje
-                </Link>
-                <Link href="/results" className="text-gray-600 hover:text-infiro-navy">
-                  Wyniki uczniów
-                </Link>
-                <Link href="/import" className="text-gray-600 hover:text-infiro-navy">
-                  Import treści
-                </Link>
-              </nav>
+              <HeaderNav />
               <LogoutButton />
             </div>
           </div>

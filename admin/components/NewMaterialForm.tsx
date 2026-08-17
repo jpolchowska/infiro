@@ -63,7 +63,7 @@ export function NewMaterialForm({
         <p className="text-xs text-gray-500">Wypełnij tekst albo dołącz plik — nie oba naraz.</p>
         <button
           type="submit"
-          className="mt-2 self-start rounded-md bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="mt-2 self-start rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           Dodaj materiał
         </button>

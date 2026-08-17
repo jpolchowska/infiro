@@ -23,16 +23,16 @@ export default async function StudentResultPage({
       <p className="mt-1 text-sm text-gray-500">{student.email}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={`${student.solvedTasks} / ${student.totalTasks}`} label="Rozwiązane" />
-        <StatTile value={student.accuracy !== null ? `${student.accuracy}%` : "—"} label="Celność" />
-        <StatTile value={student.totalAttempts} label="Odpowiedzi" />
-        <StatTile value={student.sectionProgress.length} label="Sekcje z aktywnością" />
+        <StatTile value={`${student.solvedTasks} / ${student.totalTasks}`} label="Rozwiązane" accent="navy" />
+        <StatTile value={student.accuracy !== null ? `${student.accuracy}%` : "—"} label="Celność" accent="coral" />
+        <StatTile value={student.totalAttempts} label="Odpowiedzi" accent="peach" />
+        <StatTile value={student.sectionProgress.length} label="Sekcje z aktywnością" accent="purple" />
       </div>
 
-      <h2 className="mt-10 text-sm font-medium text-gray-500">Postęp według sekcji</h2>
+      <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Postęp według sekcji</h2>
       <div className="mt-4 flex flex-col gap-3">
         {student.sectionProgress.map((sp) => (
-          <div key={sp.sectionTitle} className="rounded-md border border-gray-200 bg-white p-4">
+          <div key={sp.sectionTitle} className="rounded-sm border border-gray-200 bg-white p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-gray-900">{sp.sectionTitle}</span>
               <span className="text-gray-500">
@@ -46,7 +46,7 @@ export default async function StudentResultPage({
         ))}
       </div>
 
-      <h2 className="mt-10 text-sm font-medium text-gray-500">Do powtórki</h2>
+      <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Do powtórki</h2>
       {student.needsPractice.length === 0 ? (
         <p className="mt-2 text-sm text-gray-400">
           Brak — ostatnia próba każdego podjętego zadania była poprawna.
@@ -54,7 +54,7 @@ export default async function StudentResultPage({
       ) : (
         <ul className="mt-3 flex flex-col gap-2">
           {student.needsPractice.map((item, i) => (
-            <li key={i} className="rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm">
+            <li key={i} className="rounded-sm border border-gray-200 bg-white px-4 py-2.5 text-sm">
               <span className="font-medium text-gray-900">{item.taskTitle}</span>
               <span className="text-gray-500">
                 {" "}
@@ -65,8 +65,8 @@ export default async function StudentResultPage({
         </ul>
       )}
 
-      <h2 className="mt-10 text-sm font-medium text-gray-500">Ostatnia aktywność</h2>
-      <div className="mt-4 overflow-x-auto rounded-md border border-gray-200 bg-white">
+      <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Ostatnia aktywność</h2>
+      <div className="mt-4 overflow-x-auto rounded-sm border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">

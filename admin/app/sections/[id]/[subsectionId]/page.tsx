@@ -24,34 +24,18 @@ export default async function SubsectionPage({
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{subsection.title}</h1>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{subsection.description}</p>
 
-      <h2 className="mt-8 text-sm font-medium text-gray-500">Materiały teoretyczne</h2>
+      <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Materiały teoretyczne</h2>
       <p className="mt-2 text-sm text-gray-400">Brak materiałów — dodaj pierwszy.</p>
       <Link
         href={`/sections/${section.id}/${subsection.id}/new-material`}
-        className="mt-3 inline-block rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
+        className="mt-3 inline-block rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
       >
         Dodaj materiał
       </Link>
 
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-medium text-gray-500">Zadania</h2>
-        <div className="flex gap-3">
-          <Link
-            href={`/sections/${section.id}/${subsection.id}/new-task`}
-            className="rounded-md bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            Dodaj zadanie
-          </Link>
-          <Link
-            href="/import"
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
-          >
-            Importuj zadania (JSON)
-          </Link>
-        </div>
-      </div>
+      <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Zadania</h2>
 
-      <div className="mt-4 overflow-x-auto rounded-md border border-gray-200 bg-white">
+      <div className="mt-4 overflow-x-auto rounded-sm border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
@@ -65,7 +49,7 @@ export default async function SubsectionPage({
             {tasks.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
-                  Brak zadań — dodaj pierwsze powyżej.
+                  Brak zadań — dodaj pierwsze poniżej.
                 </td>
               </tr>
             )}
@@ -90,6 +74,21 @@ export default async function SubsectionPage({
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-3">
+        <Link
+          href={`/sections/${section.id}/${subsection.id}/new-task`}
+          className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+        >
+          Dodaj zadanie
+        </Link>
+        <Link
+          href="/import"
+          className="rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
+        >
+          Importuj zadania (JSON)
+        </Link>
       </div>
     </div>
   );

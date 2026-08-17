@@ -17,7 +17,7 @@ function UploadField({
   const [fileName, setFileName] = useState<string | null>(null);
 
   return (
-    <label className="block cursor-pointer rounded-md border border-dashed border-gray-300 px-6 py-8 text-center hover:border-infiro-navy">
+    <label className="block cursor-pointer rounded-sm border border-dashed border-gray-300 px-6 py-8 text-center hover:border-infiro-navy">
       <input
         type="file"
         accept={accept}
@@ -84,7 +84,7 @@ export default function ImportPage() {
       </p>
 
       {errors && errors.length > 0 && (
-        <div className="mt-6 max-w-xl rounded-md border border-red-300 bg-red-50 p-5">
+        <div className="mt-6 max-w-xl rounded-sm border border-red-300 bg-red-50 p-5">
           <h2 className="text-sm font-semibold text-red-700">Popraw przed importem</h2>
           <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-red-700">
             {errors.slice(0, MAX_ERRORS_SHOWN).map((err, i) => (
@@ -100,25 +100,27 @@ export default function ImportPage() {
       )}
 
       {taskCount !== null && (
-        <div className="mt-6 max-w-xl rounded-md border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
           Plik jest poprawny — {taskCount} zadań gotowych do importu.
         </div>
       )}
 
-      <form onSubmit={handleJsonSubmit} className="mt-6 max-w-xl rounded-md border border-gray-200 bg-white p-6">
+      <form onSubmit={handleJsonSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
         <h2 className="text-sm font-semibold text-infiro-navy">Plik z zadaniami (JSON)</h2>
         <div className="mt-4">
           <UploadField accept=".json" hint=".json" onFileSelected={setJsonFile} />
         </div>
-        <button
-          type="submit"
-          className="mt-4 rounded-md bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          Importuj zadania
-        </button>
+        <div className="mt-4 flex justify-center">
+          <button
+            type="submit"
+            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            Importuj zadania
+          </button>
+        </div>
       </form>
 
-      <div className="mt-6 max-w-xl rounded-md border border-gray-200 bg-white p-6">
+      <div className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
         <h2 className="text-sm font-semibold text-infiro-navy">Zdjęcia (ZIP)</h2>
         <p className="mt-1 text-xs text-gray-500">
           Rozpakowywane do static/uploads i dowiązywane do zadań po nazwie pliku.
@@ -126,9 +128,11 @@ export default function ImportPage() {
         <div className="mt-4">
           <UploadField accept=".zip" hint=".zip" onFileSelected={() => {}} />
         </div>
-        <button className="mt-4 rounded-md bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90">
-          Rozpakuj i zaimportuj
-        </button>
+        <div className="mt-4 flex justify-center">
+          <button className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90">
+            Rozpakuj i zaimportuj
+          </button>
+        </div>
       </div>
     </div>
   );

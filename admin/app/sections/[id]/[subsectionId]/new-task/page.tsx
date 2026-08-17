@@ -86,7 +86,7 @@ export default function NewTaskPage() {
           <input type="file" accept=".png,.jpg,.jpeg,.gif,.pdf" className={inputClass} />
         </FormField>
 
-        <fieldset className="rounded-md border border-gray-200 p-4">
+        <fieldset className="rounded-sm border border-gray-200 p-4">
           <legend className="px-1 text-xs font-medium text-gray-500">Opcje odpowiedzi</legend>
           <div className="flex flex-col gap-2">
             {options.map((option, index) => (
@@ -122,7 +122,7 @@ export default function NewTaskPage() {
 
         <button
           type="submit"
-          className="mt-2 self-start rounded-md bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="mt-2 self-start rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           Utwórz zadanie
         </button>

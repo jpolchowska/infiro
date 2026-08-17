@@ -13,7 +13,7 @@ export function Badge({
   variant?: keyof typeof VARIANTS;
 }) {
   return (
-    <span className={`inline-block rounded px-2.5 py-0.5 text-xs font-semibold ${VARIANTS[variant]}`}>
+    <span className={`inline-block rounded-sm px-2.5 py-0.5 text-xs font-semibold ${VARIANTS[variant]}`}>
       {children}
     </span>
   );

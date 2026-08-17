@@ -33,13 +33,13 @@ export default async function ResultsPage() {
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={students.length} label="Uczniowie" />
-        <StatTile value={totalTasks} label="Zadania w kursie" />
-        <StatTile value={totalAttempts} label="Odpowiedzi" />
-        <StatTile value={classAccuracy !== null ? `${classAccuracy}%` : "—"} label="Celność klasy" />
+        <StatTile value={students.length} label="Uczniowie" accent="navy" />
+        <StatTile value={totalTasks} label="Zadania w kursie" accent="coral" />
+        <StatTile value={totalAttempts} label="Odpowiedzi" accent="peach" />
+        <StatTile value={classAccuracy !== null ? `${classAccuracy}%` : "—"} label="Celność klasy" accent="purple" />
       </div>
 
-      <div className="mt-8 overflow-x-auto rounded-md border border-gray-200 bg-white">
+      <div className="mt-8 overflow-x-auto rounded-sm border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">

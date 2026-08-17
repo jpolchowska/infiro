@@ -45,7 +45,7 @@ export default function NewSubsectionPage() {
         </FormField>
         <button
           type="submit"
-          className="mt-2 self-start rounded-md bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="mt-2 self-start rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           Utwórz podsekcję
         </button>
