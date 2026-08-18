@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
 export default function HomeScreen() {
   const handleStart = () => {
-    console.log('start learning');
+    router.push('/leveling-test');
   };
 
   const handleLogout = async () => {
@@ -12,11 +12,11 @@ export default function HomeScreen() {
       await SecureStore.deleteItemAsync('access_token');
       await SecureStore.deleteItemAsync('refresh_token');
 
-      console.log('✅ Tokeny zostały usunięte z SecureStore');
+      console.log('Tokeny zostały usunięte z SecureStore');
 
       router.replace('/');
     } catch (error) {
-      console.error('❌ Błąd podczas wylogowywania:', error);
+      console.error('Błąd podczas wylogowywania:', error);
     }
   };
 
@@ -24,7 +24,7 @@ export default function HomeScreen() {
     <SafeAreaView className="flex-1 bg-infiro-navy">
       <View className="flex-1 justify-center px-6">
         <Text className="text-infiro-white text-4xl font-extrabold leading-tight mb-3">
-          Cześć!
+          Witaj w aplikacji!
         </Text>
         <Text className="text-infiro-white/70 text-base mb-10">
           Logowanie się udało. Możesz zaczynać naukę.

@@ -49,10 +49,10 @@ export default function LoginScreen() {
             await SecureStore.setItemAsync('refresh_token', tokenResult.refreshToken);
           }
 
-          console.log('✅ Zalogowano pomyślnie!');
+          console.log('Zalogowano pomyślnie!');
           router.replace('/home');
         } catch (error) {
-          console.error('❌ Błąd wymiany kodu na tokeny:', error);
+          console.error('Błąd wymiany kodu na tokeny:', error);
         }
       }
     };
@@ -64,7 +64,7 @@ export default function LoginScreen() {
     <SafeAreaView className="flex-1 bg-infiro-navy">
       <View className="flex-1 justify-center px-6">
         <Text className="text-infiro-white text-4xl font-extrabold leading-tight mb-6">
-          Cześć!{'\n'}Zaloguj się.
+          Cześć!
         </Text>
 
         <Pressable
@@ -83,7 +83,7 @@ export default function LoginScreen() {
             <ActivityIndicator color="#ffffff" />
           ) : (
             <Text className="text-infiro-white font-semibold text-base">
-              Zaloguj się przez Keycloak 🚀
+              Zaloguj się
             </Text>
           )}
         </Pressable>
