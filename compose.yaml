@@ -54,6 +54,24 @@ services:
       - frontend-net
       - backend-net
 
+  admin:
+    build:
+      context: ./admin/
+    ports:
+      - "3000:3000"
+    develop:
+      watch:
+      - action: sync
+        path: ./admin
+        target: /app/
+        ignore:
+            - node_modules/
+            - .next/
+      - action: rebuild
+        path: ./admin/package.json
+    networks:
+      - frontend-net
+
   postgres:
     image: postgres:16-alpine
     environment:
