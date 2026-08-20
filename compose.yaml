@@ -13,6 +13,7 @@ services:
       - "8080"
     volumes:
       - ./infrastructure/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+      - keycloak_data:/opt/keycloak/data
     networks:
       - frontend-net
       - backend-net
@@ -25,6 +26,7 @@ services:
       - ./infrastructure/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - keycloak
+      - admin
     networks:
       - frontend-net
       
@@ -57,8 +59,8 @@ services:
   admin:
     build:
       context: ./admin/
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     develop:
       watch:
       - action: sync
@@ -94,6 +96,7 @@ services:
 
 volumes:
   postgres_data:
+  keycloak_data:
 
 secrets:
   db_password:

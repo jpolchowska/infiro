@@ -496,6 +496,38 @@
   },
   "clients": [
     {
+      "id": "5a8a7ef4-4f80-4a8c-a0c5-4eecf3b3f9c1",
+      "clientId": "nextjs-app",
+      "name": "Panel administratora",
+      "description": "Panel administracyjny aplikacji",
+      "rootUrl": "http://localhost",
+      "adminUrl": "http://localhost",
+      "baseUrl": "http://localhost",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "none",
+      "redirectUris": ["http://localhost/*", "http://localhost:3000/*", "http://localhost/*"],
+      "webOrigins": ["http://localhost", "http://localhost:3000"],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost/login##http://localhost:3000/login",
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [],
+      "defaultClientScopes": ["web-origins", "acr", "roles", "profile", "basic", "email"],
+      "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
+    },
+    {
       "id": "219d32b6-10b2-4a0d-88ca-0724a0c36db2",
       "clientId": "account",
       "name": "${client_account}",
@@ -1372,23 +1404,6 @@
             "id.token.claim": "true",
             "access.token.claim": "true",
             "claim.name": "zoneinfo",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "id": "2d2f84cd-e7d2-4531-b9ee-e58e29abb982",
-          "name": "nigger",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-attribute-mapper",
-          "consentRequired": false,
-          "config": {
-            "introspection.token.claim": "true",
-            "userinfo.token.claim": "true",
-            "user.attribute": "lastName",
-            "id.token.claim": "true",
-            "lightweight.claim": "false",
-            "access.token.claim": "true",
-            "claim.name": "ŻYDZI",
             "jsonType.label": "String"
           }
         },
