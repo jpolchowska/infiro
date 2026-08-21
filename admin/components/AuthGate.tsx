@@ -1,56 +1,18 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { keycloak } from "@/lib/keycloak";
+import { useEffect } from "react";
+import { useAuth } from "@/components/AuthContext";
 import { HeaderNav } from "@/components/HeaderNav";
 import { LogoutButton } from "@/components/LogoutButton";
 
-let keycloakInitPromise: Promise<boolean> | undefined;
-
-function initializeKeycloak() {
-  if (!keycloakInitPromise) {
-    keycloakInitPromise = keycloak.init({
-      onLoad: "check-sso",
-      pkceMethod: "S256",
-      checkLoginIframe: false,
-    });
-  }
-
-  return keycloakInitPromise;
-}
-
 export function AuthGate({ children }: { children: React.ReactNode }) {
+  const { initialized, authenticated } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [initialized, setInitialized] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-
-    initializeKeycloak()
-      .then((isAuthenticated) => {
-        if (mounted) {
-          setAuthenticated(isAuthenticated);
-          setInitialized(true);
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setInitialized(true);
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!initialized) {
-      return;
-    }
+    if (!initialized) return;
 
     if (authenticated && pathname === "/login") {
       router.replace("/");
@@ -60,13 +22,24 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   }, [authenticated, initialized, pathname, router]);
 
   if (!initialized) {
-    return <div className="flex min-h-[70vh] items-center justify-center text-sm text-gray-500">Ładowanie...</div>;
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center text-sm text-gray-500">
+        Ładowanie...
+      </div>
+    );
   }
 
-  if (!authenticated) {
-    return children;
+  // Niezalogowany na innej stronie -> blokada (null), czekamy na router.replace("/login")
+  if (!authenticated && pathname !== "/login") {
+    return null;
   }
 
+  // Niezalogowany na /login -> czyste children bez layoutu admina
+  if (!authenticated && pathname === "/login") {
+    return <>{children}</>;
+  }
+
+  // Zalogowany użytkownik -> pełny layout panelu
   return (
     <>
       <header className="border-b border-gray-200 bg-white">

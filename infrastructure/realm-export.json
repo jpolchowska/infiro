@@ -507,7 +507,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "none",
-      "redirectUris": ["http://localhost/*", "http://localhost:3000/*", "http://localhost/*"],
+      "redirectUris": ["http://localhost/", "http://localhost/login", "http://localhost:3000/", "http://localhost:3000/login"],
       "webOrigins": ["http://localhost", "http://localhost:3000"],
       "notBefore": 0,
       "bearerOnly": false,
