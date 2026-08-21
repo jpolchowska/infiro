@@ -7,9 +7,12 @@ import { HeaderNav } from "@/components/HeaderNav";
 import { LogoutButton } from "@/components/LogoutButton";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
-  const { initialized, authenticated } = useAuth();
+  const { initialized, authenticated, keycloak, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+
+  // Sprawdzamy, czy zalogowany użytkownik ma przypisaną rolę "admin" w Realm
+  const isAdmin = authenticated && keycloak?.hasRealmRole("admin");
 
   useEffect(() => {
     if (!initialized) return;
@@ -29,17 +32,33 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Niezalogowany na innej stronie -> blokada (null), czekamy na router.replace("/login")
   if (!authenticated && pathname !== "/login") {
     return null;
   }
 
-  // Niezalogowany na /login -> czyste children bez layoutu admina
   if (!authenticated && pathname === "/login") {
     return <>{children}</>;
   }
 
-  // Zalogowany użytkownik -> pełny layout panelu
+  // ⛔ Zalogowany, ale bez roli admina -> Blokada 403
+  if (authenticated && !isAdmin) {
+    return (
+      <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center">
+        <h1 className="text-2xl font-semibold text-red-600">Brak dostępu (403)</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Twoje konto nie posiada uprawnień administratora do tego panelu.
+        </p>
+        <button
+          onClick={logout}
+          className="mt-6 rounded bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+        >
+          Wyloguj się
+        </button>
+      </div>
+    );
+  }
+
+  // ✅ Zalogowany administrator -> Pełny panel
   return (
     <>
       <header className="border-b border-gray-200 bg-white">
