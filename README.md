@@ -23,3 +23,12 @@ npx expo start
 ## Have expo go (NOT RECCOMENDED)
 npx expo start
 ## scan qr code
+
+## Creating Accounts
+
+#### Student (Uczeń), Teacher (Nauczyciel)
+#### Go to keykloak admin (log in), then precede to "matematyka-app" realm and go to "Users" and create accounts using form
+
+#### admin (Administrator)
+#### Go to keykloak admin (log in), then precede to "matematyka-app" realm and go to "Users" and create accounts using form
+#### then create role "admin" in Realm roles, and then map that role to the user ( Users, Role maping, asign role, filter by realm roles) and you should have here admin role

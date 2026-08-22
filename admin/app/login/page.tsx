@@ -1,5 +1,7 @@
 "use client";
 
+import { keycloak } from "@/lib/keycloak";
+
 export default function LoginPage() {
   return (
     <div className="flex min-h-[70vh] items-center justify-center">
@@ -8,7 +10,7 @@ export default function LoginPage() {
         <p className="mt-2 text-sm text-gray-600">Zaloguj się, aby zarządzać treścią aplikacji.</p>
         <button
           type="button"
-          onClick={() => console.log("login via keycloak")}
+          onClick={() => keycloak.login({ redirectUri: `${window.location.origin}/` })}
           className="mt-6 w-full rounded-sm bg-infiro-navy px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
         >
           Zaloguj się
