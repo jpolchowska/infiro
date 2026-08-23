@@ -1,5 +1,3 @@
-import uuid
-
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
@@ -11,85 +9,65 @@ from app.models.task_answer_options import TaskAnswerOption
 
 admin_import_bp = Blueprint("admin_import", __name__)
 
-STUDENT_THEME_IDS = {"default", "lol", "mario", "roblox"}
-
 
 def _is_non_empty_string(value):
     return isinstance(value, str) and value.strip() != ""
 
 
 def validate_import_payload(data):
-    """Mirrors admin/lib/validateImport.ts -- keep the two in sync."""
+    """Waliduje sparsowany JSON z importem zadań. Zwraca listę błędów jako
+    tekst; pusta lista oznacza poprawny plik. Odzwierciedla logikę
+    admin/lib/validateImport.ts -- trzymać oba pliki w zgodzie.
+    """
     errors = []
     if not isinstance(data, list):
-        return ["Plik musi zawierać tablicę JSON zadań."]
+        return ["The file must contain a JSON array of tasks."]
     if not data:
-        return ["Plik nie zawiera żadnych zadań."]
+        return ["The file contains no tasks."]
 
     for i, item in enumerate(data):
         if not isinstance(item, dict):
-            errors.append(f"zadanie #{i + 1}: musi być obiektem.")
+            errors.append(f"task #{i + 1}: must be an object.")
             continue
-        label = f"zadanie #{i + 1} ({item.get('section', '?')} / {item.get('subsection', '?')})"
+        label = f"task #{i + 1} ({item.get('section', '?')} / {item.get('subsection', '?')})"
 
-        for field in ("section", "subsection", "difficulty", "variants"):
+        for field in ("section", "subsection", "difficulty", "title", "question", "options"):
             if field not in item:
-                errors.append(f"{label}: brak pola '{field}'.")
+                errors.append(f"{label}: missing '{field}'.")
+
         if "section" in item and not _is_non_empty_string(item.get("section")):
-            errors.append(f"{label}: 'section' musi być niepustym tekstem.")
+            errors.append(f"{label}: 'section' must be a non-empty string.")
         if "subsection" in item and not _is_non_empty_string(item.get("subsection")):
-            errors.append(f"{label}: 'subsection' musi być niepustym tekstem.")
+            errors.append(f"{label}: 'subsection' must be a non-empty string.")
+        if "title" in item and not _is_non_empty_string(item.get("title")):
+            errors.append(f"{label}: 'title' must be a non-empty string.")
+        if "question" in item and not _is_non_empty_string(item.get("question")):
+            errors.append(f"{label}: 'question' must be a non-empty string.")
 
         difficulty = item.get("difficulty")
         if isinstance(difficulty, bool) or not isinstance(difficulty, int) or not (1 <= difficulty <= 5):
-            errors.append(f"{label}: 'difficulty' musi być liczbą całkowitą 1-5.")
+            errors.append(f"{label}: 'difficulty' must be an integer 1-5.")
 
-        variants = item.get("variants")
-        if not isinstance(variants, dict):
-            errors.append(f"{label}: 'variants' musi być obiektem.")
+        options = item.get("options")
+        if not isinstance(options, list) or len(options) < 2:
+            errors.append(f"{label}: 'options' must be a list with at least 2 items.")
             continue
-        if "default" not in variants:
-            errors.append(f"{label}: warianty muszą zawierać wpis 'default'.")
-        unknown_themes = sorted(set(variants) - STUDENT_THEME_IDS)
-        if unknown_themes:
-            errors.append(f"{label}: nieznane motywy: {unknown_themes}.")
 
-        for theme, variant in variants.items():
-            if theme not in STUDENT_THEME_IDS:
+        correct_count = 0
+        for j, opt in enumerate(options):
+            olabel = f"{label} option #{j + 1}"
+            if not isinstance(opt, dict):
+                errors.append(f"{olabel}: must be an object.")
                 continue
-            vlabel = f"{label} [{theme}]"
-            if not isinstance(variant, dict):
-                errors.append(f"{vlabel}: musi być obiektem.")
-                continue
-            for field in ("title", "question", "options"):
-                if field not in variant:
-                    errors.append(f"{vlabel}: brak pola '{field}'.")
-            if "title" in variant and not _is_non_empty_string(variant.get("title")):
-                errors.append(f"{vlabel}: 'title' musi być niepustym tekstem.")
-            if "question" in variant and not _is_non_empty_string(variant.get("question")):
-                errors.append(f"{vlabel}: 'question' musi być niepustym tekstem.")
+            if not _is_non_empty_string(opt.get("text")):
+                errors.append(f"{olabel}: 'text' must be a non-empty string.")
+            if not isinstance(opt.get("correct"), bool):
+                errors.append(f"{olabel}: 'correct' must be true or false.")
+            elif opt["correct"]:
+                correct_count += 1
 
-            options = variant.get("options")
-            if not isinstance(options, list) or len(options) < 2:
-                errors.append(f"{vlabel}: 'options' musi być listą z co najmniej 2 elementami.")
-                continue
-            correct_count = 0
-            for j, opt in enumerate(options):
-                olabel = f"{vlabel} opcja #{j + 1}"
-                if not isinstance(opt, dict):
-                    errors.append(f"{olabel}: musi być obiektem.")
-                    continue
-                if not _is_non_empty_string(opt.get("text")):
-                    errors.append(f"{olabel}: 'text' musi być niepustym tekstem.")
-                if not isinstance(opt.get("correct"), bool):
-                    errors.append(f"{olabel}: 'correct' musi być wartością true/false.")
-                elif opt["correct"]:
-                    correct_count += 1
-            if correct_count != 1:
-                errors.append(
-                    f"{vlabel}: dokładnie jedna opcja musi mieć \"correct\": true "
-                    f"(znaleziono {correct_count})."
-                )
+        if correct_count != 1:
+            errors.append(f"{label}: exactly one option must have \"correct\": true (found {correct_count}).")
 
     return errors
 
@@ -109,7 +87,6 @@ def import_tasks():
     section_cache = {}
     subsection_cache = {}
     task_count = 0
-    variant_row_count = 0
 
     for item in data:
         section_title = item["section"].strip()
@@ -146,35 +123,24 @@ def import_tasks():
             subsection_id = subsection.id
             subsection_cache[sub_key] = subsection_id
 
-        variants = item["variants"]
-        group = uuid.uuid4().hex if len(variants) > 1 else None
-        theme_order = ["default"] + [t for t in variants if t != "default"]
+        task = Task(
+            subsection_id=subsection_id,
+            title=item["title"].strip(),
+            body_text=item["question"].strip(),
+            difficulty_level=item["difficulty"],
+        )
+        db.session.add(task)
+        db.session.flush()
 
-        for theme in theme_order:
-            if theme not in variants:
-                continue
-            variant = variants[theme]
-            task = Task(
-                subsection_id=subsection_id,
-                title=variant["title"].strip(),
-                body_text=variant["question"].strip(),
-                difficulty_level=item["difficulty"],
-                theme=theme,
-                variant_group=group,
-            )
-            db.session.add(task)
-            db.session.flush()
-
-            for order_index, opt in enumerate(variant["options"], start=1):
-                db.session.add(TaskAnswerOption(
-                    task_id=task.id,
-                    option_text=opt["text"].strip(),
-                    is_correct=bool(opt["correct"]),
-                    order_index=order_index,
-                ))
-            variant_row_count += 1
+        for order_index, opt in enumerate(item["options"], start=1):
+            db.session.add(TaskAnswerOption(
+                task_id=task.id,
+                option_text=opt["text"].strip(),
+                is_correct=bool(opt["correct"]),
+                order_index=order_index,
+            ))
         task_count += 1
 
     db.session.commit()
 
-    return jsonify({"task_count": task_count, "variant_row_count": variant_row_count}), 201
+    return jsonify({"task_count": task_count}), 201

@@ -12,9 +12,9 @@ def allowed_file(filename):
 
 
 def save_upload_file(file_storage):
-    """Saves an uploaded file under app/static/uploads and returns (resource_type, file_url).
+    """Zapisuje przesłany plik w app/static/uploads i zwraca (resource_type, file_url).
 
-    Returns (None, None) if the file has a disallowed extension.
+    Zwraca (None, None) jeśli rozszerzenie pliku jest niedozwolone.
     """
     if not file_storage or not file_storage.filename or not allowed_file(file_storage.filename):
         return None, None

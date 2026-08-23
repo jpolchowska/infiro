@@ -16,7 +16,7 @@ def test_public_endpoint(client):
     response = client.get("/api/public")
 
     assert response.status_code == 200
-    assert response.json["message"] == "Backend działa"
+    assert response.json["message"] == "Backend is running"
 
 
 def test_student_without_token(client):
@@ -34,4 +34,4 @@ def test_student_with_token(client):
     )
 
     assert response.status_code == 200
-    assert response.json["message"] == "Witaj"
+    assert response.json["message"] == "Hello"

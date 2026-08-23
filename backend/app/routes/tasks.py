@@ -11,30 +11,28 @@ from app.models.subsections import Subsection
 tasks_bp = Blueprint("tasks", __name__)
 
 
-@tasks_bp.route("/api/tasks/<int:task_id>", methods=["GET"]) #Zwrócenie konkretnego zadaani np. task=15
+@tasks_bp.route("/api/tasks/<int:task_id>", methods=["GET"])
 def get_task(task_id):
     task = Task.query.get(task_id)
 
-    if task is None: #Brak zadania w bazie
+    if task is None:
         return jsonify({
-            "error": "Task not found"
+            "error": "task not found"
         }), 404
 
-    options = TaskAnswerOption.query.filter_by( #Łączenie z tabela opcji
+    options = TaskAnswerOption.query.filter_by(
         task_id=task.id
     ).order_by(
         TaskAnswerOption.order_index
     ).all()
 
-    return jsonify({ #zwrócenie jsona do frontendu
+    return jsonify({
         "id": task.id,
         "subsection_id": task.subsection_id,
         "title": task.title,
         "body_text": task.body_text,
         "image_url": task.image_url,
         "difficulty_level": task.difficulty_level,
-        "theme": task.theme,
-        "variant_group": task.variant_group,
         "options": [
             {
                 "id": option.id,
@@ -45,7 +43,7 @@ def get_task(task_id):
         ]
     }), 200
 
-@tasks_bp.route("/api/tasks", methods=["GET"]) #Zwrócenie wszystkich zadań z konkretnej podsekcji
+@tasks_bp.route("/api/tasks", methods=["GET"])
 def get_tasks():
     subsection_id = request.args.get("subsection_id", type=int)
 
@@ -72,19 +70,16 @@ def get_tasks():
             "title": task.title,
             "body_text": task.body_text,
             "image_url": task.image_url,
-            "difficulty_level": task.difficulty_level,
-            "theme": task.theme,
-            "variant_group": task.variant_group
+            "difficulty_level": task.difficulty_level
         }
         for task in tasks
     ]), 200
 
-# TODO: poniższe dwa endpointy (StudentAnswer) wracają razem z modelem User
-# w rundzie prac nad Uczniami/Wynikami -- student_answers.student_id wskazuje
-# dziś na nieistniejącą tabelę users, więc na razie zostają zakomentowane
-# zamiast wpiąć nieistniejącą tabelę w migracje.
+# TODO: te dwa endpointy (StudentAnswer) wracają razem z modelem User --
+# student_answers.student_id wskazuje dziś na nieistniejącą tabelę users,
+# więc są zakomentowane zamiast wpinać brakującą tabelę w migracje.
 
-# @tasks_bp.route("/api/tasks/<int:task_id>/answers", methods=["POST"]) #wysyłanie odpowiedzi przez ucznia
+# @tasks_bp.route("/api/tasks/<int:task_id>/answers", methods=["POST"])
 # def submit_answer(task_id):
 #     task = Task.query.get(task_id)
 #
@@ -111,7 +106,7 @@ def get_tasks():
 #             "error": "student_id is required"
 #         }), 400
 #
-#     # Odpowiedź zamknięta
+#     # Odpowiedź zamknięta (wybór z opcji)
 #     if selected_option_id is not None:
 #         option = TaskAnswerOption.query.filter_by(
 #             id=selected_option_id,
@@ -127,7 +122,7 @@ def get_tasks():
 #
 #     # Odpowiedź otwarta
 #     elif answer_text is not None:
-#         #TODO: dodać logikę odpowiedzi otwartrej
+#         # TODO: dodać logikę oceniania odpowiedzi otwartej
 #         is_correct = False
 #
 #     else:
@@ -169,7 +164,7 @@ def get_tasks():
 #         "submitted_at": answer.submitted_at.isoformat()
 #     }), 201
 
-# @tasks_bp.route("/api/tasks/<int:task_id>/answers", methods=["GET"]) #pobieranie historii odpowiedzi
+# @tasks_bp.route("/api/tasks/<int:task_id>/answers", methods=["GET"])
 # def get_task_answers(task_id):
 #     task = Task.query.get(task_id)
 #
@@ -184,7 +179,7 @@ def get_tasks():
 #         return jsonify({
 #             "error": "student_id is required"
 #         }), 400
-#     #TODO : trzeba zmienic student_url na tego z keyklocka
+#     # TODO: student_id powinien pochodzić z Keycloaka po podpięciu auth tutaj
 #     answers = StudentAnswer.query.filter_by(
 #         task_id=task_id,
 #         student_id=student_id

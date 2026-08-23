@@ -12,5 +12,5 @@ student_bp = Blueprint("student", __name__)
 @require_role("Uczeń")
 def student():
     return jsonify({
-        "message": "Witaj"
+        "message": "Hello"
     })

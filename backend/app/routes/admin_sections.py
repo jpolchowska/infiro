@@ -7,6 +7,7 @@ from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.knowledge_resources import KnowledgeResource
+from app.routes.admin_materials import _material_json
 
 admin_sections_bp = Blueprint("admin_sections", __name__)
 
@@ -36,7 +37,7 @@ def _subsection_json(subsection):
 
 
 def _validate_options(options):
-    """Returns an error message string, or None if options are valid."""
+    """Zwraca komunikat błędu (string), albo None jeśli opcje są poprawne."""
     if not isinstance(options, list) or len(options) < 2:
         return "options must be a list with at least 2 items"
 
@@ -65,8 +66,6 @@ def _task_json(task):
         "body_text": task.body_text,
         "image_url": task.image_url,
         "difficulty_level": task.difficulty_level,
-        "theme": task.theme,
-        "variant_group": task.variant_group,
         "options": [
             {
                 "id": option.id,
@@ -121,9 +120,13 @@ def get_section(section_id):
     subsections = Subsection.query.filter_by(section_id=section_id).order_by(
         Subsection.order_index
     ).all()
+    materials = KnowledgeResource.query.filter_by(section_id=section_id).order_by(
+        KnowledgeResource.order_index
+    ).all()
 
     payload = _section_json(section)
     payload["subsections"] = [_subsection_json(s) for s in subsections]
+    payload["materials"] = [_material_json(m) for m in materials]
     return jsonify(payload), 200
 
 
@@ -170,9 +173,13 @@ def get_subsection(subsection_id):
         return jsonify({"error": "subsection not found"}), 404
 
     tasks = Task.query.filter_by(subsection_id=subsection_id).order_by(Task.id).all()
+    materials = KnowledgeResource.query.filter_by(subsection_id=subsection_id).order_by(
+        KnowledgeResource.order_index
+    ).all()
 
     payload = _subsection_json(subsection)
     payload["tasks"] = [_task_json(t) for t in tasks]
+    payload["materials"] = [_material_json(m) for m in materials]
     return jsonify(payload), 200
 
 
@@ -209,8 +216,6 @@ def create_task(subsection_id):
         title=title,
         body_text=body_text,
         difficulty_level=difficulty_level,
-        theme="default",
-        variant_group=None,
     )
     db.session.add(task)
     db.session.flush()

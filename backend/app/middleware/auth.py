@@ -14,10 +14,10 @@ def authenticate_token(f):
         auth_header = request.headers.get("Authorization")
 
         if not auth_header:
-            return jsonify({"message": "Brak tokena autoryzacyjnego"}), 401
+            return jsonify({"message": "Missing authorization token"}), 401
 
         if not auth_header.startswith("Bearer "):
-            return jsonify({"message": "Nieprawidłowy format tokena"}), 401
+            return jsonify({"message": "Invalid token format"}), 401
 
         token = auth_header.split(" ", 1)[1]
 
@@ -30,20 +30,16 @@ def authenticate_token(f):
                 issuer=KEYCLOAK_ISSUER,
                 options={"verify_aud": False}
             )
-            print("🔓 Rozszyfrowany JWT payload:", decoded, flush=True)
             request.user = decoded
 
         except jwt.ExpiredSignatureError:
-            print("❌ BŁĄD: Token wygasł! Pobierz nowy token w Postmanie.", flush=True)
-            return jsonify({"message": "Token wygasł"}), 403
-            
-        except jwt.InvalidIssuerError as e:
-            print(f"❌ BŁĄD ISSUERA: Token ma inny 'iss' niż KEYCLOAK_ISSUER={KEYCLOAK_ISSUER}. Treść: {e}", flush=True)
-            return jsonify({"message": "Nieprawidłowy issuer"}), 403
-            
+            return jsonify({"message": "Token expired"}), 403
+
+        except jwt.InvalidIssuerError:
+            return jsonify({"message": "Invalid issuer"}), 403
+
         except Exception as e:
-            print(f"❌ INNY BŁĄD ({type(e).__name__}): {str(e)}", flush=True)
-            return jsonify({"message": f"Błąd weryfikacji: {str(e)}"}), 403
+            return jsonify({"message": f"Token verification failed: {str(e)}"}), 403
 
         return f(*args, **kwargs)
 
@@ -58,7 +54,7 @@ def require_role(role):
             user_role = user.get("user_role_test")
 
             if role != user_role:
-                return jsonify({"message": f"Brak wymaganej roli: {role}"}), 403
+                return jsonify({"message": f"Missing required role: {role}"}), 403
 
             return f(*args, **kwargs)
 
@@ -69,9 +65,9 @@ def require_role(role):
 
 def require_realm_role(role):
     """Sprawdza natywną rolę realmową Keycloaka (realm_access.roles) -- ten sam
-    mechanizm co keycloak.hasRealmRole() już używany we frontendowym AuthGate.
-    Inny mechanizm niż require_role(), który sprawdza custom claim
-    'user_role_test' używany przez aplikację mobilną.
+    mechanizm co keycloak.hasRealmRole() już używany w AuthGate panelu admina.
+    Inaczej niż require_role(), który sprawdza custom claim 'user_role_test'
+    używany przez aplikację mobilną.
     """
     def decorator(f):
         @wraps(f)
@@ -80,7 +76,7 @@ def require_realm_role(role):
             realm_roles = user.get("realm_access", {}).get("roles", [])
 
             if role not in realm_roles:
-                return jsonify({"message": f"Brak wymaganej roli: {role}"}), 403
+                return jsonify({"message": f"Missing required role: {role}"}), 403
 
             return f(*args, **kwargs)
 
