@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 import { validateImportPayload } from "@/lib/validateImport";
+import { importTasks } from "@/lib/data";
+import { ApiError } from "@/lib/api";
+import { useAuth } from "@/components/AuthContext";
 
 const MAX_ERRORS_SHOWN = 20;
 
@@ -43,11 +46,13 @@ function UploadField({
 }
 
 export default function ImportPage() {
+  const { getToken } = useAuth();
   const [jsonFile, setJsonFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<string[] | null>(null);
   const [taskCount, setTaskCount] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  async function handleJsonSubmit(e: React.FormEvent) {
+  async function handleJsonSubmit(e: SubmitEvent) {
     e.preventDefault();
     setTaskCount(null);
     if (!jsonFile) {
@@ -70,8 +75,20 @@ export default function ImportPage() {
     }
 
     setErrors(null);
-    setTaskCount(Array.isArray(data) ? data.length : 0);
-    console.log("import tasks", data);
+    setSubmitting(true);
+    try {
+      const token = await getToken();
+      const result = await importTasks(token ?? "", data);
+      setTaskCount(result.task_count);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrors([err.message]);
+      } else {
+        setErrors(["Import się nie powiódł. Spróbuj ponownie."]);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -101,7 +118,7 @@ export default function ImportPage() {
 
       {taskCount !== null && (
         <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          Plik jest poprawny — {taskCount} zadań gotowych do importu.
+          Zaimportowano {taskCount} zadań.
         </div>
       )}
 
@@ -113,9 +130,10 @@ export default function ImportPage() {
         <div className="mt-4 flex justify-center">
           <button
             type="submit"
-            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            disabled={submitting}
+            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
           >
-            Importuj zadania
+            {submitting ? "Importowanie…" : "Importuj zadania"}
           </button>
         </div>
       </form>

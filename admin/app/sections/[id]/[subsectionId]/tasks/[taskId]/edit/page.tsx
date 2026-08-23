@@ -1,24 +1,53 @@
 "use client";
 
-import { useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { FormField, inputClass } from "@/components/FormField";
 import { useAuth } from "@/components/AuthContext";
-import { createTask } from "@/lib/data";
+import { getSubsection, updateTask } from "@/lib/data";
 
 type OptionDraft = { text: string };
 
-export default function NewTaskPage() {
+export default function EditTaskPage() {
   const router = useRouter();
-  const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
+  const { id, subsectionId, taskId } = useParams<{
+    id: string;
+    subsectionId: string;
+    taskId: string;
+  }>();
   const { getToken } = useAuth();
   const [title, setTitle] = useState("");
   const [bodyText, setBodyText] = useState("");
   const [difficulty, setDifficulty] = useState("1");
   const [options, setOptions] = useState<OptionDraft[]>([{ text: "" }, { text: "" }]);
   const [correctIndex, setCorrectIndex] = useState(0);
+  const [loaded, setLoaded] = useState<boolean | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const token = await getToken();
+      const subsection = await getSubsection(token ?? "", Number(subsectionId));
+      if (!active) return;
+      const task = subsection?.tasks.find((t) => t.id === Number(taskId));
+      if (!task) {
+        setLoaded(false);
+        return;
+      }
+      setTitle(task.title);
+      setBodyText(task.bodyText);
+      setDifficulty(String(task.difficulty));
+      setOptions(task.options.map((o) => ({ text: o.optionText })));
+      setCorrectIndex(Math.max(0, task.options.findIndex((o) => o.isCorrect)));
+      setLoaded(true);
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subsectionId, taskId]);
 
   function updateOption(index: number, text: string) {
     setOptions((prev) => prev.map((o, i) => (i === index ? { text } : o)));
@@ -32,7 +61,7 @@ export default function NewTaskPage() {
     e.preventDefault();
     setSubmitting(true);
     const token = await getToken();
-    await createTask(token ?? "", Number(subsectionId), {
+    await updateTask(token ?? "", Number(taskId), {
       title,
       bodyText,
       difficultyLevel: Number(difficulty),
@@ -40,6 +69,15 @@ export default function NewTaskPage() {
     });
     router.push(`/sections/${id}/${subsectionId}`);
   }
+
+  if (loaded === undefined) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
+      </div>
+    );
+  }
+  if (loaded === false) notFound();
 
   return (
     <div>
@@ -49,7 +87,7 @@ export default function NewTaskPage() {
       >
         &larr; Wróć do podsekcji
       </Link>
-      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Nowe zadanie</h1>
+      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Edytuj zadanie</h1>
 
       <form onSubmit={handleSubmit} className="mt-6 flex max-w-lg flex-col gap-4">
         <FormField label="Tytuł">
@@ -83,10 +121,6 @@ export default function NewTaskPage() {
             <option value="3">Średni</option>
             <option value="5">Trudny</option>
           </select>
-        </FormField>
-
-        <FormField label="Załącznik (opcjonalnie)">
-          <input type="file" accept=".png,.jpg,.jpeg,.gif,.pdf" className={inputClass} />
         </FormField>
 
         <fieldset className="rounded-sm border border-gray-200 p-4">
@@ -128,7 +162,7 @@ export default function NewTaskPage() {
           disabled={submitting}
           className="mt-2 self-start rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
         >
-          {submitting ? "Tworzenie…" : "Utwórz zadanie"}
+          {submitting ? "Zapisywanie…" : "Zapisz zmiany"}
         </button>
       </form>
     </div>
