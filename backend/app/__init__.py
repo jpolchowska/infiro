@@ -15,8 +15,10 @@ def create_app():
 
     from app.routes.public import public_bp
     from app.routes.student import student_bp
+    from app.routes.tasks import tasks_bp
 
     app.register_blueprint(student_bp)
     app.register_blueprint(public_bp)
+    app.register_blueprint(tasks_bp)
 
     return app
