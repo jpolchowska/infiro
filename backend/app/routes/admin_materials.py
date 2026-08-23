@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, request
+import os
+
+from flask import Blueprint, current_app, jsonify, request
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_realm_role
@@ -81,3 +83,22 @@ def create_subsection_material(subsection_id):
     if Subsection.query.get(subsection_id) is None:
         return jsonify({"error": "subsection not found"}), 404
     return _create_material(subsection_id=subsection_id)
+
+
+@admin_materials_bp.route("/api/admin/materials/<int:material_id>", methods=["DELETE"])
+@authenticate_token
+@require_realm_role("admin")
+def delete_material(material_id):
+    resource = KnowledgeResource.query.get(material_id)
+    if resource is None:
+        return jsonify({"error": "material not found"}), 404
+
+    if resource.file_url:
+        file_path = os.path.join(current_app.static_folder, *resource.file_url.split("/")[2:])
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    db.session.delete(resource)
+    db.session.commit()
+
+    return "", 204
