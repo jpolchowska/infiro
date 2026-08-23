@@ -5,8 +5,10 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { href: "/", label: "Sekcje", isActive: (path: string) => path === "/" || path.startsWith("/sections") },
-  { href: "/results", label: "Wyniki uczniów", isActive: (path: string) => path.startsWith("/results") },
+  { href: "/results", label: "Uczniowie", isActive: (path: string) => path.startsWith("/results") },
+  { href: "/teachers", label: "Nauczyciele", isActive: (path: string) => path.startsWith("/teachers") },
   { href: "/import", label: "Import treści", isActive: (path: string) => path.startsWith("/import") },
+  { href: "/settings", label: "Ustawienia", isActive: (path: string) => path.startsWith("/settings") },
 ];
 
 export function HeaderNav() {

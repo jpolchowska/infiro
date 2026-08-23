@@ -26,8 +26,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (!initialized) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center text-sm text-gray-500">
-        Ładowanie...
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="-mt-16 h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
       </div>
     );
   }

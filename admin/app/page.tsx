@@ -16,10 +16,10 @@ export default async function Home() {
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={sections.length} label="Sekcje kursu" accent="navy" />
-        <StatTile value={totalSubsections} label="Podsekcje" accent="coral" />
-        <StatTile value={totalTasks} label="Zadania" accent="peach" />
-        <StatTile value={students.length} label="Uczniowie z dostępem" accent="purple" />
+        <StatTile value={sections.length} label="Sekcje kursu" />
+        <StatTile value={totalSubsections} label="Podsekcje" />
+        <StatTile value={totalTasks} label="Zadania" />
+        <StatTile value={students.length} label="Uczniowie z dostępem" />
       </div>
 
       <div className="mt-10 flex items-baseline justify-between">

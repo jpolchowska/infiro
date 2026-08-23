@@ -23,10 +23,10 @@ export default async function StudentResultPage({
       <p className="mt-1 text-sm text-gray-500">{student.email}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={`${student.solvedTasks} / ${student.totalTasks}`} label="Rozwiązane" accent="navy" />
-        <StatTile value={student.accuracy !== null ? `${student.accuracy}%` : "—"} label="Celność" accent="coral" />
-        <StatTile value={student.totalAttempts} label="Odpowiedzi" accent="peach" />
-        <StatTile value={student.sectionProgress.length} label="Sekcje z aktywnością" accent="purple" />
+        <StatTile value={`${student.solvedTasks} / ${student.totalTasks}`} label="Rozwiązane" />
+        <StatTile value={student.accuracy !== null ? `${student.accuracy}%` : "—"} label="Celność" />
+        <StatTile value={student.totalAttempts} label="Odpowiedzi" />
+        <StatTile value={student.sectionProgress.length} label="Sekcje z aktywnością" />
       </div>
 
       <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Postęp według sekcji</h2>
