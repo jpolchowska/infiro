@@ -1,15 +1,12 @@
 from flask import Flask
 
+from app.config import Config
 from app.extensions import db
 
 
 def create_app():
     app = Flask(__name__)
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        "postgresql://postgres:postgres@localhost:5432/infiro"
-    )
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config.from_object(Config)
 
     db.init_app(app)
 
