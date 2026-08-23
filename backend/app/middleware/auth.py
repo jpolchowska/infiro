@@ -65,3 +65,25 @@ def require_role(role):
         return decorated
 
     return decorator
+
+
+def require_realm_role(role):
+    """Sprawdza natywną rolę realmową Keycloaka (realm_access.roles) -- ten sam
+    mechanizm co keycloak.hasRealmRole() już używany we frontendowym AuthGate.
+    Inny mechanizm niż require_role(), który sprawdza custom claim
+    'user_role_test' używany przez aplikację mobilną.
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            user = getattr(request, "user", {})
+            realm_roles = user.get("realm_access", {}).get("roles", [])
+
+            if role not in realm_roles:
+                return jsonify({"message": f"Brak wymaganej roli: {role}"}), 403
+
+            return f(*args, **kwargs)
+
+        return decorated
+
+    return decorator
