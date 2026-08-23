@@ -85,6 +85,36 @@ def create_subsection_material(subsection_id):
     return _create_material(subsection_id=subsection_id)
 
 
+@admin_materials_bp.route("/api/admin/materials/<int:material_id>", methods=["PATCH"])
+@authenticate_token
+@require_realm_role("admin")
+def update_material(material_id):
+    resource = KnowledgeResource.query.get(material_id)
+    if resource is None:
+        return jsonify({"error": "material not found"}), 404
+
+    data = request.get_json()
+    if data is None:
+        return jsonify({"error": "JSON body is required"}), 400
+
+    if "title" in data:
+        title = (data.get("title") or "").strip()
+        if not title:
+            return jsonify({"error": "title cannot be empty"}), 400
+        resource.title = title
+
+    if "content_text" in data:
+        if resource.type != "text":
+            return jsonify({"error": "only text materials have editable content"}), 400
+        content_text = (data.get("content_text") or "").strip()
+        if not content_text:
+            return jsonify({"error": "content_text cannot be empty"}), 400
+        resource.content_text = content_text
+
+    db.session.commit()
+    return jsonify(_material_json(resource)), 200
+
+
 @admin_materials_bp.route("/api/admin/materials/<int:material_id>", methods=["DELETE"])
 @authenticate_token
 @require_realm_role("admin")
