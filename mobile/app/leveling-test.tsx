@@ -121,18 +121,24 @@ export default function LevelingTestScreen() {
             <Text className="text-infiro-coral text-sm mb-4">{loadError}</Text>
           )}
 
+          {questions && questions.length === 0 && (
+            <Text className="text-infiro-white/70 text-sm mb-4">
+              Nie ma jeszcze żadnych zadań do testu — wróć tu, gdy nauczyciel doda treść.
+            </Text>
+          )}
+
           <Pressable
             onPress={() => setStep('quiz')}
-            disabled={!questions}
+            disabled={!questions || questions.length === 0}
             className={`rounded-2xl py-4 items-center active:opacity-80 ${
-              questions ? 'bg-infiro-coral' : 'bg-infiro-coral/40'
+              questions && questions.length > 0 ? 'bg-infiro-coral' : 'bg-infiro-coral/40'
             }`}
             style={CTA_SHADOW}
           >
-            {questions ? (
-              <Text className="text-infiro-white font-semibold text-base">Zaczynamy</Text>
-            ) : (
+            {!questions ? (
               <ActivityIndicator color="#fefefe" />
+            ) : (
+              <Text className="text-infiro-white font-semibold text-base">Zaczynamy</Text>
             )}
           </Pressable>
         </View>
@@ -214,5 +220,19 @@ export default function LevelingTestScreen() {
     );
   }
 
-  return null;
+  // Zabezpieczenie: nieoczekiwany stan (np. step === 'quiz', ale bez pytań)
+  // -- zamiast białego ekranu, wracamy na intro, gdzie widać komunikat/loader.
+  return (
+    <SafeAreaView className="flex-1 bg-infiro-navy">
+      <View className="flex-1 justify-center items-center px-6">
+        <Text className="text-infiro-white/70 text-base mb-6">Coś poszło nie tak.</Text>
+        <Pressable
+          onPress={() => setStep('intro')}
+          className="bg-infiro-coral rounded-2xl py-3 px-6 items-center active:opacity-80"
+        >
+          <Text className="text-infiro-white font-semibold text-base">Wróć</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
 }
