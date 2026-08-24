@@ -5,10 +5,11 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect } from 'react';
 import { Pressable, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getAccountType } from '../utils/decodeToken';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const KEYCLOAK_URL = process.env.EXPO_PUBLIC_KEYCLOAK_URL; 
+const KEYCLOAK_URL = process.env.EXPO_PUBLIC_KEYCLOAK_URL;
 const REALM = 'matematyka-app';
 const CLIENT_ID = 'matematyka-mobile';
 
@@ -16,7 +17,7 @@ export default function LoginScreen() {
   const discovery = AuthSession.useAutoDiscovery(`${KEYCLOAK_URL}/realms/${REALM}`);
 
   const redirectUri = AuthSession.makeRedirectUri({
-    scheme: 'infiro', 
+    scheme: 'infiro',
   });
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
@@ -49,8 +50,17 @@ export default function LoginScreen() {
             await SecureStore.setItemAsync('refresh_token', tokenResult.refreshToken);
           }
 
-          console.log('Zalogowano pomyślnie!');
-          router.replace('/home');
+          const accountType = getAccountType(tokenResult.accessToken);
+          console.log('Zalogowano pomyślnie! Typ konta:', accountType);
+
+          if (accountType === 'Nauczyciel') {
+            console.log('Przekierowywanie do strony nauczyciela...');
+            router.replace('/(teacher)/home');
+          } else if (accountType === 'Uczeń') {
+            router.replace('/(student)/home');
+          } else {
+            console.error('Nie udało się odczytać roli z tokenu');
+          }
         } catch (error) {
           console.error('Błąd wymiany kodu na tokeny:', error);
         }

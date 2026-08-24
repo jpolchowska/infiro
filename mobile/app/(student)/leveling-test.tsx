@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ChoiceQuestionCard } from '../components/leveling-test/ChoiceQuestionCard';
-import { FadeIn } from '../components/leveling-test/FadeIn';
-import { InputQuestionCard } from '../components/leveling-test/InputQuestionCard';
-import { ProgressBar } from '../components/leveling-test/ProgressBar';
+import { ChoiceQuestionCard } from '../../components/leveling-test/ChoiceQuestionCard';
+import { FadeIn } from '../../components/leveling-test/FadeIn';
+import { InputQuestionCard } from '../../components/leveling-test/InputQuestionCard';
+import { ProgressBar } from '../../components/leveling-test/ProgressBar';
 import {
   LevelingAnswer,
   LevelingQuestion,
@@ -15,7 +15,7 @@ import {
   buildLevelingTest,
   calculateResult,
   topicLabel,
-} from '../lib/levelingTest';
+} from '../../lib/levelingTest';
 
 type Step = 'intro' | 'quiz' | 'result';
 
