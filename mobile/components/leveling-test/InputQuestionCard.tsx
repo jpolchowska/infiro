@@ -1,3 +1,9 @@
+// Zakomentowane: typ pytania "input" (wpisywanie liczby) jest odłożony na
+// później -- test poziomujący korzysta teraz tylko z "choice". Kod zostaje
+// jako wzór na przyszłość. Typy InputQuestion/isInputAnswerCorrect i stary
+// TOPIC_ACCENT, na które się powołuje, zostały usunięte z lib/levelingTest.ts.
+
+/*
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
@@ -59,3 +65,4 @@ export function InputQuestionCard({ question, onAnswer }: InputQuestionCardProps
     </View>
   );
 }
+*/

@@ -1,3 +1,9 @@
+// Zakomentowane: typ pytania "memory" nigdy nie był podpięty do realnego
+// testu poziomującego. Kod zostaje jako wzór na przyszłość. Typ MemoryQuestion
+// i stary TOPIC_ACCENT, na które się powołuje, zostały usunięte z
+// lib/levelingTest.ts.
+
+/*
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -119,3 +125,4 @@ export function MemoryQuestionCard({ question, onComplete }: MemoryQuestionCardP
     </View>
   );
 }
+*/
