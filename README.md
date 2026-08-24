@@ -13,9 +13,9 @@ docker compose watch
 
 ## Running Frontend
 
-## !!! set up .env in frontend, use frontend/.env.example for reference !!!
+## !!! set up .env in mobile, use mobile/.env.example for reference !!!
 
-## Do those commands in frontend directory
+## Do those commands in mobile directory
 ## Have android studio (RECCOMENDED)
 npx expo start
 ## then press "a" on keyboard
