@@ -7,6 +7,7 @@ from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.knowledge_resources import KnowledgeResource
+from app.models.student_answers import StudentAnswer
 from app.routes.admin_materials import _material_json
 
 admin_sections_bp = Blueprint("admin_sections", __name__)
@@ -273,6 +274,9 @@ def delete_section(section_id):
             t.id for t in Task.query.filter(Task.subsection_id.in_(subsection_ids)).all()
         ]
         if task_ids:
+            StudentAnswer.query.filter(StudentAnswer.task_id.in_(task_ids)).delete(
+                synchronize_session=False
+            )
             TaskAnswerOption.query.filter(TaskAnswerOption.task_id.in_(task_ids)).delete(
                 synchronize_session=False
             )
@@ -323,6 +327,9 @@ def delete_subsection(subsection_id):
 
     task_ids = [t.id for t in Task.query.filter_by(subsection_id=subsection_id).all()]
     if task_ids:
+        StudentAnswer.query.filter(StudentAnswer.task_id.in_(task_ids)).delete(
+            synchronize_session=False
+        )
         TaskAnswerOption.query.filter(TaskAnswerOption.task_id.in_(task_ids)).delete(
             synchronize_session=False
         )
@@ -368,6 +375,7 @@ def update_task(task_id):
         if options_error:
             return jsonify({"error": options_error}), 400
 
+        StudentAnswer.query.filter_by(task_id=task.id).delete(synchronize_session=False)
         TaskAnswerOption.query.filter_by(task_id=task.id).delete(synchronize_session=False)
         for order_index, opt in enumerate(options, start=1):
             db.session.add(TaskAnswerOption(
@@ -389,6 +397,7 @@ def delete_task(task_id):
     if task is None:
         return jsonify({"error": "task not found"}), 404
 
+    StudentAnswer.query.filter_by(task_id=task.id).delete(synchronize_session=False)
     TaskAnswerOption.query.filter_by(task_id=task.id).delete(synchronize_session=False)
     db.session.delete(task)
     db.session.commit()
