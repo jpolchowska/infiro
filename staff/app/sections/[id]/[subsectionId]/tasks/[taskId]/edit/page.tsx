@@ -118,8 +118,8 @@ export default function EditTaskPage() {
             className={inputClass}
           >
             <option value="1">Łatwy</option>
-            <option value="3">Średni</option>
-            <option value="5">Trudny</option>
+            <option value="2">Średni</option>
+            <option value="3">Trudny</option>
           </select>
         </FormField>
 

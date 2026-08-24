@@ -44,9 +44,9 @@ export function validateImportPayload(data: unknown): string[] {
       typeof difficulty !== "number" ||
       !Number.isInteger(difficulty) ||
       difficulty < 1 ||
-      difficulty > 5
+      difficulty > 3
     ) {
-      errors.push(`${label}: 'difficulty' musi być liczbą całkowitą 1-5.`);
+      errors.push(`${label}: 'difficulty' musi być liczbą całkowitą 1-3.`);
     }
 
     const options = item.options;

@@ -205,8 +205,8 @@ def create_task(subsection_id):
         return jsonify({"error": "title is required"}), 400
     if not body_text:
         return jsonify({"error": "body_text is required"}), 400
-    if not isinstance(difficulty_level, int) or not (1 <= difficulty_level <= 5):
-        return jsonify({"error": "difficulty_level must be an integer 1-5"}), 400
+    if not isinstance(difficulty_level, int) or not (1 <= difficulty_level <= 3):
+        return jsonify({"error": "difficulty_level must be an integer 1-3"}), 400
 
     options_error = _validate_options(options)
     if options_error:
@@ -366,8 +366,8 @@ def update_task(task_id):
         task.body_text = body_text
     if "difficulty_level" in data:
         difficulty_level = data.get("difficulty_level")
-        if not isinstance(difficulty_level, int) or not (1 <= difficulty_level <= 5):
-            return jsonify({"error": "difficulty_level must be an integer 1-5"}), 400
+        if not isinstance(difficulty_level, int) or not (1 <= difficulty_level <= 3):
+            return jsonify({"error": "difficulty_level must be an integer 1-3"}), 400
         task.difficulty_level = difficulty_level
     if "options" in data:
         options = data.get("options")

@@ -45,8 +45,8 @@ def validate_import_payload(data):
             errors.append(f"{label}: 'question' must be a non-empty string.")
 
         difficulty = item.get("difficulty")
-        if isinstance(difficulty, bool) or not isinstance(difficulty, int) or not (1 <= difficulty <= 5):
-            errors.append(f"{label}: 'difficulty' must be an integer 1-5.")
+        if isinstance(difficulty, bool) or not isinstance(difficulty, int) or not (1 <= difficulty <= 3):
+            errors.append(f"{label}: 'difficulty' must be an integer 1-3.")
 
         options = item.get("options")
         if not isinstance(options, list) or len(options) < 2:
