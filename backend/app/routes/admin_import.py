@@ -39,14 +39,20 @@ def validate_import_payload(data):
             errors.append(f"{label}: 'section' must be a non-empty string.")
         if "subsection" in item and not _is_non_empty_string(item.get("subsection")):
             errors.append(f"{label}: 'subsection' must be a non-empty string.")
+        if "section_description" in item and item.get("section_description") is not None \
+                and not isinstance(item.get("section_description"), str):
+            errors.append(f"{label}: 'section_description' must be a string.")
+        if "subsection_description" in item and item.get("subsection_description") is not None \
+                and not isinstance(item.get("subsection_description"), str):
+            errors.append(f"{label}: 'subsection_description' must be a string.")
         if "title" in item and not _is_non_empty_string(item.get("title")):
             errors.append(f"{label}: 'title' must be a non-empty string.")
         if "question" in item and not _is_non_empty_string(item.get("question")):
             errors.append(f"{label}: 'question' must be a non-empty string.")
 
         difficulty = item.get("difficulty")
-        if isinstance(difficulty, bool) or not isinstance(difficulty, int) or not (1 <= difficulty <= 5):
-            errors.append(f"{label}: 'difficulty' must be an integer 1-5.")
+        if isinstance(difficulty, bool) or not isinstance(difficulty, int) or not (1 <= difficulty <= 3):
+            errors.append(f"{label}: 'difficulty' must be an integer 1-3.")
 
         options = item.get("options")
         if not isinstance(options, list) or len(options) < 2:
@@ -91,40 +97,44 @@ def import_tasks():
     for item in data:
         section_title = item["section"].strip()
         subsection_title = item["subsection"].strip()
+        section_description = (item.get("section_description") or "").strip() or None
+        subsection_description = (item.get("subsection_description") or "").strip() or None
 
-        section_id = section_cache.get(section_title)
-        if section_id is None:
+        section = section_cache.get(section_title)
+        if section is None:
             section = Section.query.filter_by(title=section_title).first()
             if section is None:
                 max_order = db.session.query(db.func.max(Section.order_index)).scalar() or 0
                 section = Section(title=section_title, order_index=max_order + 1)
                 db.session.add(section)
                 db.session.flush()
-            section_id = section.id
-            section_cache[section_title] = section_id
+            section_cache[section_title] = section
+        if section_description:
+            section.description = section_description
 
-        sub_key = (section_id, subsection_title)
-        subsection_id = subsection_cache.get(sub_key)
-        if subsection_id is None:
+        sub_key = (section.id, subsection_title)
+        subsection = subsection_cache.get(sub_key)
+        if subsection is None:
             subsection = Subsection.query.filter_by(
-                section_id=section_id, title=subsection_title
+                section_id=section.id, title=subsection_title
             ).first()
             if subsection is None:
                 max_order = db.session.query(db.func.max(Subsection.order_index)).filter(
-                    Subsection.section_id == section_id
+                    Subsection.section_id == section.id
                 ).scalar() or 0
                 subsection = Subsection(
-                    section_id=section_id,
+                    section_id=section.id,
                     title=subsection_title,
                     order_index=max_order + 1,
                 )
                 db.session.add(subsection)
                 db.session.flush()
-            subsection_id = subsection.id
-            subsection_cache[sub_key] = subsection_id
+            subsection_cache[sub_key] = subsection
+        if subsection_description:
+            subsection.description = subsection_description
 
         task = Task(
-            subsection_id=subsection_id,
+            subsection_id=subsection.id,
             title=item["title"].strip(),
             body_text=item["question"].strip(),
             difficulty_level=item["difficulty"],

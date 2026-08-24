@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import { Pressable, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { apiFetch } from '../lib/api';
+
 WebBrowser.maybeCompleteAuthSession();
 
 const KEYCLOAK_URL = process.env.EXPO_PUBLIC_KEYCLOAK_URL; 
@@ -49,10 +51,21 @@ export default function LoginScreen() {
             await SecureStore.setItemAsync('refresh_token', tokenResult.refreshToken);
           }
 
-          console.log('Zalogowano pomyślnie!');
-          router.replace('/home');
+          console.log('Logged in successfully!');
+
+          let goToLevelingTest = false;
+          try {
+            const me = await apiFetch<{ leveling_test_completed: boolean }>('/api/student/me');
+            goToLevelingTest = !me.leveling_test_completed;
+          } catch (syncError) {
+            // Fail-open: logowanie już się udało, nie blokujemy go awarią backendu
+            // (np. offline, albo to konto nauczyciela bez roli "Uczeń" -> 403).
+            console.error('Backend sync failed:', syncError);
+          }
+
+          router.replace(goToLevelingTest ? '/leveling-test' : '/home');
         } catch (error) {
-          console.error('Błąd wymiany kodu na tokeny:', error);
+          console.error('Token exchange failed:', error);
         }
       }
     };

@@ -1,0 +1,510 @@
+[
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "section_description": "Mnożenie i dzielenie w pamięci, od podstaw do biegłości.",
+    "subsection": "Zrozumienie mnożenia",
+    "subsection_description": "Wizualizacje, mnożenie jako powtarzanie dodawania.",
+    "difficulty": 1,
+    "title": "Rozpoznaj działanie — diamenty w skrzyniach",
+    "question": "4 skrzynie Minecraft, z których wystają po 3 diamenty. Wybierz działanie opisujące łączną liczbę diamentów gracza:",
+    "options": [
+      { "text": "4 − 3", "correct": false },
+      { "text": "4 / 3", "correct": false },
+      { "text": "4 × 3", "correct": true },
+      { "text": "4 + 3", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Łatwe mnożenie",
+    "subsection_description": "Opanowywanie najprostszych przypadków tabliczki mnożenia, szukanie wzorców, liczby 1-5 oraz 0 i 10.",
+    "difficulty": 1,
+    "title": "Mnożenie 2 × 4",
+    "question": "Ile to 2 × 4?",
+    "options": [
+      { "text": "6", "correct": false },
+      { "text": "8", "correct": true },
+      { "text": "9", "correct": false },
+      { "text": "10", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Łatwe mnożenie",
+    "difficulty": 1,
+    "title": "Mnożenie 5 × 5",
+    "question": "Ile to 5 × 5?",
+    "options": [
+      { "text": "20", "correct": false },
+      { "text": "25", "correct": true },
+      { "text": "30", "correct": false },
+      { "text": "15", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Trudniejsze mnożenie i ćwiczenia pamięciowe",
+    "subsection_description": "Mnożenie liczb 6-9 bardziej w formie pamięciowej. Mnemotechniki na trudniejsze równania.",
+    "difficulty": 2,
+    "title": "Mnożenie 7 × 6",
+    "question": "Ile to 7 × 6?",
+    "options": [
+      { "text": "36", "correct": false },
+      { "text": "42", "correct": true },
+      { "text": "48", "correct": false },
+      { "text": "49", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Trudniejsze mnożenie i ćwiczenia pamięciowe",
+    "difficulty": 2,
+    "title": "Mnożenie 8 × 7",
+    "question": "Ile to 8 × 7?",
+    "options": [
+      { "text": "54", "correct": false },
+      { "text": "56", "correct": true },
+      { "text": "64", "correct": false },
+      { "text": "63", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Trudniejsze mnożenie i ćwiczenia pamięciowe",
+    "difficulty": 2,
+    "title": "Mnożenie 9 × 6",
+    "question": "Ile to 9 × 6?",
+    "options": [
+      { "text": "45", "correct": false },
+      { "text": "52", "correct": false },
+      { "text": "54", "correct": true },
+      { "text": "56", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Trudniejsze mnożenie i ćwiczenia pamięciowe",
+    "difficulty": 3,
+    "title": "Mnożenie 14 × 3",
+    "question": "Ile to 14 × 3?",
+    "options": [
+      { "text": "32", "correct": false },
+      { "text": "42", "correct": true },
+      { "text": "48", "correct": false },
+      { "text": "52", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Zrozumienie dzielenia",
+    "subsection_description": "Dzielenie jako rozdawanie i odwrotność mnożenia.",
+    "difficulty": 1,
+    "title": "Rozpoznaj działanie — kości dla psów",
+    "question": "15 kości podzielono na 3 równe miski dla psów. Wybierz działanie opisujące podział kości na obrazku:",
+    "options": [
+      { "text": "15 − 3", "correct": false },
+      { "text": "15 / 3", "correct": true },
+      { "text": "15 × 3", "correct": false },
+      { "text": "15 + 3", "correct": false }
+    ]
+  },
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsection": "Dzielenie w praktyce",
+    "subsection_description": "Nauka dzielenia w zakresie 100 w formie pamięciowej.",
+    "difficulty": 3,
+    "title": "Trasa sztafety",
+    "question": "Trasa sztafety ma 42 km i jest podzielona na 6 równych odcinków. Ile km przebiegnie jeden zawodnik?",
+    "options": [
+      { "text": "6", "correct": false },
+      { "text": "7", "correct": true },
+      { "text": "8", "correct": false },
+      { "text": "36", "correct": false }
+    ]
+  },
+
+  {
+    "section": "Ułamki proste",
+    "section_description": "Czym są ułamki, ich rodzaje i podstawowe działania.",
+    "subsection": "Kawałki całości",
+    "subsection_description": "Czym jest ułamek? Poznanie na przykładach.",
+    "difficulty": 1,
+    "title": "Zjedzony kawałek pizzy",
+    "question": "Pizzę podzielono na 4 równe kawałki. Zjedzono 1 kawałek. Jaki ułamek pizzy zjedzono?",
+    "options": [
+      { "text": "1/4", "correct": true },
+      { "text": "1/2", "correct": false },
+      { "text": "1/3", "correct": false },
+      { "text": "4/1", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Jak wygląda ułamek?",
+    "subsection_description": "Pojęcie licznika, mianownika i kreski ułamkowej (krótka część teoretyczna).",
+    "difficulty": 1,
+    "title": "Licznik ułamka",
+    "question": "W zagrodzie jest 12 zwierząt. 5 z nich to króliki. W ułamku 5/12 liczba 5 oznacza:",
+    "options": [
+      { "text": "liczbę wszystkich zwierząt", "correct": false },
+      { "text": "liczbę królików", "correct": true },
+      { "text": "liczbę zagród", "correct": false },
+      { "text": "liczbę pozostałych zwierząt", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Rodzaje ułamków",
+    "subsection_description": "Ułamki właściwe, niewłaściwe, zamiana na całości i na ułamki dziesiętne.",
+    "difficulty": 2,
+    "title": "Właściwy czy niewłaściwy",
+    "question": "Biegacz pokonał 7/5 dystansu wyznaczonego na trening. Jaki to rodzaj ułamka?",
+    "options": [
+      { "text": "właściwy", "correct": false },
+      { "text": "niewłaściwy", "correct": true },
+      { "text": "równy 0", "correct": false },
+      { "text": "ujemny", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Liczby mieszane",
+    "subsection_description": "Rozbijanie na całości i reszty.",
+    "difficulty": 2,
+    "title": "Pełne tabliczki czekolady",
+    "question": "Do deseru potrzeba 9/4 tabliczki czekolady. Ile pełnych tabliczek można wykorzystać?",
+    "options": [
+      { "text": "1", "correct": false },
+      { "text": "2", "correct": true },
+      { "text": "3", "correct": false },
+      { "text": "4", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Skracanie i rozszerzanie ułamków",
+    "subsection_description": "Upraszczanie ułamków, doprowadzanie do wspólnego mianownika.",
+    "difficulty": 2,
+    "title": "Ta sama część",
+    "question": "Na obrazku 3/6 zwierząt to koty. Który ułamek przedstawia dokładnie tę samą część?",
+    "options": [
+      { "text": "1/2", "correct": true },
+      { "text": "1/3", "correct": false },
+      { "text": "2/3", "correct": false },
+      { "text": "3/12", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Mnożenie i dzielenie",
+    "subsection_description": "Mnożenie ułamków oraz dzielenie ułamków, jako mnożenie przez odwrotność.",
+    "difficulty": 1,
+    "title": "Połowa z 10",
+    "question": "Ile to 1/2 z 10?",
+    "options": [
+      { "text": "2", "correct": false },
+      { "text": "4", "correct": false },
+      { "text": "5", "correct": true },
+      { "text": "6", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Mnożenie i dzielenie",
+    "difficulty": 1,
+    "title": "Który ułamek jest największy",
+    "question": "Który ułamek jest największy?",
+    "options": [
+      { "text": "1/4", "correct": false },
+      { "text": "1/2", "correct": false },
+      { "text": "3/4", "correct": true },
+      { "text": "1/8", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Mnożenie i dzielenie",
+    "difficulty": 1,
+    "title": "Połowa z 18",
+    "question": "Ile to 1/2 z 18?",
+    "options": [
+      { "text": "6", "correct": false },
+      { "text": "9", "correct": true },
+      { "text": "12", "correct": false },
+      { "text": "18", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Mnożenie i dzielenie",
+    "difficulty": 2,
+    "title": "Szczeniaki w schronisku",
+    "question": "W schronisku jest 20 psów. 3/4 z nich to szczeniaki. Ile jest szczeniąt?",
+    "options": [
+      { "text": "5", "correct": false },
+      { "text": "15", "correct": true },
+      { "text": "16", "correct": false },
+      { "text": "20", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Mnożenie i dzielenie",
+    "difficulty": 2,
+    "title": "Cukierki Basi",
+    "question": "Basia miała 12 cukierków i zjadła 1/3 z nich. Ile cukierków zjadła?",
+    "options": [
+      { "text": "3", "correct": false },
+      { "text": "4", "correct": true },
+      { "text": "6", "correct": false },
+      { "text": "9", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Mnożenie i dzielenie",
+    "difficulty": 2,
+    "title": "Uczniowie grający na instrumencie",
+    "question": "W klasie jest 24 uczniów. 1/4 z nich gra na instrumencie. Ilu uczniów gra na instrumencie?",
+    "options": [
+      { "text": "4", "correct": false },
+      { "text": "6", "correct": true },
+      { "text": "8", "correct": false },
+      { "text": "12", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Dodawanie i odejmowanie",
+    "subsection_description": "Działania na ułamkach o tych samych i różnych mianownikach.",
+    "difficulty": 3,
+    "title": "Dodawanie ułamków 1/4 + 1/2",
+    "question": "Ile to 1/4 + 1/2?",
+    "options": [
+      { "text": "3/4", "correct": true },
+      { "text": "2/6", "correct": false },
+      { "text": "1/6", "correct": false },
+      { "text": "3/6", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki proste",
+    "subsection": "Dodawanie i odejmowanie",
+    "difficulty": 3,
+    "title": "Sprzedane jabłka",
+    "question": "W sklepie było 40 jabłek. Sprzedano 3/5 z nich. Ile jabłek zostało?",
+    "options": [
+      { "text": "16", "correct": true },
+      { "text": "24", "correct": false },
+      { "text": "30", "correct": false },
+      { "text": "10", "correct": false }
+    ]
+  },
+
+  {
+    "section": "Ułamki dziesiętne",
+    "section_description": "Zapis dziesiętny, porównywanie i działania z przecinkiem.",
+    "subsection": "Wprowadzenie do \"przecinka\"",
+    "subsection_description": "Poznanie części dziesiętnych, setnych i tysięcznych na codziennych przykładach, wytłumaczenie w nich roli przecinka i dodawania zer.",
+    "difficulty": 1,
+    "title": "Ta sama wartość",
+    "question": "Która z liczb jest równa 0,5?",
+    "options": [
+      { "text": "0,05", "correct": false },
+      { "text": "0,50", "correct": true },
+      { "text": "5,0", "correct": false },
+      { "text": "0,005", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki dziesiętne",
+    "subsection": "Porównywanie i oś liczbowa",
+    "subsection_description": "Który ułamek jest większy? Umiejscawianie ułamków na osi liczbowej.",
+    "difficulty": 1,
+    "title": "Największa liczba (1)",
+    "question": "Która liczba jest największa?",
+    "options": [
+      { "text": "0,45", "correct": false },
+      { "text": "0,5", "correct": true },
+      { "text": "0,4", "correct": false },
+      { "text": "0,05", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki dziesiętne",
+    "subsection": "Porównywanie i oś liczbowa",
+    "difficulty": 1,
+    "title": "Największa liczba (2)",
+    "question": "Która liczba jest największa?",
+    "options": [
+      { "text": "0,3", "correct": false },
+      { "text": "0,8", "correct": true },
+      { "text": "0,08", "correct": false },
+      { "text": "0,03", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki dziesiętne",
+    "subsection": "Dodawanie i odejmowanie",
+    "subsection_description": "Działania na ułamkach dziesiętnych z zasadą przecinek pod przecinkiem.",
+    "difficulty": 2,
+    "title": "Dodawanie 1,2 + 0,3",
+    "question": "Ile to 1,2 + 0,3?",
+    "options": [
+      { "text": "1,5", "correct": true },
+      { "text": "1,4", "correct": false },
+      { "text": "1,6", "correct": false },
+      { "text": "1,3", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki dziesiętne",
+    "subsection": "Dodawanie i odejmowanie",
+    "difficulty": 3,
+    "title": "Odejmowanie 4 − 1,65",
+    "question": "Ile to 4 − 1,65?",
+    "options": [
+      { "text": "2,35", "correct": true },
+      { "text": "2,45", "correct": false },
+      { "text": "3,35", "correct": false },
+      { "text": "2,25", "correct": false }
+    ]
+  },
+  {
+    "section": "Ułamki dziesiętne",
+    "subsection": "Mnożenie i dzielenie",
+    "subsection_description": "Działania przez 10, 100, 1000, czyli przesuwanie przecinka oraz działania pisemne na ułamkach dziesiętnych.",
+    "difficulty": 2,
+    "title": "Wysokość wieży z klocków",
+    "question": "Jeden klocek Lego ma grubość 0,96 cm. Zbudowano wieżę ze 100 takich samych klocków. Wybierz poprawną wysokość wieży:",
+    "options": [
+      { "text": "0,096 cm", "correct": false },
+      { "text": "9,6 cm", "correct": false },
+      { "text": "96 cm", "correct": true },
+      { "text": "960 cm", "correct": false }
+    ]
+  },
+
+  {
+    "section": "Procenty",
+    "section_description": "Procent jako ułamek, obliczenia procentowe i rabaty.",
+    "subsection": "Czym są procenty?",
+    "subsection_description": "Procent a ułamek.",
+    "difficulty": 1,
+    "title": "Procent ukończonej budowli",
+    "question": "Budujesz rakietę z LEGO. Zużyłeś już 1 z 4 woreczków klocków. Jaki procent budowli ukończyłeś?",
+    "options": [
+      { "text": "10%", "correct": false },
+      { "text": "25%", "correct": true },
+      { "text": "40%", "correct": false },
+      { "text": "50%", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Zamiana ról",
+    "subsection_description": "Jak zamienić procent na ułamek i na odwrót, nauka pamięciowa typowych rozwiązań.",
+    "difficulty": 1,
+    "title": "Ułamek odpowiadający procentowi",
+    "question": "Jaki ułamek odpowiada 25%?",
+    "options": [
+      { "text": "1/2", "correct": false },
+      { "text": "1/4", "correct": true },
+      { "text": "1/3", "correct": false },
+      { "text": "1/5", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Procent z liczby",
+    "subsection_description": "Obliczanie procentu z danej liczby.",
+    "difficulty": 1,
+    "title": "10% z 50",
+    "question": "Ile to 10% z 50?",
+    "options": [
+      { "text": "5", "correct": true },
+      { "text": "10", "correct": false },
+      { "text": "15", "correct": false },
+      { "text": "20", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Procent z liczby",
+    "difficulty": 2,
+    "title": "50% z 40",
+    "question": "Ile to 50% z 40?",
+    "options": [
+      { "text": "10", "correct": false },
+      { "text": "20", "correct": true },
+      { "text": "25", "correct": false },
+      { "text": "15", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Procent z liczby",
+    "difficulty": 2,
+    "title": "25% z 60",
+    "question": "Ile to 25% z 60?",
+    "options": [
+      { "text": "12", "correct": false },
+      { "text": "15", "correct": true },
+      { "text": "20", "correct": false },
+      { "text": "25", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Procent z liczby",
+    "difficulty": 3,
+    "title": "15% z 60",
+    "question": "Ile to 15% z 60?",
+    "options": [
+      { "text": "6", "correct": false },
+      { "text": "9", "correct": true },
+      { "text": "12", "correct": false },
+      { "text": "15", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Procent z liczby",
+    "difficulty": 3,
+    "title": "75% z 200",
+    "question": "Ile to 75% z 200?",
+    "options": [
+      { "text": "100", "correct": false },
+      { "text": "125", "correct": false },
+      { "text": "150", "correct": true },
+      { "text": "175", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Szukanie całości i zniżki",
+    "subsection_description": "Obliczanie całej liczby, gdy znamy jedynie jej procent i obliczanie ceny po podwyżce/obniżce procentowej.",
+    "difficulty": 2,
+    "title": "Wysokość rabatu",
+    "question": "Zestaw LEGO kosztuje 200 zł. Sklep daje 20% rabatu. Ile złotych wynosi rabat?",
+    "options": [
+      { "text": "20", "correct": false },
+      { "text": "40", "correct": true },
+      { "text": "160", "correct": false },
+      { "text": "180", "correct": false }
+    ]
+  },
+  {
+    "section": "Procenty",
+    "subsection": "Szukanie całości i zniżki",
+    "difficulty": 3,
+    "title": "Cena po rabacie",
+    "question": "Zestaw LEGO kosztuje 200 zł. Sklep daje 20% rabatu. Ile kosztuje zestaw po rabacie?",
+    "options": [
+      { "text": "140", "correct": false },
+      { "text": "160", "correct": true },
+      { "text": "180", "correct": false },
+      { "text": "220", "correct": false }
+    ]
+  }
+]

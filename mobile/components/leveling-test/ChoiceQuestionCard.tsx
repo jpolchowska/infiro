@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { ChoiceQuestion, TOPIC_ACCENT } from '../../lib/levelingTest';
+import { ChoiceQuestion, Accent } from '../../lib/levelingTest';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
 type ChoiceQuestionCardProps = {
   question: ChoiceQuestion;
-  onAnswer: (correct: boolean) => void;
+  accent: Accent;
+  onAnswer: (selectedOptionId: number, correct: boolean) => void;
 };
 
-export function ChoiceQuestionCard({ question, onAnswer }: ChoiceQuestionCardProps) {
+export function ChoiceQuestionCard({ question, accent, onAnswer }: ChoiceQuestionCardProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
-  const accent = TOPIC_ACCENT[question.topic];
 
   const handleSelect = (index: number) => {
     if (answered) return;
@@ -23,7 +23,8 @@ export function ChoiceQuestionCard({ question, onAnswer }: ChoiceQuestionCardPro
   const handleSubmit = () => {
     if (answered || selectedIndex === null) return;
     setAnswered(true);
-    onAnswer(selectedIndex === question.correctIndex);
+    const option = question.options[selectedIndex];
+    onAnswer(option.id, option.isCorrect);
   };
 
   return (
@@ -32,7 +33,7 @@ export function ChoiceQuestionCard({ question, onAnswer }: ChoiceQuestionCardPro
         const isSelected = selectedIndex === index;
         return (
           <Pressable
-            key={option}
+            key={option.id}
             onPress={() => handleSelect(index)}
             disabled={answered}
             className={`flex-row items-center rounded-2xl border px-4 py-4 mb-3 ${
@@ -49,7 +50,7 @@ export function ChoiceQuestionCard({ question, onAnswer }: ChoiceQuestionCardPro
               </Text>
             </View>
             <Text className={`text-base font-semibold ${isSelected ? 'text-infiro-white' : 'text-infiro-navy'}`}>
-              {option}
+              {option.text}
             </Text>
           </Pressable>
         );

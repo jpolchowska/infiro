@@ -72,7 +72,7 @@ export default function EditTaskPage() {
 
   if (loaded === undefined) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
+      <div className="fixed inset-0 flex items-center justify-center">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
       </div>
     );
@@ -118,8 +118,8 @@ export default function EditTaskPage() {
             className={inputClass}
           >
             <option value="1">Łatwy</option>
-            <option value="3">Średni</option>
-            <option value="5">Trudny</option>
+            <option value="2">Średni</option>
+            <option value="3">Trudny</option>
           </select>
         </FormField>
 

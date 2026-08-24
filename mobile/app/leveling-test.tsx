@@ -1,20 +1,18 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ChoiceQuestionCard } from '../components/leveling-test/ChoiceQuestionCard';
 import { FadeIn } from '../components/leveling-test/FadeIn';
-import { InputQuestionCard } from '../components/leveling-test/InputQuestionCard';
 import { ProgressBar } from '../components/leveling-test/ProgressBar';
 import {
   LevelingAnswer,
   LevelingQuestion,
-  TOPIC_ACCENT,
-  TOPICS,
-  buildLevelingTest,
   calculateResult,
-  topicLabel,
+  fetchLevelingTest,
+  getAccent,
+  submitLevelingTest,
 } from '../lib/levelingTest';
 
 type Step = 'intro' | 'quiz' | 'result';
@@ -27,26 +25,50 @@ const CTA_SHADOW = {
   elevation: 8,
 };
 
-const INTRO_POINTS = [
-  '12 pytań',
-  'Ten test jest dla ciebie',
-  'Zadania są z różnych działów matematyki',
-];
-
 export default function LevelingTestScreen() {
   const [step, setStep] = useState<Step>('intro');
-  const [questions] = useState<LevelingQuestion[]>(() => buildLevelingTest());
+  const [questions, setQuestions] = useState<LevelingQuestion[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<LevelingAnswer[]>([]);
 
-  const currentQuestion = questions[index];
+  useEffect(() => {
+    let active = true;
+    fetchLevelingTest()
+      .then((data) => {
+        if (active) setQuestions(data);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch leveling test:', error);
+        if (active) setLoadError('Nie udało się załadować testu. Spróbuj ponownie.');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  const handleAnswer = (correct: boolean) => {
-    const nextAnswers = [...answers, { topic: currentQuestion.topic, correct }];
+  const currentQuestion = questions?.[index];
+
+  const handleAnswer = (selectedOptionId: number, correct: boolean) => {
+    if (!currentQuestion || !questions) return;
+
+    const nextAnswers = [
+      ...answers,
+      {
+        sectionId: currentQuestion.sectionId,
+        sectionTitle: currentQuestion.sectionTitle,
+        taskId: currentQuestion.taskId,
+        selectedOptionId,
+        correct,
+      },
+    ];
     setAnswers(nextAnswers);
 
     if (index + 1 >= questions.length) {
       setStep('result');
+      submitLevelingTest(nextAnswers).catch((error) => {
+        console.error('Failed to submit leveling test results:', error);
+      });
     } else {
       setIndex(index + 1);
     }
@@ -79,28 +101,53 @@ export default function LevelingTestScreen() {
           </Text>
 
           <View className="mb-10">
-            {INTRO_POINTS.map((item) => (
-              <View key={item} className="flex-row items-center mb-3">
-                <View className="w-2 h-2 rounded-full bg-infiro-purple mr-3" />
-                <Text className="text-infiro-white text-base">{item}</Text>
-              </View>
-            ))}
+            <View className="flex-row items-center mb-3">
+              <View className="w-2 h-2 rounded-full bg-infiro-purple mr-3" />
+              <Text className="text-infiro-white text-base">
+                {questions ? `${questions.length} pytań` : 'Ładowanie pytań…'}
+              </Text>
+            </View>
+            <View className="flex-row items-center mb-3">
+              <View className="w-2 h-2 rounded-full bg-infiro-purple mr-3" />
+              <Text className="text-infiro-white text-base">Ten test jest dla ciebie</Text>
+            </View>
+            <View className="flex-row items-center mb-3">
+              <View className="w-2 h-2 rounded-full bg-infiro-purple mr-3" />
+              <Text className="text-infiro-white text-base">Zadania są z różnych działów matematyki</Text>
+            </View>
           </View>
+
+          {loadError && (
+            <Text className="text-infiro-coral text-sm mb-4">{loadError}</Text>
+          )}
+
+          {questions && questions.length === 0 && (
+            <Text className="text-infiro-white/70 text-sm mb-4">
+              Nie ma jeszcze żadnych zadań do testu — wróć tu, gdy nauczyciel doda treść.
+            </Text>
+          )}
 
           <Pressable
             onPress={() => setStep('quiz')}
-            className="bg-infiro-coral rounded-2xl py-4 items-center active:opacity-80"
+            disabled={!questions || questions.length === 0}
+            className={`rounded-2xl py-4 items-center active:opacity-80 ${
+              questions && questions.length > 0 ? 'bg-infiro-coral' : 'bg-infiro-coral/40'
+            }`}
             style={CTA_SHADOW}
           >
-            <Text className="text-infiro-white font-semibold text-base">Zaczynamy</Text>
+            {!questions ? (
+              <ActivityIndicator color="#fefefe" />
+            ) : (
+              <Text className="text-infiro-white font-semibold text-base">Zaczynamy</Text>
+            )}
           </Pressable>
         </View>
       </SafeAreaView>
     );
   }
 
-  if (step === 'quiz' && currentQuestion) {
-    const accent = TOPIC_ACCENT[currentQuestion.topic];
+  if (step === 'quiz' && questions && currentQuestion) {
+    const accent = getAccent(currentQuestion.sectionIndex);
 
     return (
       <SafeAreaView className="flex-1 bg-infiro-white">
@@ -121,23 +168,16 @@ export default function LevelingTestScreen() {
 
           <ProgressBar current={index + 1} total={questions.length} accentClassName={accent.bg} />
 
-          <FadeIn key={currentQuestion.id}>
+          <FadeIn key={currentQuestion.taskId}>
             <Text className={`${accent.text} text-xs font-bold uppercase tracking-wide mt-8 mb-2`}>
-              {topicLabel(currentQuestion.topic)}
+              {currentQuestion.sectionTitle}
             </Text>
 
-            {currentQuestion.type !== 'memory' && (
-              <Text className="text-infiro-navy text-2xl font-extrabold leading-snug mb-6">
-                {currentQuestion.prompt}
-              </Text>
-            )}
+            <Text className="text-infiro-navy text-2xl font-extrabold leading-snug mb-6">
+              {currentQuestion.prompt}
+            </Text>
 
-            {currentQuestion.type === 'choice' && (
-              <ChoiceQuestionCard question={currentQuestion} onAnswer={handleAnswer} />
-            )}
-            {currentQuestion.type === 'input' && (
-              <InputQuestionCard question={currentQuestion} onAnswer={handleAnswer} />
-            )}
+            <ChoiceQuestionCard question={currentQuestion} accent={accent} onAnswer={handleAnswer} />
           </FadeIn>
         </View>
       </SafeAreaView>
@@ -158,11 +198,11 @@ export default function LevelingTestScreen() {
           <Text className="text-infiro-white/80 text-base mb-8">{result.encouragement}</Text>
 
           <View className="bg-infiro-white/10 rounded-2xl p-4 mb-10">
-            {TOPICS.map((topic) => (
-              <View key={topic.id} className="flex-row items-center justify-between py-2">
-                <Text className="text-infiro-white text-base">{topic.label}</Text>
+            {result.perSection.map((section) => (
+              <View key={section.sectionId} className="flex-row items-center justify-between py-2">
+                <Text className="text-infiro-white text-base">{section.sectionTitle}</Text>
                 <Text className="text-infiro-white/70 text-base font-semibold">
-                  {result.perTopic[topic.id]}/3
+                  {section.score}/{section.total}
                 </Text>
               </View>
             ))}
@@ -180,5 +220,19 @@ export default function LevelingTestScreen() {
     );
   }
 
-  return null;
+  // Zabezpieczenie: nieoczekiwany stan (np. step === 'quiz', ale bez pytań)
+  // -- zamiast białego ekranu, wracamy na intro, gdzie widać komunikat/loader.
+  return (
+    <SafeAreaView className="flex-1 bg-infiro-navy">
+      <View className="flex-1 justify-center items-center px-6">
+        <Text className="text-infiro-white/70 text-base mb-6">Coś poszło nie tak.</Text>
+        <Pressable
+          onPress={() => setStep('intro')}
+          className="bg-infiro-coral rounded-2xl py-3 px-6 items-center active:opacity-80"
+        >
+          <Text className="text-infiro-white font-semibold text-base">Wróć</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
 }

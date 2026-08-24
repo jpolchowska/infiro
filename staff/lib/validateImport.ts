@@ -32,6 +32,20 @@ export function validateImportPayload(data: unknown): string[] {
     if ("subsection" in item && !isNonEmptyString(item.subsection)) {
       errors.push(`${label}: 'subsection' musi być niepustym tekstem.`);
     }
+    if (
+      "section_description" in item &&
+      item.section_description != null &&
+      typeof item.section_description !== "string"
+    ) {
+      errors.push(`${label}: 'section_description' musi być tekstem.`);
+    }
+    if (
+      "subsection_description" in item &&
+      item.subsection_description != null &&
+      typeof item.subsection_description !== "string"
+    ) {
+      errors.push(`${label}: 'subsection_description' musi być tekstem.`);
+    }
     if ("title" in item && !isNonEmptyString(item.title)) {
       errors.push(`${label}: 'title' musi być niepustym tekstem.`);
     }
@@ -44,9 +58,9 @@ export function validateImportPayload(data: unknown): string[] {
       typeof difficulty !== "number" ||
       !Number.isInteger(difficulty) ||
       difficulty < 1 ||
-      difficulty > 5
+      difficulty > 3
     ) {
-      errors.push(`${label}: 'difficulty' musi być liczbą całkowitą 1-5.`);
+      errors.push(`${label}: 'difficulty' musi być liczbą całkowitą 1-3.`);
     }
 
     const options = item.options;
