@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormField, inputClass } from "@/components/FormField";
+import { useAuth } from "@/components/AuthContext";
+import { createSection } from "@/lib/data";
 
 export default function NewSectionPage() {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    console.log("create section", { title, description });
+    setSubmitting(true);
+    const token = await getToken();
+    await createSection(token ?? "", { title, description });
     router.push("/");
   }
 
@@ -44,9 +50,10 @@ export default function NewSectionPage() {
         </FormField>
         <button
           type="submit"
-          className="mt-2 self-start rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          disabled={submitting}
+          className="mt-2 self-start rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
         >
-          Utwórz sekcję
+          {submitting ? "Tworzenie…" : "Utwórz sekcję"}
         </button>
       </form>
     </div>

@@ -1,10 +1,44 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/components/AuthContext";
 import { getSections, getStudents } from "@/lib/data";
 import { StatTile } from "@/components/StatTile";
+import type { Section } from "@/lib/types";
 
-export default async function Home() {
-  const sections = await getSections();
-  const students = await getStudents();
+export default function Home() {
+  const { getToken } = useAuth();
+  const [sections, setSections] = useState<Section[] | null>(null);
+  const [studentCount, setStudentCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const token = await getToken();
+      const [sectionsData, students] = await Promise.all([
+        getSections(token ?? ""),
+        getStudents(),
+      ]);
+      if (active) {
+        setSections(sectionsData);
+        setStudentCount(students.length);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (sections === null) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
+      </div>
+    );
+  }
+
   const totalSubsections = sections.reduce((sum, s) => sum + s.subsectionCount, 0);
   const totalTasks = sections.reduce((sum, s) => sum + s.taskCount, 0);
 
@@ -19,7 +53,7 @@ export default async function Home() {
         <StatTile value={sections.length} label="Sekcje kursu" />
         <StatTile value={totalSubsections} label="Podsekcje" />
         <StatTile value={totalTasks} label="Zadania" />
-        <StatTile value={students.length} label="Uczniowie z dostępem" />
+        <StatTile value={studentCount} label="Uczniowie z dostępem" />
       </div>
 
       <div className="mt-10 flex items-baseline justify-between">
@@ -31,12 +65,16 @@ export default async function Home() {
         </span>
       </div>
 
+      {sections.length === 0 && (
+        <p className="mt-4 text-sm text-gray-400">Brak sekcji — dodaj pierwszą.</p>
+      )}
+
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sections.map((section, index) => (
           <Link
             key={section.id}
             href={`/sections/${section.id}`}
-            className="flex flex-col rounded-sm border border-gray-200 bg-white p-5 hover:border-infiro-navy"
+            className="flex min-h-41 flex-col rounded-sm border border-gray-200 bg-white p-5 hover:border-infiro-navy"
           >
             <span className="text-xs font-medium text-gray-400">
               {String(index + 1).padStart(2, "0")}
@@ -55,7 +93,7 @@ export default async function Home() {
         ))}
         <Link
           href="/sections/new"
-          className="flex flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
+          className="flex min-h-41 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
         >
           <span className="text-2xl leading-none">+</span>
           <span className="text-sm font-medium">Dodaj sekcję</span>

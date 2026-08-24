@@ -1,29 +1,58 @@
 export type Section = {
   id: number;
   title: string;
-  description: string;
+  description: string | null;
   subsectionCount: number;
   taskCount: number;
+};
+
+export type SectionDetail = Section & {
+  subsections: Subsection[];
+  materials: Material[];
 };
 
 export type Subsection = {
   id: number;
   sectionId: number;
   title: string;
-  description: string;
+  description: string | null;
   taskCount: number;
 };
 
+export type SubsectionDetail = Subsection & {
+  tasks: Task[];
+  materials: Material[];
+};
+
 export type TaskDifficulty = 1 | 2 | 3 | 4 | 5;
+
+export type TaskOption = {
+  id: number;
+  optionText: string;
+  isCorrect: boolean;
+  orderIndex: number;
+};
 
 export type Task = {
   id: number;
   subsectionId: number;
   title: string;
   bodyText: string;
+  imageUrl: string | null;
   difficulty: TaskDifficulty;
-  correctAnswer: string;
-  variantCount: number;
+  options: TaskOption[];
+};
+
+export type MaterialType = "text" | "pdf" | "image";
+
+export type Material = {
+  id: number;
+  sectionId: number | null;
+  subsectionId: number | null;
+  type: MaterialType;
+  title: string;
+  contentText: string | null;
+  fileUrl: string | null;
 };
 
 export type Student = {

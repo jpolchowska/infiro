@@ -14,5 +14,3 @@ class Task(db.Model):
     body_text = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.Text, nullable=True)
     difficulty_level = db.Column(db.Integer, nullable=False)
-    theme = db.Column(db.Text, nullable=False)
-    variant_group = db.Column(db.Text, nullable=True)

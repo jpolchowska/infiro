@@ -1,8 +1,13 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getStudents, getSections } from "@/lib/data";
 import { StatTile } from "@/components/StatTile";
 import { Badge } from "@/components/Badge";
 import { ProgressBar } from "@/components/ProgressBar";
+import { useAuth } from "@/components/AuthContext";
+import type { Section, Student } from "@/lib/types";
 
 function accuracyBadgeVariant(accuracy: number | null): "easy" | "mid" | "hard" | "neutral" {
   if (accuracy === null) return "neutral";
@@ -11,9 +16,38 @@ function accuracyBadgeVariant(accuracy: number | null): "easy" | "mid" | "hard" 
   return "hard";
 }
 
-export default async function ResultsPage() {
-  const students = await getStudents();
-  const sections = await getSections();
+export default function ResultsPage() {
+  const { getToken } = useAuth();
+  const [students, setStudents] = useState<Student[] | null>(null);
+  const [sections, setSections] = useState<Section[] | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const token = await getToken();
+      const [studentsData, sectionsData] = await Promise.all([
+        getStudents(),
+        getSections(token ?? ""),
+      ]);
+      if (active) {
+        setStudents(studentsData);
+        setSections(sectionsData);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (students === null || sections === null) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
+      </div>
+    );
+  }
+
   const totalTasks = sections.reduce((sum, s) => sum + s.taskCount, 0);
   const totalAttempts = students.reduce((sum, s) => sum + s.totalAttempts, 0);
   const withAccuracy = students.filter((s) => s.accuracy !== null);
