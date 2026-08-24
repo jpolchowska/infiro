@@ -12,11 +12,11 @@ export default function HomeScreen() {
       await SecureStore.deleteItemAsync('access_token');
       await SecureStore.deleteItemAsync('refresh_token');
 
-      console.log('Tokeny zostały usunięte z SecureStore');
+      console.log('Tokens removed from SecureStore');
 
       router.replace('/');
     } catch (error) {
-      console.error('Błąd podczas wylogowywania:', error);
+      console.error('Logout failed:', error);
     }
   };
 

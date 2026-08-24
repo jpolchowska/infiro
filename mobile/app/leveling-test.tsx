@@ -39,7 +39,7 @@ export default function LevelingTestScreen() {
         if (active) setQuestions(data);
       })
       .catch((error) => {
-        console.error('Nie udało się pobrać testu poziomującego:', error);
+        console.error('Failed to fetch leveling test:', error);
         if (active) setLoadError('Nie udało się załadować testu. Spróbuj ponownie.');
       });
     return () => {
@@ -67,7 +67,7 @@ export default function LevelingTestScreen() {
     if (index + 1 >= questions.length) {
       setStep('result');
       submitLevelingTest(nextAnswers).catch((error) => {
-        console.error('Nie udało się zapisać wyniku testu poziomującego:', error);
+        console.error('Failed to submit leveling test results:', error);
       });
     } else {
       setIndex(index + 1);
