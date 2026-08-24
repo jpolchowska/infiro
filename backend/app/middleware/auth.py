@@ -4,7 +4,7 @@ import jwt
 from jwt import PyJWKClient
 
 KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/matematyka-app/protocol/openid-connect/certs"
-KEYCLOAK_ISSUER = "http://localhost/realms/matematyka-app"
+KEYCLOAK_ISSUER_PATH = "/realms/matematyka-app"
 
 jwks_client = PyJWKClient(KEYCLOAK_JWKS_URI)
 
@@ -27,16 +27,20 @@ def authenticate_token(f):
                 token,
                 signing_key.key,
                 algorithms=["RS256"],
-                issuer=KEYCLOAK_ISSUER,
-                options={"verify_aud": False}
+                options={"verify_aud": False, "verify_iss": False}
             )
+
+            # Host w 'iss' zależy od tego, jak klient dotarł do Keycloaka
+            # (localhost w przeglądarce, adres LAN/10.0.2.2 z telefonu/emulatora)
+            # -- sprawdzamy tylko, że to token z naszego realmu, nie z jakiegoś innego.
+            issuer = decoded.get("iss", "")
+            if not issuer.endswith(KEYCLOAK_ISSUER_PATH):
+                return jsonify({"message": "Invalid issuer"}), 403
+
             request.user = decoded
 
         except jwt.ExpiredSignatureError:
             return jsonify({"message": "Token expired"}), 403
-
-        except jwt.InvalidIssuerError:
-            return jsonify({"message": "Invalid issuer"}), 403
 
         except Exception as e:
             return jsonify({"message": f"Token verification failed: {str(e)}"}), 403
