@@ -316,7 +316,9 @@ type RawStudent = {
   total_tasks: number;
   accuracy: number | null;
   total_attempts: number;
+  correct_attempts: number;
   last_activity: string | null;
+  leveling_test_completed_at: string | null;
 };
 
 type RawStudentDetail = RawStudent & {
@@ -340,7 +342,9 @@ function mapStudent(raw: RawStudent): Student {
     totalTasks: raw.total_tasks,
     accuracy: raw.accuracy,
     totalAttempts: raw.total_attempts,
+    correctAttempts: raw.correct_attempts,
     lastActivity: raw.last_activity,
+    levelingTestCompletedAt: raw.leveling_test_completed_at,
   };
 }
 

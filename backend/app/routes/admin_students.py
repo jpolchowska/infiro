@@ -47,7 +47,13 @@ def _student_json(student, total_tasks):
         "total_tasks": total_tasks,
         "accuracy": accuracy,
         "total_attempts": total_attempts,
+        "correct_attempts": correct_attempts,
         "last_activity": last_activity.isoformat() if last_activity else None,
+        "leveling_test_completed_at": (
+            student.leveling_test_completed_at.isoformat()
+            if student.leveling_test_completed_at
+            else None
+        ),
     }
 
 
@@ -179,14 +185,18 @@ def update_student(student_id):
 
     if "teacher_id" in data:
         teacher_id = data.get("teacher_id")
-        if not isinstance(teacher_id, int):
-            return jsonify({"error": "teacher_id must be an integer"}), 400
 
-        teacher = User.query.filter_by(id=teacher_id, role="teacher").first()
-        if teacher is None:
-            return jsonify({"error": "teacher not found"}), 404
+        if teacher_id is not None:
+            if not isinstance(teacher_id, int):
+                return jsonify({"error": "teacher_id must be an integer or null"}), 400
 
-        student.teacher_id = teacher.id
+            teacher = User.query.filter_by(id=teacher_id, role="teacher").first()
+            if teacher is None:
+                return jsonify({"error": "teacher not found"}), 404
+
+        student.teacher_id = teacher_id
 
     db.session.commit()
-    return jsonify(_student_json(student, Task.query.count())), 200
+
+    total_tasks = Task.query.count()
+    return jsonify(_student_json(student, total_tasks)), 200

@@ -26,6 +26,30 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     }
   }, [authenticated, initialized, pathname, router]);
 
+  useEffect(() => {
+    if (role) {
+      document.title = role === "admin" ? "Panel administratora" : "Panel nauczyciela";
+    }
+  }, [role, pathname]);
+
+  // Favicon zależny od roli -- admin zostaje przy statycznym /icon.svg (litera "A"),
+  // nauczyciel dostaje wersję z "N" wygenerowaną w tym samym stylu.
+  useEffect(() => {
+    if (!role) return;
+
+    const link =
+      document.querySelector<HTMLLinkElement>("link[rel='icon'][type='image/svg+xml']") ??
+      document.querySelector<HTMLLinkElement>("link[rel='icon']");
+    if (!link) return;
+
+    if (role === "teacher") {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#142284"/><text x="32" y="33" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="500" fill="#fff">N</text></svg>`;
+      link.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    } else {
+      link.href = "/icon.svg";
+    }
+  }, [role, pathname]);
+
   if (!initialized) {
     return (
       <div className="flex min-h-screen items-center justify-center">

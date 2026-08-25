@@ -12,7 +12,8 @@ import type { Section, SubsectionDetail } from "@/lib/types";
 export default function SubsectionPage() {
   const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
   const router = useRouter();
-  const { getToken } = useAuth();
+  const { getToken, keycloak } = useAuth();
+  const isTeacher = Boolean(keycloak?.hasRealmRole("ROLE_TEACHER"));
   const [section, setSection] = useState<Section | null | undefined>(null);
   const [subsection, setSubsection] = useState<SubsectionDetail | null | undefined>(null);
 
@@ -76,26 +77,30 @@ export default function SubsectionPage() {
       </Link>
       <div className="mt-3 flex items-start justify-between gap-4">
         <h1 className="text-2xl font-semibold text-infiro-navy">{subsection.title}</h1>
-        <div className="flex shrink-0 gap-4 text-sm">
-          <Link
-            href={`/sections/${section.id}/${subsection.id}/edit`}
-            className="font-medium text-infiro-navy hover:underline"
-          >
-            Edytuj
-          </Link>
-          <button
-            onClick={handleDeleteSubsection}
-            className="font-medium text-red-600 hover:underline"
-          >
-            Usuń podsekcję
-          </button>
-        </div>
+        {!isTeacher && (
+          <div className="flex shrink-0 gap-4 text-sm">
+            <Link
+              href={`/sections/${section.id}/${subsection.id}/edit`}
+              className="font-medium text-infiro-navy hover:underline"
+            >
+              Edytuj
+            </Link>
+            <button
+              onClick={handleDeleteSubsection}
+              className="font-medium text-red-600 hover:underline"
+            >
+              Usuń podsekcję
+            </button>
+          </div>
+        )}
       </div>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{subsection.description}</p>
 
       <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Materiały teoretyczne</h2>
       {subsection.materials.length === 0 ? (
-        <p className="mt-2 text-sm text-gray-400">Brak materiałów — dodaj pierwszy.</p>
+        <p className="mt-2 text-sm text-gray-400">
+          {isTeacher ? "Brak materiałów." : "Brak materiałów — dodaj pierwszy."}
+        </p>
       ) : (
         <ul className="mt-2 flex flex-col gap-2">
           {subsection.materials.map((m) => (
@@ -109,30 +114,34 @@ export default function SubsectionPage() {
                   ({m.type === "text" ? "tekst" : m.type})
                 </span>
               </span>
-              <span className="flex gap-3">
-                <Link
-                  href={`/sections/${section.id}/${subsection.id}/materials/${m.id}/edit`}
-                  className="text-xs font-medium text-infiro-navy hover:underline"
-                >
-                  Edytuj
-                </Link>
-                <button
-                  onClick={() => handleDeleteMaterial(m.id)}
-                  className="text-xs font-medium text-red-600 hover:underline"
-                >
-                  Usuń
-                </button>
-              </span>
+              {!isTeacher && (
+                <span className="flex gap-3">
+                  <Link
+                    href={`/sections/${section.id}/${subsection.id}/materials/${m.id}/edit`}
+                    className="text-xs font-medium text-infiro-navy hover:underline"
+                  >
+                    Edytuj
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteMaterial(m.id)}
+                    className="text-xs font-medium text-red-600 hover:underline"
+                  >
+                    Usuń
+                  </button>
+                </span>
+              )}
             </li>
           ))}
         </ul>
       )}
-      <Link
-        href={`/sections/${section.id}/${subsection.id}/new-material`}
-        className="mt-3 inline-block rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
-      >
-        Dodaj materiał
-      </Link>
+      {!isTeacher && (
+        <Link
+          href={`/sections/${section.id}/${subsection.id}/new-material`}
+          className="mt-3 inline-block rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
+        >
+          Dodaj materiał
+        </Link>
+      )}
 
       <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Zadania</h2>
 
@@ -150,7 +159,7 @@ export default function SubsectionPage() {
             {subsection.tasks.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
-                  Brak zadań — dodaj pierwsze poniżej.
+                  {isTeacher ? "Brak zadań." : "Brak zadań — dodaj pierwsze poniżej."}
                 </td>
               </tr>
             )}
@@ -165,20 +174,22 @@ export default function SubsectionPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{correctOption?.optionText ?? "—"}</td>
                   <td className="px-4 py-3 text-right">
-                    <span className="flex justify-end gap-3">
-                      <Link
-                        href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}/edit`}
-                        className="text-xs font-medium text-infiro-navy hover:underline"
-                      >
-                        Edytuj
-                      </Link>
-                      <button
-                        onClick={() => handleDeleteTask(task.id)}
-                        className="text-xs font-medium text-red-600 hover:underline"
-                      >
-                        Usuń
-                      </button>
-                    </span>
+                    {!isTeacher && (
+                      <span className="flex justify-end gap-3">
+                        <Link
+                          href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}/edit`}
+                          className="text-xs font-medium text-infiro-navy hover:underline"
+                        >
+                          Edytuj
+                        </Link>
+                        <button
+                          onClick={() => handleDeleteTask(task.id)}
+                          className="text-xs font-medium text-red-600 hover:underline"
+                        >
+                          Usuń
+                        </button>
+                      </span>
+                    )}
                   </td>
                 </tr>
               );
@@ -187,20 +198,22 @@ export default function SubsectionPage() {
         </table>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-3">
-        <Link
-          href={`/sections/${section.id}/${subsection.id}/new-task`}
-          className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          Dodaj zadanie
-        </Link>
-        <Link
-          href="/import"
-          className="rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
-        >
-          Importuj zadania (JSON)
-        </Link>
-      </div>
+      {!isTeacher && (
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={`/sections/${section.id}/${subsection.id}/new-task`}
+            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            Dodaj zadanie
+          </Link>
+          <Link
+            href="/import"
+            className="rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
+          >
+            Importuj zadania (JSON)
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

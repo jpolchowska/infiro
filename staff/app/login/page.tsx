@@ -18,7 +18,7 @@ export default function LoginPage() {
             fontWeight="500"
             fill="#fff"
           >
-            A
+            I
           </text>
         </svg>
         <h1 className="mt-4 text-xl font-semibold text-infiro-navy">Panel Infiro</h1>
