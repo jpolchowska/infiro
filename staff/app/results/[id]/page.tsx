@@ -49,11 +49,29 @@ export default function StudentResultPage() {
       </h1>
       <p className="mt-1 text-sm text-gray-500">{student.email ?? "—"}</p>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={`${student.solvedTasks} / ${student.totalTasks}`} label="Rozwiązane" />
-        <StatTile value={student.accuracy !== null ? `${student.accuracy}%` : "—"} label="Celność" />
-        <StatTile value={student.totalAttempts} label="Odpowiedzi" />
-        <StatTile value={student.sectionProgress.length} label="Sekcje z aktywnością" />
+      <div className="mt-6 rounded-sm border border-infiro-navy/20 bg-infiro-navy/5 p-4">
+        <h2 className="text-sm font-semibold text-infiro-navy">Test poziomujący</h2>
+        <p className="mt-1 text-sm text-gray-600">
+          Wszystkie dane na tej stronie pochodzą obecnie z testu poziomującego — przeglądanie
+          kursu i regularne zadania nie są jeszcze dostępne w aplikacji mobilnej.
+        </p>
+      </div>
+
+      <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Wynik testu poziomującego</h2>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <StatTile
+          value={`${student.correctAttempts} / ${student.totalAttempts}`}
+          label="Poprawne odpowiedzi"
+        />
+        <StatTile value={student.accuracy !== null ? `${student.accuracy}%` : "—"} label="Celność testu" />
+        <StatTile
+          value={
+            student.levelingTestCompletedAt
+              ? formatRelativeDate(student.levelingTestCompletedAt)
+              : "—"
+          }
+          label={student.levelingTestCompletedAt ? "Ukończony" : "Nieukończony"}
+        />
       </div>
 
       <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Postęp według sekcji</h2>

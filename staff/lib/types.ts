@@ -63,7 +63,9 @@ export type Student = {
   totalTasks: number;
   accuracy: number | null;
   totalAttempts: number;
+  correctAttempts: number;
   lastActivity: string | null;
+  levelingTestCompletedAt: string | null;
 };
 
 export type SectionProgress = {
