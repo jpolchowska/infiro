@@ -21,14 +21,23 @@ export default function LoginPage() {
             A
           </text>
         </svg>
-        <h1 className="mt-4 text-xl font-semibold text-infiro-navy">Panel administratora</h1>
-        <p className="mt-2 text-sm text-gray-600">Zaloguj się, aby zarządzać treścią aplikacji.</p>
+        <h1 className="mt-4 text-xl font-semibold text-infiro-navy">Panel Infiro</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Zaloguj się, aby zarządzać treścią aplikacji albo przeglądać postępy uczniów.
+        </p>
         <button
           type="button"
           onClick={() => keycloak.login({ redirectUri: `${window.location.origin}/` })}
           className="mt-6 w-full rounded-sm bg-infiro-navy px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
         >
-          Zaloguj się
+          Zaloguj się jako administrator
+        </button>
+        <button
+          type="button"
+          onClick={() => keycloak.login({ redirectUri: `${window.location.origin}/` })}
+          className="mt-3 w-full rounded-sm border border-infiro-navy px-4 py-2.5 text-sm font-medium text-infiro-navy hover:bg-infiro-navy/5"
+        >
+          Zaloguj się jako nauczyciel
         </button>
       </div>
     </div>

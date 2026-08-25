@@ -7,6 +7,7 @@ import { StatTile } from "@/components/StatTile";
 import { Badge } from "@/components/Badge";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useAuth } from "@/components/AuthContext";
+import { formatRelativeDate } from "@/lib/format";
 import type { Section, Student } from "@/lib/types";
 
 function accuracyBadgeVariant(accuracy: number | null): "easy" | "mid" | "hard" | "neutral" {
@@ -26,7 +27,7 @@ export default function ResultsPage() {
     (async () => {
       const token = await getToken();
       const [studentsData, sectionsData] = await Promise.all([
-        getStudents(),
+        getStudents(token ?? ""),
         getSections(token ?? ""),
       ]);
       if (active) {
@@ -93,7 +94,7 @@ export default function ResultsPage() {
                     href={`/results/${student.id}`}
                     className="font-medium text-infiro-navy hover:underline"
                   >
-                    {student.name}
+                    {student.name ?? "Uczeń bez imienia"}
                   </Link>
                 </td>
                 <td className="px-4 py-3">
@@ -114,7 +115,7 @@ export default function ResultsPage() {
                   )}
                 </td>
                 <td className="px-4 py-3 text-gray-600">{student.totalAttempts}</td>
-                <td className="px-4 py-3 text-gray-600">{student.lastActivity ?? "—"}</td>
+                <td className="px-4 py-3 text-gray-600">{formatRelativeDate(student.lastActivity)}</td>
                 <td className="px-4 py-3 text-right">
                   <Link href={`/results/${student.id}`} className="text-infiro-navy hover:underline">
                     Zobacz

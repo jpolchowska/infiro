@@ -3,7 +3,7 @@ export default function SettingsPage() {
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">Ustawienia</h1>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">
-        Ustawienia panelu administratora pojawią się tutaj.
+        Ustawienia panelu pojawią się tutaj.
       </p>
 
       <div className="flex min-h-[60vh] items-center justify-center text-sm text-gray-500">

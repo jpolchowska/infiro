@@ -1,26 +1,53 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
+import { useAuth } from "@/components/AuthContext";
 import { getStudentDetail } from "@/lib/data";
+import { formatRelativeDate } from "@/lib/format";
 import { StatTile } from "@/components/StatTile";
 import { Badge } from "@/components/Badge";
 import { ProgressBar } from "@/components/ProgressBar";
+import type { StudentDetail } from "@/lib/types";
 
-export default async function StudentResultPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const student = await getStudentDetail(Number(id));
-  if (!student) notFound();
+export default function StudentResultPage() {
+  const { id } = useParams<{ id: string }>();
+  const { getToken } = useAuth();
+  const [student, setStudent] = useState<StudentDetail | null | undefined>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const token = await getToken();
+      const data = await getStudentDetail(token ?? "", Number(id));
+      if (active) setStudent(data ?? undefined);
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  if (student === undefined) notFound();
+
+  if (student === null) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
+      </div>
+    );
+  }
 
   return (
     <div>
       <Link href="/results" className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wszyscy uczniowie
       </Link>
-      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{student.name}</h1>
-      <p className="mt-1 text-sm text-gray-500">{student.email}</p>
+      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">
+        {student.name ?? "Uczeń bez imienia"}
+      </h1>
+      <p className="mt-1 text-sm text-gray-500">{student.email ?? "—"}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile value={`${student.solvedTasks} / ${student.totalTasks}`} label="Rozwiązane" />
@@ -95,7 +122,7 @@ export default async function StudentResultPage({
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-gray-600">#{a.attemptNumber}</td>
-                <td className="px-4 py-3 text-gray-600">{a.submittedAt}</td>
+                <td className="px-4 py-3 text-gray-600">{formatRelativeDate(a.submittedAt)}</td>
               </tr>
             ))}
           </tbody>

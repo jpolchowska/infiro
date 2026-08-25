@@ -4,19 +4,45 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Sekcje", isActive: (path: string) => path === "/" || path.startsWith("/sections") },
-  { href: "/results", label: "Uczniowie", isActive: (path: string) => path.startsWith("/results") },
-  { href: "/teachers", label: "Nauczyciele", isActive: (path: string) => path.startsWith("/teachers") },
-  { href: "/import", label: "Import treści", isActive: (path: string) => path.startsWith("/import") },
-  { href: "/settings", label: "Ustawienia", isActive: (path: string) => path.startsWith("/settings") },
+  {
+    href: "/",
+    label: "Sekcje",
+    isActive: (path: string) => path === "/" || path.startsWith("/sections"),
+    roles: ["admin", "teacher"] as const,
+  },
+  {
+    href: "/results",
+    label: "Uczniowie",
+    isActive: (path: string) => path.startsWith("/results"),
+    roles: ["admin", "teacher"] as const,
+  },
+  {
+    href: "/teachers",
+    label: "Nauczyciele",
+    isActive: (path: string) => path.startsWith("/teachers"),
+    roles: ["admin"] as const,
+  },
+  {
+    href: "/import",
+    label: "Import treści",
+    isActive: (path: string) => path.startsWith("/import"),
+    roles: ["admin"] as const,
+  },
+  {
+    href: "/settings",
+    label: "Ustawienia",
+    isActive: (path: string) => path.startsWith("/settings"),
+    roles: ["admin", "teacher"] as const,
+  },
 ];
 
-export function HeaderNav() {
+export function HeaderNav({ role }: { role: "admin" | "teacher" }) {
   const pathname = usePathname();
+  const items = NAV_ITEMS.filter((item) => (item.roles as readonly string[]).includes(role));
 
   return (
     <nav className="flex items-center gap-6 text-sm font-medium">
-      {NAV_ITEMS.map((item) => (
+      {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
