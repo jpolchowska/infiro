@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ChoiceQuestionCard } from '../components/leveling-test/ChoiceQuestionCard';
-import { FadeIn } from '../components/leveling-test/FadeIn';
-import { ProgressBar } from '../components/leveling-test/ProgressBar';
+import { ChoiceQuestionCard } from '../../components/leveling-test/ChoiceQuestionCard';
+import { FadeIn } from '../../components/leveling-test/FadeIn';
+import { ProgressBar } from '../../components/leveling-test/ProgressBar';
 import {
   LevelingAnswer,
   LevelingQuestion,
@@ -13,7 +13,7 @@ import {
   fetchLevelingTest,
   getAccent,
   submitLevelingTest,
-} from '../lib/levelingTest';
+} from '../../lib/levelingTest';
 
 type Step = 'intro' | 'quiz' | 'result';
 

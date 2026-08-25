@@ -27,6 +27,7 @@ services:
     depends_on:
       - keycloak
       - staff
+      - backend
     networks:
       - frontend-net
       
