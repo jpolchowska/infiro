@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 
+# Frontend dependencies
+frontend/node_modules/
+frontend/.expo/
+
 # Virtual environment
 .venv/
 venv/
