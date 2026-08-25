@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
-from app.middleware.auth import authenticate_token
+from app.middleware.auth import authenticate_token, require_realm_role
 from app.models.users import User
 from app.models.student_answers import StudentAnswer
 from app.models.tasks import Task
@@ -165,6 +165,28 @@ def get_student(student_id):
     return jsonify(payload), 200
 
 
-# TODO(panel nauczyciela): PATCH /api/admin/students/<id> { "teacher_id": <id> }
-# -- tylko dla admina (@require_realm_role("admin")), do przypisywania uczniów
-# do nauczycieli. Wzorem update_section()/update_task() w admin_sections.py.
+@admin_students_bp.route("/api/admin/students/<int:student_id>", methods=["PATCH"])
+@authenticate_token
+@require_realm_role("admin")
+def update_student(student_id):
+    student = User.query.filter_by(id=student_id, role="student").first()
+    if student is None:
+        return jsonify({"error": "student not found"}), 404
+
+    data = request.get_json()
+    if data is None:
+        return jsonify({"error": "JSON body is required"}), 400
+
+    if "teacher_id" in data:
+        teacher_id = data.get("teacher_id")
+        if not isinstance(teacher_id, int):
+            return jsonify({"error": "teacher_id must be an integer"}), 400
+
+        teacher = User.query.filter_by(id=teacher_id, role="teacher").first()
+        if teacher is None:
+            return jsonify({"error": "teacher not found"}), 404
+
+        student.teacher_id = teacher.id
+
+    db.session.commit()
+    return jsonify(_student_json(student, Task.query.count())), 200
