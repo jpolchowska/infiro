@@ -5,7 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect } from 'react';
 import { Pressable, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { getAccountType } from '../utils/decodeToken';
 import { apiFetch } from '../lib/api';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -30,48 +30,52 @@ export default function LoginScreen() {
     discovery
   );
 
-  useEffect(() => {
-    const handleAuthResponse = async () => {
-      if (response?.type === 'success' && response.params.code && discovery) {
-        try {
-          const tokenResult = await AuthSession.exchangeCodeAsync(
-            {
-              clientId: CLIENT_ID,
-              code: response.params.code,
-              redirectUri,
-              extraParams: {
-                code_verifier: request?.codeVerifier || '',
-              },
+useEffect(() => {
+  const handleAuthResponse = async () => {
+    if (response?.type === 'success' && response.params.code && discovery) {
+      try {
+        const tokenResult = await AuthSession.exchangeCodeAsync(
+          {
+            clientId: CLIENT_ID,
+            code: response.params.code,
+            redirectUri,
+            extraParams: {
+              code_verifier: request?.codeVerifier || '',
             },
-            discovery
-          );
+          },
+          discovery
+        );
 
-          await SecureStore.setItemAsync('access_token', tokenResult.accessToken);
-          if (tokenResult.refreshToken) {
-            await SecureStore.setItemAsync('refresh_token', tokenResult.refreshToken);
-          }
+        await SecureStore.setItemAsync('access_token', tokenResult.accessToken);
+        if (tokenResult.refreshToken) {
+          await SecureStore.setItemAsync('refresh_token', tokenResult.refreshToken);
+        }
 
-          console.log('Logged in successfully!');
+        console.log('Logged in successfully!');
+        const accountType = getAccountType(tokenResult.accessToken);
 
+        if (accountType === "Nauczyciel") {
+          router.replace('/(teacher)/home');
+        } else if (accountType === "Uczeń") {
           let goToLevelingTest = false;
           try {
             const me = await apiFetch<{ leveling_test_completed: boolean }>('/api/student/me');
             goToLevelingTest = !me.leveling_test_completed;
           } catch (syncError) {
             // Fail-open: logowanie już się udało, nie blokujemy go awarią backendu
-            // (np. offline, albo to konto nauczyciela bez roli "Uczeń" -> 403).
             console.error('Backend sync failed:', syncError);
           }
 
-          router.replace(goToLevelingTest ? '/leveling-test' : '/home');
-        } catch (error) {
-          console.error('Token exchange failed:', error);
+          router.replace(goToLevelingTest ? '/(student)/leveling-test' : '/(student)/home');
         }
+      } catch (error) {
+        console.error('Token exchange failed:', error);
       }
-    };
+    }
+  };
 
-    handleAuthResponse();
-  }, [response]);
+  handleAuthResponse();
+}, [response, discovery, request, redirectUri]);
 
   return (
     <SafeAreaView className="flex-1 bg-infiro-navy">
