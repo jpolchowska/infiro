@@ -67,6 +67,25 @@ def require_role(role):
     return decorator
 
 
+def require_any_realm_role(*roles):
+    """Jak require_realm_role, ale wpuszcza, jeśli user ma KTÓRĄKOLWIEK
+    z podanych ról (np. "admin" LUB "ROLE_TEACHER")."""
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            user = getattr(request, "user", {})
+            realm_roles = set(user.get("realm_access", {}).get("roles", []))
+
+            if not realm_roles.intersection(roles):
+                return jsonify({"message": f"Missing required role: one of {roles}"}), 403
+
+            return f(*args, **kwargs)
+
+        return decorated
+
+    return decorator
+
+
 def require_realm_role(role):
     """Sprawdza natywną rolę realmową Keycloaka (realm_access.roles) -- ten sam
     mechanizm co keycloak.hasRealmRole() już używany w AuthGate panelu admina.

@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request
 
-from app.extensions import db
 from app.middleware.auth import authenticate_token
 from app.middleware.auth import require_role
 from app.models.users import User
+from app.services.users import get_or_create_user
 
 
 student_bp = Blueprint("student", __name__)
@@ -20,7 +20,9 @@ def student():
 
 def _current_user():
     """Znajduje User po claimie 'sub' z JWT. Zwraca None, jeśli nie ma
-    jeszcze lokalnego wiersza -- wywołujący ma zdecydować co z tym zrobić.
+    jeszcze lokalnego wiersza -- używane tam, gdzie brak wiersza ma być
+    błędem (np. leveling-test wymaga wcześniejszego wywołania /me),
+    w odróżnieniu od get_or_create_user(), który go zakłada.
     """
     sub = request.user.get("sub")
     return User.query.filter_by(keycloak_sub=sub).first()
@@ -30,12 +32,7 @@ def _current_user():
 @authenticate_token
 @require_role("Uczeń")
 def me():
-    user = _current_user()
-
-    if user is None:
-        user = User(keycloak_sub=request.user.get("sub"), role="student")
-        db.session.add(user)
-        db.session.commit()
+    user = get_or_create_user("student")
 
     return jsonify({
         "id": user.id,

@@ -8,7 +8,8 @@ import { StatTile } from "@/components/StatTile";
 import type { Section } from "@/lib/types";
 
 export default function Home() {
-  const { getToken } = useAuth();
+  const { getToken, keycloak } = useAuth();
+  const isTeacher = keycloak?.hasRealmRole("ROLE_TEACHER");
   const [sections, setSections] = useState<Section[] | null>(null);
   const [studentCount, setStudentCount] = useState(0);
 
@@ -18,7 +19,7 @@ export default function Home() {
       const token = await getToken();
       const [sectionsData, students] = await Promise.all([
         getSections(token ?? ""),
-        getStudents(),
+        getStudents(token ?? ""),
       ]);
       if (active) {
         setSections(sectionsData);
@@ -46,7 +47,9 @@ export default function Home() {
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">Witaj!</h1>
       <p className="mt-1 max-w-2xl text-sm text-gray-500">
-        Zarządzaj sekcjami, materiałami i zadaniami. Zmiany są widoczne w aplikacji mobilnej po opublikowaniu.
+        {isTeacher
+          ? "Przeglądaj sekcje, materiały i zadania kursu."
+          : "Zarządzaj sekcjami, materiałami i zadaniami. Zmiany są widoczne w aplikacji mobilnej po opublikowaniu."}
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -91,13 +94,15 @@ export default function Home() {
             </div>
           </Link>
         ))}
-        <Link
-          href="/sections/new"
-          className="flex min-h-41 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
-        >
-          <span className="text-2xl leading-none">+</span>
-          <span className="text-sm font-medium">Dodaj sekcję</span>
-        </Link>
+        {!isTeacher && (
+          <Link
+            href="/sections/new"
+            className="flex min-h-41 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
+          >
+            <span className="text-2xl leading-none">+</span>
+            <span className="text-sm font-medium">Dodaj sekcję</span>
+          </Link>
+        )}
       </div>
     </div>
   );

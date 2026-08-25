@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_realm_role
+from app.middleware.auth import authenticate_token, require_realm_role, require_any_realm_role
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
@@ -81,7 +81,7 @@ def _task_json(task):
 
 @admin_sections_bp.route("/api/admin/sections", methods=["GET"])
 @authenticate_token
-@require_realm_role("admin")
+@require_any_realm_role("admin", "ROLE_TEACHER")
 def list_sections():
     sections = Section.query.order_by(Section.order_index).all()
     return jsonify([_section_json(s) for s in sections]), 200
@@ -112,7 +112,7 @@ def create_section():
 
 @admin_sections_bp.route("/api/admin/sections/<int:section_id>", methods=["GET"])
 @authenticate_token
-@require_realm_role("admin")
+@require_any_realm_role("admin", "ROLE_TEACHER")
 def get_section(section_id):
     section = Section.query.get(section_id)
     if section is None:
@@ -167,7 +167,7 @@ def create_subsection(section_id):
 
 @admin_sections_bp.route("/api/admin/subsections/<int:subsection_id>", methods=["GET"])
 @authenticate_token
-@require_realm_role("admin")
+@require_any_realm_role("admin", "ROLE_TEACHER")
 def get_subsection(subsection_id):
     subsection = Subsection.query.get(subsection_id)
     if subsection is None:

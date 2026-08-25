@@ -20,6 +20,7 @@ def create_app():
     from app.routes.admin_sections import admin_sections_bp
     from app.routes.admin_materials import admin_materials_bp
     from app.routes.admin_import import admin_import_bp
+    from app.routes.admin_students import admin_students_bp
 
     app.register_blueprint(student_bp)
     app.register_blueprint(leveling_test_bp)
@@ -28,5 +29,6 @@ def create_app():
     app.register_blueprint(admin_sections_bp)
     app.register_blueprint(admin_materials_bp)
     app.register_blueprint(admin_import_bp)
+    app.register_blueprint(admin_students_bp)
 
     return app

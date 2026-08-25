@@ -57,8 +57,8 @@ export type Material = {
 
 export type Student = {
   id: number;
-  name: string;
-  email: string;
+  name: string | null;
+  email: string | null;
   solvedTasks: number;
   totalTasks: number;
   accuracy: number | null;

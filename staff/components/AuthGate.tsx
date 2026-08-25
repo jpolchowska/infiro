@@ -11,8 +11,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Sprawdzamy, czy zalogowany użytkownik ma przypisaną rolę "admin" w Realm
+  // Sprawdzamy role realmowe -- panel obsługuje zarówno admina, jak i nauczyciela.
   const isAdmin = authenticated && keycloak?.hasRealmRole("admin");
+  const isTeacher = authenticated && keycloak?.hasRealmRole("ROLE_TEACHER");
+  const role: "admin" | "teacher" | null = isAdmin ? "admin" : isTeacher ? "teacher" : null;
 
   useEffect(() => {
     if (!initialized) return;
@@ -40,13 +42,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // ⛔ Zalogowany, ale bez roli admina -> Blokada 403
-  if (authenticated && !isAdmin) {
+  // Zalogowany, ale bez roli admina ani nauczyciela -> Blokada 403
+  if (authenticated && role === null) {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-semibold text-red-600">Brak dostępu (403)</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Twoje konto nie posiada uprawnień administratora do tego panelu.
+          Twoje konto nie posiada uprawnień do tego panelu.
         </p>
         <button
           onClick={logout}
@@ -58,14 +60,16 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // ✅ Zalogowany administrator -> Pełny panel
+  // Zalogowany administrator lub nauczyciel -> Pełny panel
   return (
     <>
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-lg font-semibold text-infiro-navy">Panel administratora</span>
+          <span className="text-lg font-semibold text-infiro-navy">
+            {role === "admin" ? "Panel administratora" : "Panel nauczyciela"}
+          </span>
           <div className="flex items-center gap-8">
-            <HeaderNav />
+            <HeaderNav role={role as "admin" | "teacher"} />
             <LogoutButton />
           </div>
         </div>

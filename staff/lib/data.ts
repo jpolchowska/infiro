@@ -308,49 +308,72 @@ export async function importTasks(
   });
 }
 
-const STUDENTS: Student[] = [
-  { id: 1, name: "Zosia Kowalska", email: "zosia.kowalska@example.com", solvedTasks: 92, totalTasks: 216, accuracy: 82, totalAttempts: 210, lastActivity: "dzisiaj" },
-  { id: 2, name: "Jan Nowak", email: "jan.nowak@example.com", solvedTasks: 45, totalTasks: 216, accuracy: 54, totalAttempts: 96, lastActivity: "2 dni temu" },
-];
-
-export async function getStudents(): Promise<Student[]> {
-  return STUDENTS;
-}
-
-export async function getStudent(id: number): Promise<Student | undefined> {
-  return STUDENTS.find((s) => s.id === id);
-}
-
-const STUDENT_DETAILS: Record<number, Pick<StudentDetail, "sectionProgress" | "needsPractice" | "recentActivity">> = {
-  1: {
-    sectionProgress: [
-      { sectionTitle: "Liczby i działania", solvedTasks: 40, totalTasks: 44 },
-      { sectionTitle: "Algebra", solvedTasks: 30, totalTasks: 52 },
-      { sectionTitle: "Geometria", solvedTasks: 22, totalTasks: 40 },
-    ],
-    needsPractice: [
-      { taskTitle: "Rozwiąż równanie z ułamkiem", subsectionTitle: "Równania liniowe", attemptNumber: 2 },
-    ],
-    recentActivity: [
-      { taskTitle: "Znajdź różnicę", subsectionTitle: "Dodawanie i odejmowanie", isCorrect: true, attemptNumber: 1, submittedAt: "dziś, 14:02" },
-      { taskTitle: "Pole trójkąta", subsectionTitle: "Figury i kąty", isCorrect: false, attemptNumber: 2, submittedAt: "wczoraj" },
-    ],
-  },
-  2: {
-    sectionProgress: [
-      { sectionTitle: "Liczby i działania", solvedTasks: 20, totalTasks: 44 },
-      { sectionTitle: "Algebra", solvedTasks: 15, totalTasks: 52 },
-    ],
-    needsPractice: [],
-    recentActivity: [
-      { taskTitle: "Pomnóż", subsectionTitle: "Mnożenie i dzielenie", isCorrect: true, attemptNumber: 1, submittedAt: "2 dni temu" },
-    ],
-  },
+type RawStudent = {
+  id: number;
+  name: string | null;
+  email: string | null;
+  solved_tasks: number;
+  total_tasks: number;
+  accuracy: number | null;
+  total_attempts: number;
+  last_activity: string | null;
 };
 
-export async function getStudentDetail(id: number): Promise<StudentDetail | undefined> {
-  const student = STUDENTS.find((s) => s.id === id);
-  if (!student) return undefined;
-  const extra = STUDENT_DETAILS[id] ?? { sectionProgress: [], needsPractice: [], recentActivity: [] };
-  return { ...student, ...extra };
+type RawStudentDetail = RawStudent & {
+  section_progress: { section_title: string; solved_tasks: number; total_tasks: number }[];
+  needs_practice: { task_title: string; subsection_title: string; attempt_number: number }[];
+  recent_activity: {
+    task_title: string;
+    subsection_title: string;
+    is_correct: boolean;
+    attempt_number: number;
+    submitted_at: string;
+  }[];
+};
+
+function mapStudent(raw: RawStudent): Student {
+  return {
+    id: raw.id,
+    name: raw.name,
+    email: raw.email,
+    solvedTasks: raw.solved_tasks,
+    totalTasks: raw.total_tasks,
+    accuracy: raw.accuracy,
+    totalAttempts: raw.total_attempts,
+    lastActivity: raw.last_activity,
+  };
+}
+
+export async function getStudents(token: string): Promise<Student[]> {
+  const raw = await apiFetch<RawStudent[]>("/api/admin/students", { token });
+  return raw.map(mapStudent);
+}
+
+export async function getStudentDetail(
+  token: string,
+  id: number
+): Promise<StudentDetail | undefined> {
+  return getOrUndefined(async () => {
+    const raw = await apiFetch<RawStudentDetail>(`/api/admin/students/${id}`, { token });
+    return {
+      ...mapStudent(raw),
+      sectionProgress: raw.section_progress.map((sp) => ({
+        sectionTitle: sp.section_title,
+        solvedTasks: sp.solved_tasks,
+        totalTasks: sp.total_tasks,
+      })),
+      needsPractice: raw.needs_practice.map((np) => ({
+        taskTitle: np.task_title,
+        subsectionTitle: np.subsection_title,
+        attemptNumber: np.attempt_number,
+      })),
+      recentActivity: raw.recent_activity.map((ra) => ({
+        taskTitle: ra.task_title,
+        subsectionTitle: ra.subsection_title,
+        isCorrect: ra.is_correct,
+        attemptNumber: ra.attempt_number,
+        submittedAt: ra.submitted_at,
+      })),
+    };
+  });
 }
