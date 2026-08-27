@@ -59,6 +59,7 @@ export type Student = {
   id: number;
   name: string | null;
   email: string | null;
+  teacherId: number | null;
   solvedTasks: number;
   totalTasks: number;
   accuracy: number | null;

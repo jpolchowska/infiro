@@ -6,8 +6,20 @@ from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
+from app.services.uploads import extract_image_zip
 
 admin_import_bp = Blueprint("admin_import", __name__)
+
+
+@admin_import_bp.route("/api/admin/uploads/images", methods=["POST"])
+@authenticate_token
+@require_realm_role("admin")
+def upload_images_zip():
+    urls, error = extract_image_zip(request.files.get("file"))
+    if error:
+        return jsonify({"error": error}), 400
+
+    return jsonify({"file_count": len(urls), "files": urls}), 201
 
 
 def _is_non_empty_string(value):
