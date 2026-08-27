@@ -174,7 +174,14 @@ export default function SubsectionPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{correctOption?.optionText ?? "—"}</td>
                   <td className="px-4 py-3 text-right">
-                    {!isTeacher && (
+                    {isTeacher ? (
+                      <Link
+                        href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}/view`}
+                        className="text-xs font-medium text-infiro-navy hover:underline"
+                      >
+                        Wyświetl
+                      </Link>
+                    ) : (
                       <span className="flex justify-end gap-3">
                         <Link
                           href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}/edit`}

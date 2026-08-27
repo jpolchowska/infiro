@@ -43,6 +43,7 @@ def _student_json(student, total_tasks):
         "id": student.id,
         "name": name,
         "email": student.email,
+        "teacher_id": student.teacher_id,
         "solved_tasks": len(solved_task_ids),
         "total_tasks": total_tasks,
         "accuracy": accuracy,
@@ -129,6 +130,21 @@ def _recent_activity(student, limit=10):
             "submitted_at": answer.submitted_at.isoformat(),
         })
     return items
+
+
+@admin_students_bp.route("/api/admin/teachers", methods=["GET"])
+@authenticate_token
+@require_realm_role("admin")
+def list_teachers():
+    teachers = User.query.filter_by(role="teacher").order_by(User.last_name, User.first_name, User.id).all()
+    return jsonify([
+        {
+            "id": teacher.id,
+            "name": f"{teacher.first_name or ''} {teacher.last_name or ''}".strip() or None,
+            "email": teacher.email,
+        }
+        for teacher in teachers
+    ]), 200
 
 
 @admin_students_bp.route("/api/admin/students", methods=["GET"])

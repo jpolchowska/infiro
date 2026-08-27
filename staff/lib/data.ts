@@ -308,10 +308,24 @@ export async function importTasks(
   });
 }
 
+export async function uploadImagesZip(
+  token: string,
+  file: File
+): Promise<{ file_count: number; files: string[] }> {
+  const form = new FormData();
+  form.set("file", file);
+  return apiFetch<{ file_count: number; files: string[] }>("/api/admin/uploads/images", {
+    token,
+    method: "POST",
+    body: form,
+  });
+}
+
 type RawStudent = {
   id: number;
   name: string | null;
   email: string | null;
+  teacher_id: number | null;
   solved_tasks: number;
   total_tasks: number;
   accuracy: number | null;
@@ -333,11 +347,18 @@ type RawStudentDetail = RawStudent & {
   }[];
 };
 
+type RawTeacher = {
+  id: number;
+  name: string | null;
+  email: string | null;
+};
+
 function mapStudent(raw: RawStudent): Student {
   return {
     id: raw.id,
     name: raw.name,
     email: raw.email,
+    teacherId: raw.teacher_id,
     solvedTasks: raw.solved_tasks,
     totalTasks: raw.total_tasks,
     accuracy: raw.accuracy,
@@ -351,6 +372,23 @@ function mapStudent(raw: RawStudent): Student {
 export async function getStudents(token: string): Promise<Student[]> {
   const raw = await apiFetch<RawStudent[]>("/api/admin/students", { token });
   return raw.map(mapStudent);
+}
+
+export async function getTeachers(token: string): Promise<RawTeacher[]> {
+  return apiFetch<RawTeacher[]>("/api/admin/teachers", { token });
+}
+
+export async function updateStudentTeacher(
+  token: string,
+  studentId: number,
+  teacherId: number | null
+): Promise<Student> {
+  const raw = await apiFetch<RawStudent>(`/api/admin/students/${studentId}`, {
+    token,
+    method: "PATCH",
+    json: { teacher_id: teacherId },
+  });
+  return mapStudent(raw);
 }
 
 export async function getStudentDetail(

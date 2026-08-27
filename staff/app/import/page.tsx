@@ -2,7 +2,7 @@
 
 import { useState, type SubmitEvent } from "react";
 import { validateImportPayload } from "@/lib/validateImport";
-import { importTasks } from "@/lib/data";
+import { importTasks, uploadImagesZip } from "@/lib/data";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/components/AuthContext";
 
@@ -48,9 +48,11 @@ function UploadField({
 export default function ImportPage() {
   const { getToken } = useAuth();
   const [jsonFile, setJsonFile] = useState<File | null>(null);
+  const [zipFile, setZipFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<string[] | null>(null);
   const [taskCount, setTaskCount] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadResult, setUploadResult] = useState<number | null>(null);
 
   async function handleJsonSubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -85,6 +87,31 @@ export default function ImportPage() {
         setErrors([err.message]);
       } else {
         setErrors(["Import się nie powiódł. Spróbuj ponownie."]);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleZipSubmit(e: SubmitEvent) {
+    e.preventDefault();
+    setUploadResult(null);
+    if (!zipFile) {
+      setErrors(["Wybierz plik .zip."]);
+      return;
+    }
+
+    setErrors(null);
+    setSubmitting(true);
+    try {
+      const token = await getToken();
+      const result = await uploadImagesZip(token ?? "", zipFile);
+      setUploadResult(result.file_count);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrors([err.message]);
+      } else {
+        setErrors(["Nie udało się rozpakować zdjęć. Spróbuj ponownie."]);
       }
     } finally {
       setSubmitting(false);
@@ -138,20 +165,30 @@ export default function ImportPage() {
         </div>
       </form>
 
-      <div className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
+      {uploadResult !== null && (
+        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+          Rozpakowano {uploadResult} zdjęć.
+        </div>
+      )}
+
+      <form onSubmit={handleZipSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
         <h2 className="text-sm font-semibold text-infiro-navy">Zdjęcia (ZIP)</h2>
         <p className="mt-1 text-xs text-gray-500">
           Rozpakowywane do static/uploads i dowiązywane do zadań po nazwie pliku.
         </p>
         <div className="mt-4">
-          <UploadField accept=".zip" hint=".zip" onFileSelected={() => {}} />
+          <UploadField accept=".zip" hint=".zip" onFileSelected={setZipFile} />
         </div>
         <div className="mt-4 flex justify-center">
-          <button className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90">
-            Rozpakuj i zaimportuj
+          <button
+            type="submit"
+            disabled={submitting}
+            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+          >
+            {submitting ? "Rozpakowywanie…" : "Rozpakuj i zaimportuj"}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
