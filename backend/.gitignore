@@ -22,6 +22,10 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+app/static/
+static/
+backend/app/static/
+**/static
 /backend/app/static/*
 /backend/app/static/uploads/*
 !/backend/app/static/uploads/.gitkeep
