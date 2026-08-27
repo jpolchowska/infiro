@@ -46,6 +46,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - ./backend/app/static/uploads:/app/app/static/uploads
     develop:
       watch:
       - action: sync+restart
