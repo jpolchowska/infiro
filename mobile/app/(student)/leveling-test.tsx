@@ -74,18 +74,20 @@ export default function LevelingTestScreen() {
     }
   };
 
-  const goHome = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/home');
-    }
+  const goToApp = () => {
+    router.replace('/(student)/home');
+  };
+
+  const restartTest = () => {
+    setStep('intro');
+    setIndex(0);
+    setAnswers([]);
   };
 
   const handleClose = () => {
-    Alert.alert('Przerwać test?', 'Twoje odpowiedzi nie zostaną zapisane.', [
+    Alert.alert('Przerwać test?', 'Test trzeba będzie zrobić od nowa, żeby wejść do aplikacji.', [
       { text: 'Zostań', style: 'cancel' },
-      { text: 'Przerwij', style: 'destructive', onPress: goHome },
+      { text: 'Przerwij', style: 'destructive', onPress: restartTest },
     ]);
   };
 
@@ -209,7 +211,7 @@ export default function LevelingTestScreen() {
           </View>
 
           <Pressable
-            onPress={goHome}
+            onPress={goToApp}
             className="bg-infiro-coral rounded-2xl py-4 items-center active:opacity-80"
             style={CTA_SHADOW}
           >
@@ -220,8 +222,6 @@ export default function LevelingTestScreen() {
     );
   }
 
-  // Zabezpieczenie: nieoczekiwany stan (np. step === 'quiz', ale bez pytań)
-  // -- zamiast białego ekranu, wracamy na intro, gdzie widać komunikat/loader.
   return (
     <SafeAreaView className="flex-1 bg-infiro-navy">
       <View className="flex-1 justify-center items-center px-6">

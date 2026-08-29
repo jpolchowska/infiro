@@ -6,13 +6,10 @@ import { useEffect } from 'react';
 import { Pressable, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAccountType } from '../utils/decodeToken';
-import { apiFetch } from '../lib/api';
+import { CLIENT_ID, KEYCLOAK_URL, REALM } from '../lib/auth';
+import { getMe } from '../lib/student';
 
 WebBrowser.maybeCompleteAuthSession();
-
-const KEYCLOAK_URL = process.env.EXPO_PUBLIC_KEYCLOAK_URL; 
-const REALM = 'matematyka-app';
-const CLIENT_ID = 'matematyka-mobile';
 
 export default function LoginScreen() {
   const discovery = AuthSession.useAutoDiscovery(`${KEYCLOAK_URL}/realms/${REALM}`);
@@ -57,16 +54,19 @@ useEffect(() => {
         if (accountType === "Nauczyciel") {
           router.replace('/(teacher)/home');
         } else if (accountType === "Uczeń") {
-          let goToLevelingTest = false;
+          let nextRoute: '/(student)/interests' | '/(student)/leveling-test' | '/(student)/home' = '/(student)/home';
           try {
-            const me = await apiFetch<{ leveling_test_completed: boolean }>('/api/student/me');
-            goToLevelingTest = !me.leveling_test_completed;
+            const me = await getMe();
+            if (me.interest === null) {
+              nextRoute = '/(student)/interests';
+            } else if (!me.levelingTestCompleted) {
+              nextRoute = '/(student)/leveling-test';
+            }
           } catch (syncError) {
-            // Fail-open: logowanie już się udało, nie blokujemy go awarią backendu
             console.error('Backend sync failed:', syncError);
           }
 
-          router.replace(goToLevelingTest ? '/(student)/leveling-test' : '/(student)/home');
+          router.replace(nextRoute);
         }
       } catch (error) {
         console.error('Token exchange failed:', error);
@@ -85,7 +85,7 @@ useEffect(() => {
         </Text>
 
         <Pressable
-          onPress={() => promptAsync()}
+          onPress={() => promptAsync({ preferEphemeralSession: true })}
           disabled={!request}
           className="bg-infiro-coral rounded-2xl py-4 items-center active:opacity-80"
           style={{
