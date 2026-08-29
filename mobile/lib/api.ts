@@ -1,4 +1,5 @@
 import * as SecureStore from "expo-secure-store";
+import { refreshAccessToken } from "./auth";
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -15,10 +16,8 @@ type ApiFetchOptions = Omit<RequestInit, "body"> & {
   body?: BodyInit;
 };
 
-export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
+function buildRequest(options: ApiFetchOptions, token: string | null) {
   const { json, body, headers, ...rest } = options;
-
-  const token = await SecureStore.getItemAsync("access_token");
 
   const finalHeaders = new Headers(headers);
   if (token) finalHeaders.set("Authorization", `Bearer ${token}`);
@@ -29,11 +28,24 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     finalBody = JSON.stringify(json);
   }
 
-  const response = await fetch(`${BACKEND_URL}${path}`, {
-    ...rest,
-    headers: finalHeaders,
-    body: finalBody,
-  });
+  return { ...rest, headers: finalHeaders, body: finalBody };
+}
+
+export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
+  const token = await SecureStore.getItemAsync("access_token");
+  let response = await fetch(`${BACKEND_URL}${path}`, buildRequest(options, token));
+
+  if (response.status === 401 || response.status === 403) {
+    const bodyForCheck = await response.clone().json().catch(() => null);
+    const looksLikeExpiredToken = response.status === 401 || bodyForCheck?.message === "Token expired";
+
+    if (looksLikeExpiredToken) {
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        response = await fetch(`${BACKEND_URL}${path}`, buildRequest(options, newToken));
+      }
+    }
+  }
 
   if (response.status === 204) {
     return undefined as T;
