@@ -15,3 +15,4 @@ class User(db.Model):
     last_name = db.Column(db.String(255), nullable=True)
     email = db.Column(db.String(255), nullable=True, index=True)
     teacher_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
+    interest = db.Column(db.String(50), nullable=True)
