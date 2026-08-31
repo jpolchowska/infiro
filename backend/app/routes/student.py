@@ -9,6 +9,7 @@ from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.student_answers import StudentAnswer
+from app.models.leveling_test_attempts import LevelingTestAttempt
 
 student_bp = Blueprint("student", __name__)
 
@@ -224,4 +225,103 @@ def get_student_subsection_tasks(subsection_id):
 
 @student_bp.route("/api/student/stats")
 def get_student_stats():
-    ...
+    student = _current_user()
+    student_id = student.id
+
+    total_tasks = Task.query.count()
+
+    solved_task_ids = _get_solved_task_ids(student_id)
+
+    solved_tasks = len(solved_task_ids)
+
+    total_attempts = (
+        StudentAnswer.query
+        .filter_by(student_id=student_id)
+        .count()
+    )
+
+    correct_attempts = (
+        StudentAnswer.query
+        .filter_by(
+            student_id=student_id,
+            is_correct=True,
+        )
+        .count()
+    )
+
+    if total_attempts == 0:
+        accuracy = None
+    else:
+        accuracy = round(
+            100 * correct_attempts / total_attempts
+        )
+
+    started_sections = (
+        db.session.query(Section.id)
+        .join(Subsection, Subsection.section_id == Section.id)
+        .join(Task, Task.subsection_id == Subsection.id)
+        .join(StudentAnswer, StudentAnswer.task_id == Task.id)
+        .filter(
+            StudentAnswer.student_id == student_id,
+            StudentAnswer.is_correct.is_(True),
+        )
+        .distinct()
+        .count()
+    )
+
+    current_subsection = _get_current_subsection(
+        student_id,
+    )
+
+    recent_sections = _get_recent_sections(
+        student_id,
+        limit=5,
+    )
+
+    recent_section_data = []
+
+    for section in recent_sections:
+        progress = _get_section_progress(
+            student_id,
+            section,
+        )
+
+        recent_section_data.append(
+            {
+                "section_id": section.id,
+                "section_title": section.title,
+                "section_index": _get_section_index(section.id),
+                "solved_tasks": progress["solved_tasks"],
+                "total_tasks": progress["total_tasks"],
+            }
+        )
+
+    last_leveling_test = (
+    LevelingTestAttempt.query
+    .filter_by(student_id=student_id)
+    .order_by(LevelingTestAttempt.completed_at.desc())
+    .first()
+)
+
+    return jsonify(
+        {
+            "solved_tasks": solved_tasks,
+            "total_tasks": total_tasks,
+            "accuracy": accuracy,
+            "started_sections": started_sections,
+            "current": _current_subsection_json(
+                student_id,
+                current_subsection,
+            ),
+            "recent_sections": recent_section_data,
+            "last_leveling_test": (
+                {
+                    "completed_at": last_leveling_test.completed_at.isoformat(),
+                    "score": last_leveling_test.score,
+                    "total": last_leveling_test.max_score,
+                }
+                if last_leveling_test is not None
+                else None
+            ),
+        }
+    ), 200
