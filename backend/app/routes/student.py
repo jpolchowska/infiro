@@ -152,6 +152,7 @@ def get_student_sections():
 
 
 @student_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
+@authenticate_token
 def get_student_subsection_tasks(subsection_id):
     student = _current_user()
     student_id = student.id
@@ -341,6 +342,7 @@ def _current_subsection_json(student_id, subsection):
     }
 
 @student_bp.route("/api/student/stats")
+@authenticate_token
 def get_student_stats():
     student = _current_user()
     student_id = student.id
