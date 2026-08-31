@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from app.models.leveling_test_attempts import LevelingTestAttempt
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
@@ -103,10 +104,18 @@ def submit_leveling_test():
             id=selected_option_id, task_id=task_id
         ).first()
         if option is None:
-            return jsonify({"error": f"option {selected_option_id} does not belong to task {task_id}"}), 400
+            return jsonify({
+                "error": f"option {selected_option_id} does not belong to task {task_id}"
+            }), 400
 
         validated.append((task, option))
 
+    # Obliczenie wyniku
+    score = sum(1 for _, option in validated if option.is_correct)
+    max_score = len(validated)
+    now = datetime.utcnow()
+
+    # Zapis odpowiedzi na poszczególne zadania
     saved = 0
     for task, option in validated:
         last_attempt = (
@@ -116,17 +125,47 @@ def submit_leveling_test():
         )
         attempt_number = last_attempt.attempt_number + 1 if last_attempt else 1
 
-        db.session.add(StudentAnswer(
-            task_id=task.id,
-            student_id=user.id,
-            selected_option_id=option.id,
-            is_correct=option.is_correct,
-            attempt_number=attempt_number,
-            submitted_at=datetime.utcnow(),
-        ))
+        db.session.add(
+            StudentAnswer(
+                task_id=task.id,
+                student_id=user.id,
+                selected_option_id=option.id,
+                is_correct=option.is_correct,
+                attempt_number=attempt_number,
+                submitted_at=now,
+            )
+        )
         saved += 1
 
-    user.leveling_test_completed_at = datetime.utcnow()
+    # Wstawienie rekordu podejścia do nowej tabeli
+    attempt = LevelingTestAttempt(
+        student_id=user.id,
+        score=score,
+        max_score=max_score,
+        completed_at=now,
+    )
+    db.session.add(attempt)
+
+    # Zachowanie dotychczasowej flagi w profilu
+    user.leveling_test_completed_at = now
     db.session.commit()
 
-    return jsonify({"saved": saved}), 201
+    return jsonify({"saved": saved}), 201 
+
+@leveling_test_bp.route("/api/student/leveling-test/history", methods=["GET"])
+@authenticate_token
+def get_leveling_test_history():
+    user = _current_user()
+    if user is None:
+        return jsonify({"error": "user not found, call /api/student/me first"}), 404
+
+    leveling_test_attempts = LevelingTestAttempt.query.filter_by(student_id=user.id).order_by(LevelingTestAttempt.completed_at.desc()).all()
+
+    return jsonify([
+        {
+            "score": a.score,
+            "total": a.max_score,
+            "completedAt": a.completed_at.isoformat() if a.completed_at else None,
+        }
+        for a in leveling_test_attempts
+    ]), 200
