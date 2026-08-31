@@ -152,7 +152,75 @@ def get_student_sections():
 
 @student_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
 def get_student_subsection_tasks(subsection_id):
-    ...
+    student = _current_user()
+    student_id = student.id
+
+    subsection = db.session.get(Subsection, subsection_id)
+
+    if subsection is None:
+        return jsonify({"message": "Subsection not found"}), 404
+
+    section = db.session.get(Section, subsection.section_id)
+
+    solved_task_ids = _get_solved_task_ids(
+        student_id,
+        subsection.id,
+    )
+
+    tasks = (
+        Task.query
+        .filter_by(subsection_id=subsection.id)
+        .order_by(Task.difficulty_level, Task.id)
+        .all()
+    )
+
+    first_unsolved_found = False
+    task_data = []
+
+    for task in tasks:
+        if task.id in solved_task_ids:
+            status = "done"
+        elif not first_unsolved_found:
+            status = "current"
+            first_unsolved_found = True
+        else:
+            status = "todo"
+
+        task_data.append(
+            {
+                "id": task.id,
+                "title": task.title,
+                "difficulty_level": task.difficulty_level,
+                "status": status,
+            }
+        )
+
+    next_subsection = (
+        Subsection.query
+        .filter(
+            Subsection.section_id == subsection.section_id,
+            Subsection.order_index > subsection.order_index,
+        )
+        .order_by(Subsection.order_index, Subsection.id)
+        .first()
+    )
+
+    return jsonify(
+        {
+            "id": subsection.id,
+            "title": subsection.title,
+            "description": subsection.description,
+            "section_id": section.id,
+            "section_title": section.title,
+            "section_index": _get_section_index(section.id),
+            "next_subsection_id": (
+                next_subsection.id
+                if next_subsection is not None
+                else None
+            ),
+            "tasks": task_data,
+        }
+    ), 200
 
 @student_bp.route("/api/student/stats")
 def get_student_stats():
