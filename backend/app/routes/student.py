@@ -1,9 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, redirect, url_for
 
 from app.middleware.auth import authenticate_token
 from app.middleware.auth import require_role
 from app.models.users import User
-from app.services.users import get_or_create_user
+from app.services.users import get_or_create_user, update_interest
 
 
 student_bp = Blueprint("student", __name__)
@@ -30,7 +30,6 @@ def _current_user():
 
 @student_bp.route("/api/student/me", methods=["GET"])
 @authenticate_token
-@require_role("Uczeń")
 def me():
     user = get_or_create_user("student")
 
@@ -38,4 +37,16 @@ def me():
         "id": user.id,
         "role": user.role,
         "leveling_test_completed": user.leveling_test_completed_at is not None,
+        "interest": user.interest
     }), 200
+
+@student_bp.route("/api/student/interest", methods=["PATCH"])
+@authenticate_token
+def add_interest():
+    user = _current_user()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    update_interest()
+
+    return "", 204
