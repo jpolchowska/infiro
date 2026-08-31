@@ -50,3 +50,28 @@ def add_interest():
     update_interest()
 
     return "", 204
+
+def _get_section_index(section_id):
+    ...
+
+def _get_solved_task_ids(student_id):
+    ...
+
+def _get_section_progress(student_id, section):
+    ...
+def _get_subsection_progress(student_id, subsection):
+    ...
+
+@student_bp.route("/api/student/sections")
+@authenticate_token
+def get_student_sections():
+    ...
+
+
+@student_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
+def get_student_subsection_tasks(subsection_id):
+    ...
+
+@student_bp.route("/api/student/stats")
+def get_student_stats():
+    ...
