@@ -223,6 +223,123 @@ def get_student_subsection_tasks(subsection_id):
         }
     ), 200
 
+def _get_section_progress(student_id, section):
+    subsections = (
+        Subsection.query
+        .filter_by(section_id=section.id)
+        .all()
+    )
+
+    solved_tasks = 0
+    total_tasks = 0
+
+    for subsection in subsections:
+        progress = _subsection_progress(
+            student_id,
+            subsection,
+        )
+
+        solved_tasks += progress["solved_tasks"]
+        total_tasks += progress["total_tasks"]
+
+    return {
+        "solved_tasks": solved_tasks,
+        "total_tasks": total_tasks,
+    }
+
+def _get_current_subsection(student_id):
+    answers = (
+        db.session.query(
+            StudentAnswer.submitted_at,
+            Task.subsection_id,
+        )
+        .join(Task, StudentAnswer.task_id == Task.id)
+        .filter(
+            StudentAnswer.student_id == student_id,
+        )
+        .order_by(StudentAnswer.submitted_at.desc())
+        .all()
+    )
+
+    checked_subsections = set()
+
+    for submitted_at, subsection_id in answers:
+        if subsection_id in checked_subsections:
+            continue
+
+        checked_subsections.add(subsection_id)
+
+        subsection = db.session.get(
+            Subsection,
+            subsection_id,
+        )
+
+        if subsection is None:
+            continue
+
+        progress = _subsection_progress(
+            student_id,
+            subsection,
+        )
+
+        if progress["solved_tasks"] < progress["total_tasks"]:
+            return subsection
+
+    return None
+
+def _get_recent_sections(student_id, limit=5):
+    rows = (
+        db.session.query(
+            StudentAnswer.submitted_at,
+            Section.id,
+        )
+        .join(Task, StudentAnswer.task_id == Task.id)
+        .join(Subsection, Task.subsection_id == Subsection.id)
+        .join(Section, Subsection.section_id == Section.id)
+        .filter(
+            StudentAnswer.student_id == student_id,
+        )
+        .order_by(StudentAnswer.submitted_at.desc())
+        .all()
+    )
+
+    section_ids = []
+
+    for submitted_at, section_id in rows:
+        if section_id not in section_ids:
+            section_ids.append(section_id)
+
+        if len(section_ids) >= limit:
+            break
+
+    return [
+        db.session.get(Section, section_id)
+        for section_id in section_ids
+    ]
+
+def _current_subsection_json(student_id, subsection):
+    if subsection is None:
+        return None
+
+    section = db.session.get(
+        Section,
+        subsection.section_id,
+    )
+
+    progress = _subsection_progress(
+        student_id,
+        subsection,
+    )
+
+    return {
+        "subsection_id": subsection.id,
+        "subsection_title": subsection.title,
+        "section_title": section.title,
+        "section_index": _get_section_index(section.id),
+        "solved_tasks": progress["solved_tasks"],
+        "total_tasks": progress["total_tasks"],
+    }
+
 @student_bp.route("/api/student/stats")
 def get_student_stats():
     student = _current_user()
