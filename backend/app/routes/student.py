@@ -84,8 +84,17 @@ def _get_solved_task_ids(student_id, subsection_id=None):
 
     return {task_id for (task_id,) in query.all()}
 
-def _get_section_progress(student_id, section):
-    ...
+def _student_subsection_json(student_id, subsection):
+    progress = _subsection_progress(student_id, subsection)
+
+    return {
+        "id": subsection.id,
+        "title": subsection.title,
+        "description": subsection.description,
+        "solved_tasks": progress["solved_tasks"],
+        "total_tasks": progress["total_tasks"],
+    }
+
 def _subsection_progress(student_id, subsection):
     total_tasks = (
         Task.query
@@ -106,30 +115,32 @@ def _subsection_progress(student_id, subsection):
 @student_bp.route("/api/student/sections")
 @authenticate_token
 def get_student_sections():
-    student_id = _current_user() 
+    student = _current_user()
+    student_id = student.id
     sections = ( 
         Section.query 
         .order_by(Section.order_index) 
         .all()
           ) 
+    
     result = [] 
+
     for index, section in enumerate(sections): 
         subsections = ( 
             Subsection.query 
             .filter_by(section_id=section.id) 
-            .order_by(Subsection.order_index) 
+            .order_by(Subsection.order_index, Subsection.id) 
             .all() 
             ) 
+        
         subsection_data = [] 
+
         for subsection in subsections:
-             total_tasks = 0 
-             solved_tasks = 0  
-             subsection_data.append({ 
-                 "id": subsection.id, 
-                 "title": subsection.title, 
-                 "description": subsection.description, 
-                 "solved_tasks": solved_tasks, 
-                 "total_tasks": total_tasks, }) 
+             subsection_data.append( 
+                _student_subsection_json( 
+                    student_id, 
+                    subsection )
+             )
         result.append({ 
             "id": section.id, 
             "title": section.title, 
