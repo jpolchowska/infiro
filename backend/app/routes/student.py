@@ -4,7 +4,11 @@ from app.middleware.auth import authenticate_token
 from app.middleware.auth import require_role
 from app.models.users import User
 from app.services.users import get_or_create_user, update_interest
-
+from app.extensions import db
+from app.models.sections import Section
+from app.models.subsections import Subsection
+from app.models.tasks import Task
+from app.models.student_answers import StudentAnswer
 
 student_bp = Blueprint("student", __name__)
 
@@ -52,20 +56,87 @@ def add_interest():
     return "", 204
 
 def _get_section_index(section_id):
-    ...
+    sections = (
+        Section.query
+        .order_by(Section.order_index, Section.id)
+        .all()
+    )
 
-def _get_solved_task_ids(student_id):
-    ...
+    for index, section in enumerate(sections):
+        if section.id == section_id:
+            return index
+
+    return None
+
+def _get_solved_task_ids(student_id, subsection_id=None):
+    query = (
+        db.session.query(StudentAnswer.task_id)
+        .join(Task, StudentAnswer.task_id == Task.id)
+        .filter(
+            StudentAnswer.student_id == student_id,
+            StudentAnswer.is_correct.is_(True),
+        )
+        .distinct()
+    )
+
+    if subsection_id is not None:
+        query = query.filter(Task.subsection_id == subsection_id)
+
+    return {task_id for (task_id,) in query.all()}
 
 def _get_section_progress(student_id, section):
     ...
-def _get_subsection_progress(student_id, subsection):
-    ...
+def _subsection_progress(student_id, subsection):
+    total_tasks = (
+        Task.query
+        .filter_by(subsection_id=subsection.id)
+        .count()
+    )
+
+    solved_task_ids = _get_solved_task_ids(
+        student_id,
+        subsection.id
+    )
+
+    return {
+        "solved_tasks": len(solved_task_ids),
+        "total_tasks": total_tasks,
+    }
 
 @student_bp.route("/api/student/sections")
 @authenticate_token
 def get_student_sections():
-    ...
+    student_id = _current_user() 
+    sections = ( 
+        Section.query 
+        .order_by(Section.order_index) 
+        .all()
+          ) 
+    result = [] 
+    for index, section in enumerate(sections): 
+        subsections = ( 
+            Subsection.query 
+            .filter_by(section_id=section.id) 
+            .order_by(Subsection.order_index) 
+            .all() 
+            ) 
+        subsection_data = [] 
+        for subsection in subsections:
+             total_tasks = 0 
+             solved_tasks = 0  
+             subsection_data.append({ 
+                 "id": subsection.id, 
+                 "title": subsection.title, 
+                 "description": subsection.description, 
+                 "solved_tasks": solved_tasks, 
+                 "total_tasks": total_tasks, }) 
+        result.append({ 
+            "id": section.id, 
+            "title": section.title, 
+            "description": section.description, 
+            "index": index, "subsections": subsection_data,
+            })
+    return jsonify(result), 200
 
 
 @student_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
