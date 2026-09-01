@@ -29,33 +29,33 @@ type RawMe = {
   id: number;
   role: string;
   leveling_test_completed: boolean;
+  interest: string | null;
 };
 
 export async function getMe(): Promise<StudentMe> {
   const raw = await apiFetch<RawMe>("/api/student/me");
   const token = await SecureStore.getItemAsync("access_token");
   const name = token ? getGivenName(token) : null;
-  const interest = await SecureStore.getItemAsync(interestKey(raw.id));
 
   return {
     id: raw.id,
     role: raw.role,
     name,
     levelingTestCompleted: raw.leveling_test_completed,
-    interest,
+    interest: raw.interest
   };
 }
 
-// TODO(backend): nie ma jeszcze endpointu do zapisu zainteresowania
-// (PATCH /api/student/interest) -- trzymamy wybór lokalnie na urządzeniu,
-// żeby ekran działał już teraz. Podmienić na apiFetch, jak endpoint powstanie.
 export async function saveInterest(userId: number, interest: string | null): Promise<void> {
-  const key = interestKey(userId);
-  if (interest === null) {
-    await SecureStore.deleteItemAsync(key);
-  } else {
-    await SecureStore.setItemAsync(key, interest);
-  }
+  await apiFetch<void>("/api/student/interest", {
+  method: "PATCH",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    interest,
+  }),
+});
 }
 
 export type CurrentSubsection = {
@@ -226,9 +226,10 @@ export async function getSubsectionTasks(subsectionId: number): Promise<Subsecti
   throw new Error(`Unknown subsection: ${subsectionId}`);
 }
 
-// TODO(backend): brak GET /api/student/leveling-test/history i tabeli pod nią
-// (dziś jest tylko jedna kolumna leveling_test_completed_at, nie historia
-// wielu podejść) -- zamockowane, patrz lib/mockStudentData.ts.
 export async function getLevelingTestHistory(): Promise<LastLevelingTest[]> {
-  return MOCK_LEVELING_HISTORY.map((a) => ({ ...a }));
+  const data = await apiFetch<LastLevelingTest[]>("/api/student/leveling-test/history", {
+    method: "GET",
+  });
+
+  return data;
 }
