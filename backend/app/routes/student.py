@@ -52,7 +52,10 @@ def add_interest():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    update_interest()
+    try:
+        update_interest()
+    except ValueError:
+        return jsonify({"error": "Invalid interest"}), 400
 
     return "", 204
 
