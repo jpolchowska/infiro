@@ -40,8 +40,8 @@ def update_interest():
     sub = request.user.get("sub")
     user = User.query.filter_by(keycloak_sub=sub).first()
     interest = request.json.get("interest")
-
-    anivableInterests_options = ["sport", "zwierzeta", "gotowanie", "lego", "gry", "rysowanie"]
+    
+    anivableInterests_options = ["sport", "zwierzeta", "gotowanie", "lego", "gry", "rysowanie", "muzyka", "jedzenie", None]
 
     if interest in anivableInterests_options:
         user.interest = interest
