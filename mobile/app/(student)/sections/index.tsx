@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../../components/student/BottomTabBar';
@@ -45,6 +45,19 @@ export default function SectionsScreen() {
     );
   }
 
+  if (!sections) {
+    return (
+      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+        <SafeAreaView className="flex-1" edges={['top']}>
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator color="#142284" />
+          </View>
+        </SafeAreaView>
+        <BottomTabBar />
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
       <SafeAreaView className="flex-1" edges={['top']}>
@@ -54,12 +67,12 @@ export default function SectionsScreen() {
           showsVerticalScrollIndicator={false}
         >
           <Text className="text-infiro-navy font-extrabold text-[27px] leading-[31px]">Działy tematyczne</Text>
-          <Text style={{ color: '#6b74a8' }} className="font-medium text-[13px] mt-1 mb-[22px]">
-            Wybierz dział, w którym chcesz dziś poćwiczyć.
+          <Text style={{ color: '#6b74a8' }} className="font-medium text-[14px] leading-[20px] mt-1 mb-[22px]">
+            Wybierz dział, który chcesz dziś poćwiczyć.
           </Text>
 
           <View style={{ gap: 14 }}>
-            {(sections ?? []).map((section) => {
+            {sections.map((section) => {
               const accent = getAccent(section.index);
               const accentHex = ACCENT_HEX[section.index % ACCENT_HEX.length];
               const totalTasks = section.subsections.reduce((sum, s) => sum + s.totalTasks, 0);
@@ -120,7 +133,7 @@ export default function SectionsScreen() {
                     </View>
 
                     {expanded && section.description && (
-                      <Text style={{ color: '#6b74a8' }} className="font-medium text-[13px] leading-[19px] mt-3.5">
+                      <Text style={{ color: '#6b74a8' }} className="font-medium text-[14px] leading-[20px] mt-3.5">
                         {section.description}
                       </Text>
                     )}

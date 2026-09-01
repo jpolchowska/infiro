@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ErrorState } from '../../../components/student/ErrorState';
@@ -79,6 +79,17 @@ export default function SubsectionTasksScreen() {
     );
   }
 
+  if (!detail) {
+    return (
+      <View
+        className="flex-1 items-center justify-center"
+        style={{ backgroundColor: '#f4f5fb', paddingTop: insets.top }}
+      >
+        <ActivityIndicator color="#142284" />
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
       <ScrollView
@@ -97,7 +108,7 @@ export default function SubsectionTasksScreen() {
           }}
         >
           <Pressable onPress={goToSection} hitSlop={8} className="mb-3.5">
-            <Text style={{ color: '#6b74a8' }} className="font-semibold text-[13px]" numberOfLines={1}>
+            <Text style={{ color: '#6b74a8' }} className="font-semibold text-[14px]" numberOfLines={1}>
               ‹ {detail?.sectionTitle ?? 'Wróć'}
             </Text>
           </Pressable>
@@ -106,7 +117,7 @@ export default function SubsectionTasksScreen() {
             {detail?.title ?? ''}
           </Text>
           {detail?.description && (
-            <Text style={{ color: '#5a6392' }} className="font-medium text-[13px] leading-[19px] mt-2.5">
+            <Text style={{ color: '#5a6392' }} className="font-medium text-[14px] leading-[20px] mt-2.5">
               {detail.description}
             </Text>
           )}
