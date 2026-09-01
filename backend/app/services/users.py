@@ -39,11 +39,11 @@ def get_or_create_user(role):
 def update_interest():
     sub = request.user.get("sub")
     user = User.query.filter_by(keycloak_sub=sub).first()
-    interest = request.json.get("interest")
-    
-    anivableInterests_options = ["sport", "zwierzeta", "gotowanie", "lego", "gry", "rysowanie", "muzyka", "jedzenie", None]
+    interest = (request.get_json(silent=True) or {}).get("interest")
 
-    if interest in anivableInterests_options:
+    anivableInterests_options = ["sport", "zwierzeta", "lego", "gry", "rysowanie", "muzyka", "jedzenie"]
+
+    if interest is None or interest in anivableInterests_options:
         user.interest = interest
     else:
         raise ValueError("Invalid interest")

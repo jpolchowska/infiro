@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { InterestIcon, InterestId } from '../../components/student/InterestIcon';
@@ -47,14 +47,9 @@ export default function InterestsScreen() {
 
   const handleDone = async () => {
     if (saving) return;
-    // Bez wybranej opcji nie wołamy PATCH -- backend nie przyjmuje jeszcze
-    // `null` (patrz uwagi dla backendu). Zachowujemy się jak "Pomiń".
-    if (picked === null) {
-      goNext();
-      return;
-    }
     setSaving(true);
     try {
+      // picked === null czyści wybór (backend przyjmuje null).
       await saveInterest(picked);
     } catch (error) {
       console.error('Failed to save interest:', error);
@@ -69,8 +64,12 @@ export default function InterestsScreen() {
     : 'Możesz wybrać jedną rzecz';
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
-      <View className="flex-1 px-[22px] pt-4" style={{ paddingBottom: 30 }}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: '#f4f5fb' }} edges={['top']}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: 22, paddingTop: 16, paddingBottom: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
         <Text
           style={{ color: '#ff5f55', letterSpacing: 1.5 }}
           className="font-bold text-[12px] uppercase mb-3.5"
@@ -119,18 +118,27 @@ export default function InterestsScreen() {
             );
           })}
         </View>
+      </ScrollView>
 
-        <View className="flex-1" style={{ minHeight: 20 }} />
-
+      <View
+        style={{
+          paddingHorizontal: 22,
+          paddingTop: 10,
+          paddingBottom: 30,
+          borderTopWidth: 1,
+          borderTopColor: '#e8eaf4',
+          backgroundColor: '#f4f5fb',
+        }}
+      >
         <Text style={{ color: '#8b93bd' }} className="font-semibold text-[13px] text-center mb-3">
           {pickedLabel}
         </Text>
 
         <Pressable
           onPress={handleDone}
-          disabled={saving || !picked}
+          disabled={saving}
           className="rounded-full items-center justify-center"
-          style={[{ height: 60, backgroundColor: '#ff5f55', opacity: picked ? 1 : 0.45 }, CTA_SHADOW]}
+          style={[{ height: 60, backgroundColor: '#ff5f55', opacity: saving ? 0.6 : 1 }, CTA_SHADOW]}
         >
           <Text className="text-infiro-white font-extrabold text-[17px]">Gotowe</Text>
         </Pressable>

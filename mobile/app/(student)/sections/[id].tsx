@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ErrorState } from '../../../components/student/ErrorState';
@@ -52,6 +52,37 @@ export default function SectionDetailScreen() {
     );
   }
 
+  if (!sections) {
+    return (
+      <View
+        className="flex-1 items-center justify-center"
+        style={{ backgroundColor: '#f4f5fb', paddingTop: insets.top }}
+      >
+        <ActivityIndicator color="#142284" />
+      </View>
+    );
+  }
+
+  if (!section) {
+    return (
+      <View className="flex-1" style={{ backgroundColor: '#f4f5fb', paddingTop: insets.top + 8 }}>
+        <Pressable onPress={() => router.dismissTo('/(student)/sections')} hitSlop={8} className="px-5">
+          <Text style={{ color: '#6b74a8' }} className="font-semibold text-[14px]">
+            ‹ Działy tematyczne
+          </Text>
+        </Pressable>
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="text-infiro-navy font-extrabold text-lg text-center mb-2">
+            Nie znaleziono działu
+          </Text>
+          <Text style={{ color: '#8b93bd' }} className="font-medium text-[13px] text-center">
+            Ten dział mógł zostać usunięty albo link jest nieaktualny.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
       <ScrollView
@@ -72,7 +103,7 @@ export default function SectionDetailScreen() {
           }}
         >
           <Pressable onPress={() => router.dismissTo('/(student)/sections')} hitSlop={8} className="mb-3.5">
-            <Text style={{ color: '#6b74a8' }} className="font-semibold text-[13px]">
+            <Text style={{ color: '#6b74a8' }} className="font-semibold text-[14px]">
               ‹ Działy tematyczne
             </Text>
           </Pressable>
@@ -92,7 +123,7 @@ export default function SectionDetailScreen() {
               </View>
 
               {section.description && (
-                <Text style={{ color: '#5a6392' }} className="font-medium text-[13px] leading-[19px] mt-2.5">
+                <Text style={{ color: '#5a6392' }} className="font-medium text-[14px] leading-[20px] mt-2.5">
                   {section.description}
                 </Text>
               )}
@@ -125,7 +156,7 @@ export default function SectionDetailScreen() {
               <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-bold text-[12px] uppercase">
                 Podsekcje
               </Text>
-              <Text style={{ color: '#8b93bd' }} className="font-semibold text-[12px]">
+              <Text style={{ color: '#8b93bd' }} className="font-semibold text-xs">
                 {doneCount} z {section.subsections.length} ukończonych
               </Text>
             </View>
@@ -177,11 +208,11 @@ export default function SectionDetailScreen() {
                     </View>
 
                     <View className="flex-1">
-                      <Text className="text-infiro-navy font-extrabold text-[14px] leading-[18px]">{sub.title}</Text>
+                      <Text className="text-infiro-navy font-extrabold text-[15px] leading-[19px]">{sub.title}</Text>
                       {sub.description && (
                         <Text
                           style={{ color: '#6b74a8' }}
-                          className="font-medium text-[13px] leading-[18px] mt-1"
+                          className="font-medium text-[14px] leading-[20px] mt-1"
                         >
                           {sub.description}
                         </Text>
