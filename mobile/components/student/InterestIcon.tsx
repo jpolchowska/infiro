@@ -1,17 +1,25 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ComponentProps } from 'react';
 
-export type InterestId = 'sport' | 'zwierzeta' | 'gotowanie' | 'lego' | 'gry' | 'rysowanie';
+export type InterestId =
+  | 'sport'
+  | 'gry'
+  | 'lego'
+  | 'zwierzeta'
+  | 'rysowanie'
+  | 'muzyka'
+  | 'jedzenie';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
 const ICON_NAME: Record<InterestId, IoniconName> = {
   sport: 'football',
-  zwierzeta: 'paw',
-  gotowanie: 'restaurant',
-  lego: 'cube',
   gry: 'game-controller',
+  lego: 'cube',
+  zwierzeta: 'paw',
   rysowanie: 'brush',
+  muzyka: 'musical-notes',
+  jedzenie: 'restaurant',
 };
 
 export function InterestIcon({

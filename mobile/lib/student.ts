@@ -1,19 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 import { apiFetch } from "./api";
 import { getGivenName } from "../utils/decodeToken";
-import {
-  MOCK_CURRENT,
-  MOCK_LEVELING_HISTORY,
-  MOCK_SECTIONS,
-  MOCK_STATS,
-  sectionTotals,
-} from "./mockStudentData";
-
-// Klucz zawiera id ucznia -- bez tego jedno konto widziałoby zainteresowanie
-// zapisane wcześniej przez INNE konto zalogowane na tym samym telefonie.
-function interestKey(userId: number) {
-  return `student_interest_${userId}`;
-}
 
 export type StudentMe = {
   id: number;
@@ -23,8 +10,6 @@ export type StudentMe = {
   interest: string | null;
 };
 
-// Backend dziś zwraca tylko te trzy pola -- reszta (imię, zainteresowanie)
-// jest dociągana z innych, realnie dostępnych źródeł poniżej.
 type RawMe = {
   id: number;
   role: string;
@@ -35,6 +20,7 @@ type RawMe = {
 export async function getMe(): Promise<StudentMe> {
   const raw = await apiFetch<RawMe>("/api/student/me");
   const token = await SecureStore.getItemAsync("access_token");
+  // Imię bierzemy wprost z tokena Keycloaka -- backend go nie zwraca.
   const name = token ? getGivenName(token) : null;
 
   return {
@@ -42,20 +28,16 @@ export async function getMe(): Promise<StudentMe> {
     role: raw.role,
     name,
     levelingTestCompleted: raw.leveling_test_completed,
-    interest: raw.interest
+    interest: raw.interest,
   };
 }
 
-export async function saveInterest(userId: number, interest: string | null): Promise<void> {
+// interest === null czyści wybór.
+export async function saveInterest(interest: string | null): Promise<void> {
   await apiFetch<void>("/api/student/interest", {
-  method: "PATCH",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    interest,
-  }),
-});
+    method: "PATCH",
+    json: { interest },
+  });
 }
 
 export type CurrentSubsection = {
@@ -91,43 +73,63 @@ export type DashboardStats = {
   lastLevelingTest: LastLevelingTest | null;
 };
 
-// TODO(backend): brak GET /api/student/stats -- zamockowane pod dashboard
-// z prototypu (Claude Design). Podmienić na realny fetch, jak endpoint powstanie
-// (kształt oczekiwany po stronie frontu opisany w notatce dla backendu).
+type RawCurrentSubsection = {
+  subsection_id: number;
+  subsection_title: string;
+  section_title: string;
+  section_index: number;
+  solved_tasks: number;
+  total_tasks: number;
+};
+
+type RawRecentSection = {
+  section_id: number;
+  section_title: string;
+  section_index: number;
+  solved_tasks: number;
+  total_tasks: number;
+};
+
+type RawDashboardStats = {
+  solved_tasks: number;
+  total_tasks: number;
+  accuracy: number | null;
+  started_sections: number;
+  current: RawCurrentSubsection | null;
+  recent_sections: RawRecentSection[];
+  last_leveling_test: { completed_at: string; score: number; total: number } | null;
+};
+
 export async function getStats(): Promise<DashboardStats> {
-  const totalTasks = MOCK_SECTIONS.reduce((sum, s) => sum + sectionTotals(s).totalTasks, 0);
-  const recentSections: RecentSection[] = MOCK_SECTIONS.filter((s) =>
-    s.subsections.some((sub) => sub.solvedTasks > 0)
-  ).map((s) => {
-    const totals = sectionTotals(s);
-    return {
-      sectionId: s.id,
-      sectionTitle: s.title,
-      sectionIndex: s.index,
-      solvedTasks: totals.solvedTasks,
-      totalTasks: totals.totalTasks,
-    };
-  });
+  const raw = await apiFetch<RawDashboardStats>("/api/student/stats");
 
   return {
-    solvedTasks: MOCK_STATS.solvedTasks,
-    totalTasks,
-    accuracy: MOCK_STATS.accuracy,
-    startedSections: MOCK_STATS.startedSections,
-    current: {
-      subsectionId: MOCK_CURRENT.subsectionId,
-      subsectionTitle: MOCK_CURRENT.subsectionTitle,
-      sectionTitle: MOCK_CURRENT.sectionTitle,
-      sectionIndex: MOCK_CURRENT.sectionIndex,
-      solvedTasks: MOCK_CURRENT.solvedTasks,
-      totalTasks: MOCK_CURRENT.totalTasks,
-    },
-    recentSections,
-    lastLevelingTest: MOCK_LEVELING_HISTORY[0]
+    solvedTasks: raw.solved_tasks,
+    totalTasks: raw.total_tasks,
+    accuracy: raw.accuracy,
+    startedSections: raw.started_sections,
+    current: raw.current
       ? {
-          completedAt: MOCK_LEVELING_HISTORY[0].completedAt,
-          score: MOCK_LEVELING_HISTORY[0].score,
-          total: MOCK_LEVELING_HISTORY[0].total,
+          subsectionId: raw.current.subsection_id,
+          subsectionTitle: raw.current.subsection_title,
+          sectionTitle: raw.current.section_title,
+          sectionIndex: raw.current.section_index,
+          solvedTasks: raw.current.solved_tasks,
+          totalTasks: raw.current.total_tasks,
+        }
+      : null,
+    recentSections: raw.recent_sections.map((s) => ({
+      sectionId: s.section_id,
+      sectionTitle: s.section_title,
+      sectionIndex: s.section_index,
+      solvedTasks: s.solved_tasks,
+      totalTasks: s.total_tasks,
+    })),
+    lastLevelingTest: raw.last_leveling_test
+      ? {
+          completedAt: raw.last_leveling_test.completed_at,
+          score: raw.last_leveling_test.score,
+          total: raw.last_leveling_test.total,
         }
       : null,
   };
@@ -149,10 +151,26 @@ export type SectionSummary = {
   subsections: SectionSubsectionSummary[];
 };
 
-// TODO(backend): brak GET /api/student/sections -- zamockowane, patrz
-// lib/mockStudentData.ts.
+type RawSectionSubsection = {
+  id: number;
+  title: string;
+  description: string | null;
+  solved_tasks: number;
+  total_tasks: number;
+};
+
+type RawSection = {
+  id: number;
+  title: string;
+  description: string | null;
+  index: number;
+  subsections: RawSectionSubsection[];
+};
+
 export async function getSections(): Promise<SectionSummary[]> {
-  return MOCK_SECTIONS.map((s) => ({
+  const raw = await apiFetch<RawSection[]>("/api/student/sections");
+
+  return raw.map((s) => ({
     id: s.id,
     title: s.title,
     description: s.description,
@@ -161,8 +179,8 @@ export async function getSections(): Promise<SectionSummary[]> {
       id: sub.id,
       title: sub.title,
       description: sub.description,
-      solvedTasks: sub.solvedTasks,
-      totalTasks: sub.totalTasks,
+      solvedTasks: sub.solved_tasks,
+      totalTasks: sub.total_tasks,
     })),
   }));
 }
@@ -189,47 +207,47 @@ export type SubsectionDetail = {
   tasks: SubsectionTaskSummary[];
 };
 
-// TODO(backend): brak GET /api/student/subsections/<id>/tasks -- zamockowane:
-// dorabiamy `solvedTasks` zadań ze statusem "done", jedno "current" (jeśli
-// zostały jakieś nierozwiązane), reszta "todo". Realny endpoint ma zwracać
-// prawdziwy status per zadanie (patrz notatka dla backendu).
+type RawSubsectionTask = {
+  id: number;
+  title: string;
+  difficulty_level: number;
+  status: SubsectionTaskStatus;
+};
+
+type RawSubsectionDetail = {
+  id: number;
+  title: string;
+  description: string | null;
+  section_id: number;
+  section_title: string;
+  section_index: number;
+  next_subsection_id: number | null;
+  tasks: RawSubsectionTask[];
+};
+
 export async function getSubsectionTasks(subsectionId: number): Promise<SubsectionDetail> {
-  for (const section of MOCK_SECTIONS) {
-    const idx = section.subsections.findIndex((s) => s.id === subsectionId);
-    if (idx === -1) continue;
-    const sub = section.subsections[idx];
-    const next = section.subsections[idx + 1] ?? null;
+  const raw = await apiFetch<RawSubsectionDetail>(
+    `/api/student/subsections/${subsectionId}/tasks`
+  );
 
-    const tasks: SubsectionTaskSummary[] = Array.from({ length: sub.totalTasks }, (_, i) => {
-      const status: SubsectionTaskStatus =
-        i < sub.solvedTasks ? "done" : i === sub.solvedTasks ? "current" : "todo";
-      return {
-        id: sub.id * 100 + i,
-        title: `${sub.title} — zadanie ${i + 1}`,
-        difficulty: ((i % 3) + 1) as 1 | 2 | 3,
-        status,
-      };
-    });
-
-    return {
-      id: sub.id,
-      title: sub.title,
-      description: sub.description,
-      sectionId: section.id,
-      sectionTitle: section.title,
-      sectionIndex: section.index,
-      nextSubsectionId: next ? next.id : null,
-      tasks,
-    };
-  }
-
-  throw new Error(`Unknown subsection: ${subsectionId}`);
+  return {
+    id: raw.id,
+    title: raw.title,
+    description: raw.description,
+    sectionId: raw.section_id,
+    sectionTitle: raw.section_title,
+    sectionIndex: raw.section_index,
+    nextSubsectionId: raw.next_subsection_id,
+    tasks: raw.tasks.map((t) => ({
+      id: t.id,
+      title: t.title,
+      difficulty: (t.difficulty_level as 1 | 2 | 3),
+      status: t.status,
+    })),
+  };
 }
 
+// Backend zwraca tu już camelCase (`completedAt`) -- bez mapowania.
 export async function getLevelingTestHistory(): Promise<LastLevelingTest[]> {
-  const data = await apiFetch<LastLevelingTest[]>("/api/student/leveling-test/history", {
-    method: "GET",
-  });
-
-  return data;
+  return apiFetch<LastLevelingTest[]>("/api/student/leveling-test/history");
 }

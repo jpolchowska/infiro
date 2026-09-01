@@ -19,7 +19,6 @@ const CTA_SHADOW = {
 export default function InterestsScreen() {
   const { from } = useLocalSearchParams<{ from?: string }>();
   const [picked, setPicked] = useState<InterestId | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
   const [levelingTestCompleted, setLevelingTestCompleted] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -28,7 +27,6 @@ export default function InterestsScreen() {
     getMe()
       .then((me) => {
         if (active) {
-          setUserId(me.id);
           setLevelingTestCompleted(me.levelingTestCompleted);
           if (me.interest) setPicked(me.interest as InterestId);
         }
@@ -48,10 +46,16 @@ export default function InterestsScreen() {
   };
 
   const handleDone = async () => {
-    if (saving || userId === null) return;
+    if (saving) return;
+    // Bez wybranej opcji nie wołamy PATCH -- backend nie przyjmuje jeszcze
+    // `null` (patrz uwagi dla backendu). Zachowujemy się jak "Pomiń".
+    if (picked === null) {
+      goNext();
+      return;
+    }
     setSaving(true);
     try {
-      await saveInterest(userId, picked);
+      await saveInterest(picked);
     } catch (error) {
       console.error('Failed to save interest:', error);
     } finally {
@@ -124,7 +128,7 @@ export default function InterestsScreen() {
 
         <Pressable
           onPress={handleDone}
-          disabled={saving}
+          disabled={saving || !picked}
           className="rounded-full items-center justify-center"
           style={[{ height: 60, backgroundColor: '#ff5f55', opacity: picked ? 1 : 0.45 }, CTA_SHADOW]}
         >
