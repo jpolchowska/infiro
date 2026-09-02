@@ -1,0 +1,1200 @@
+[
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "subsections": [
+      {
+        "subsection": "Zrozumienie mnożenia",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "W 4 pudełkach jest po 3 przedmioty. Które działanie opisuje ich łączną liczbę?",
+                "options": [
+                  { "text": "4 + 3" },
+                  { "text": "4 − 3" },
+                  { "text": "4 × 3", "correct": true },
+                  { "text": "4 / 3" }
+                ]
+              },
+              "gry": {
+                "prompt": "W grze masz 4 skrzynie, a z każdej wystają po 3 kryształy. Które działanie opisuje ich łączną liczbę?",
+                "options": [
+                  { "text": "4 + 3" },
+                  { "text": "4 − 3" },
+                  { "text": "4 × 3", "correct": true },
+                  { "text": "4 / 3" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Które dodawanie jest tym samym co 3 × 4?",
+                "options": [
+                  { "text": "3 + 4" },
+                  { "text": "4 + 4 + 4", "correct": true },
+                  { "text": "3 + 3 + 3" },
+                  { "text": "3 + 4 + 4" }
+                ]
+              },
+              "rysowanie": {
+                "prompt": "Troje dzieci dostało po 4 kredki. Które dodawanie opisuje łączną liczbę kredek?",
+                "options": [
+                  { "text": "3 + 4" },
+                  { "text": "4 + 4 + 4", "correct": true },
+                  { "text": "3 + 3 + 3" },
+                  { "text": "3 + 4 + 4" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Łatwe mnożenie",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 2 × 4?",
+                "options": [
+                  { "text": "6" },
+                  { "text": "8", "correct": true },
+                  { "text": "9" },
+                  { "text": "10" }
+                ]
+              },
+              "jedzenie": {
+                "prompt": "Na 2 talerzach leży po 4 naleśniki. Ile naleśników jest łącznie?",
+                "options": [
+                  { "text": "6" },
+                  { "text": "8", "correct": true },
+                  { "text": "9" },
+                  { "text": "10" }
+                ]
+              },
+              "zwierzeta": {
+                "prompt": "W 2 klatkach jest po 4 chomiki. Ile chomików jest łącznie?",
+                "options": [
+                  { "text": "6" },
+                  { "text": "8", "correct": true },
+                  { "text": "9" },
+                  { "text": "10" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 5 × 5?",
+                "options": [
+                  { "text": "20" },
+                  { "text": "25", "correct": true },
+                  { "text": "30" },
+                  { "text": "15" }
+                ]
+              },
+              "sport": {
+                "prompt": "Do turnieju zgłosiło się 5 drużyn, każda po 5 zawodników. Ilu zawodników jest łącznie?",
+                "options": [
+                  { "text": "20" },
+                  { "text": "25", "correct": true },
+                  { "text": "30" },
+                  { "text": "15" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Na 7 półkach stoi po 4 pudełka. Ile pudełek jest łącznie?",
+                "options": [
+                  { "text": "11" },
+                  { "text": "24" },
+                  { "text": "28", "correct": true },
+                  { "text": "21" }
+                ]
+              },
+              "gry": {
+                "prompt": "W grze zbierasz 4 monety na każdym z 7 poziomów. Ile monet masz łącznie?",
+                "options": [
+                  { "text": "11" },
+                  { "text": "24" },
+                  { "text": "28", "correct": true },
+                  { "text": "21" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "W 3 rzędach ustawiono po 8 osób. Ile osób jest łącznie?",
+                "options": [
+                  { "text": "11" },
+                  { "text": "24", "correct": true },
+                  { "text": "21" },
+                  { "text": "16" }
+                ]
+              },
+              "muzyka": {
+                "prompt": "Chór ustawił się w 3 rzędach po 8 osób. Ile osób liczy chór?",
+                "options": [
+                  { "text": "11" },
+                  { "text": "24", "correct": true },
+                  { "text": "21" },
+                  { "text": "16" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 3 × 6? Wpisz wynik.",
+                "answers": ["18"]
+              },
+              "muzyka": {
+                "prompt": "Zespół ma 3 płyty, a na każdej po 6 piosenek. Ile piosenek jest łącznie? Wpisz wynik.",
+                "answers": ["18"]
+              }
+            }
+          },
+          {
+            "type": "memory",
+            "themes": {
+              "default": {
+                "prompt": "Połącz działania z wynikami.",
+                "pairs": [
+                  { "a": "2 × 3", "b": "6" },
+                  { "a": "4 × 2", "b": "8" },
+                  { "a": "5 × 2", "b": "10" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Trudniejsze mnożenie i ćwiczenia pamięciowe",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 7 × 6?",
+                "options": [
+                  { "text": "36" },
+                  { "text": "42", "correct": true },
+                  { "text": "48" },
+                  { "text": "49" }
+                ]
+              },
+              "gry": {
+                "prompt": "W grze masz 7 plansz, a na każdej po 6 pól. Ile pól jest łącznie?",
+                "options": [
+                  { "text": "36" },
+                  { "text": "42", "correct": true },
+                  { "text": "48" },
+                  { "text": "49" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 8 × 7?",
+                "options": [
+                  { "text": "54" },
+                  { "text": "56", "correct": true },
+                  { "text": "64" },
+                  { "text": "63" }
+                ]
+              },
+              "zwierzeta": {
+                "prompt": "W schronisku jest 8 boksów, a w każdym po 7 kotów. Ile kotów jest łącznie?",
+                "options": [
+                  { "text": "54" },
+                  { "text": "56", "correct": true },
+                  { "text": "64" },
+                  { "text": "63" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 6 × 3?",
+                "options": [
+                  { "text": "9" },
+                  { "text": "15" },
+                  { "text": "18", "correct": true },
+                  { "text": "12" }
+                ]
+              },
+              "sport": {
+                "prompt": "Drużyna rozegrała 6 meczów i w każdym strzeliła po 3 bramki. Ile bramek zdobyła łącznie?",
+                "options": [
+                  { "text": "9" },
+                  { "text": "15" },
+                  { "text": "18", "correct": true },
+                  { "text": "12" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 14 × 3?",
+                "options": [
+                  { "text": "32" },
+                  { "text": "42", "correct": true },
+                  { "text": "48" },
+                  { "text": "52" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 8 × 9? Wpisz wynik.",
+                "answers": ["72"]
+              }
+            }
+          },
+          {
+            "type": "memory",
+            "themes": {
+              "default": {
+                "prompt": "Połącz działania z wynikami.",
+                "pairs": [
+                  { "a": "6 × 7", "b": "42" },
+                  { "a": "8 × 6", "b": "48" },
+                  { "a": "7 × 7", "b": "49" },
+                  { "a": "9 × 6", "b": "54" },
+                  { "a": "8 × 8", "b": "64" },
+                  { "a": "9 × 8", "b": "72" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Zrozumienie dzielenia",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "15 przedmiotów rozłożono po równo do 3 pudełek. Które działanie opisuje ten podział?",
+                "options": [
+                  { "text": "15 − 3" },
+                  { "text": "15 / 3", "correct": true },
+                  { "text": "15 × 3" },
+                  { "text": "15 + 3" }
+                ]
+              },
+              "zwierzeta": {
+                "prompt": "15 kości podzielono na 3 równe miski dla psów. Które działanie opisuje ten podział?",
+                "options": [
+                  { "text": "15 − 3" },
+                  { "text": "15 / 3", "correct": true },
+                  { "text": "15 × 3" },
+                  { "text": "15 + 3" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Dzielenie jest odwrotnością którego działania?",
+                "options": [
+                  { "text": "dodawania" },
+                  { "text": "odejmowania" },
+                  { "text": "mnożenia", "correct": true },
+                  { "text": "porównywania" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Dzielenie w praktyce",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "42 przedmioty rozdzielono po równo na 6 pudełek. Ile przedmiotów jest w jednym pudełku?",
+                "options": [
+                  { "text": "6" },
+                  { "text": "7", "correct": true },
+                  { "text": "8" },
+                  { "text": "36" }
+                ]
+              },
+              "sport": {
+                "prompt": "Trasa sztafety ma 42 km i jest podzielona na 6 równych odcinków. Ile km przebiegnie jeden zawodnik?",
+                "options": [
+                  { "text": "6" },
+                  { "text": "7", "correct": true },
+                  { "text": "8" },
+                  { "text": "36" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 30 : 6? Wpisz wynik.",
+                "answers": ["5"]
+              },
+              "jedzenie": {
+                "prompt": "30 ciastek rozłożono po równo na 6 talerzy. Ile ciastek jest na jednym talerzu? Wpisz wynik.",
+                "answers": ["5"]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "section": "Ułamki proste",
+    "subsections": [
+      {
+        "subsection": "Kawałki całości",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Figurę podzielono na 4 równe części. Zamalowano 1 część. Jaki ułamek figury zamalowano?",
+                "options": [
+                  { "text": "1/4", "correct": true },
+                  { "text": "1/2" },
+                  { "text": "1/3" },
+                  { "text": "4/1" }
+                ]
+              },
+              "jedzenie": {
+                "prompt": "Pizzę podzielono na 4 równe kawałki. Zjedzono 1 kawałek. Jaki ułamek pizzy zjedzono?",
+                "options": [
+                  { "text": "1/4", "correct": true },
+                  { "text": "1/2" },
+                  { "text": "1/3" },
+                  { "text": "4/1" }
+                ]
+              },
+              "sport": {
+                "prompt": "Boisko podzielono na 4 równe strefy. Rozgrzewka odbywa się w 1 strefie. Jaki ułamek boiska to strefa rozgrzewki?",
+                "options": [
+                  { "text": "1/4", "correct": true },
+                  { "text": "1/2" },
+                  { "text": "1/3" },
+                  { "text": "4/1" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Kartkę podzielono na 8 równych pól. Zamalowano 3 pola. Jaki ułamek kartki zamalowano?",
+                "options": [
+                  { "text": "3/8", "correct": true },
+                  { "text": "8/3" },
+                  { "text": "1/3" },
+                  { "text": "3/5" }
+                ]
+              },
+              "rysowanie": {
+                "prompt": "Kartkę na rysunek podzielono na 8 równych pól. Pomalowano 3 pola. Jaki ułamek kartki pomalowano?",
+                "options": [
+                  { "text": "3/8", "correct": true },
+                  { "text": "8/3" },
+                  { "text": "1/3" },
+                  { "text": "3/5" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Jak wygląda ułamek?",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "W ułamku 5/12 liczba 5 (licznik) oznacza:",
+                "options": [
+                  { "text": "liczbę wszystkich części" },
+                  { "text": "liczbę wziętych części", "correct": true },
+                  { "text": "liczbę całości" },
+                  { "text": "kreskę ułamkową" }
+                ]
+              },
+              "zwierzeta": {
+                "prompt": "W zagrodzie jest 12 zwierząt, 5 z nich to króliki. W ułamku 5/12 liczba 5 oznacza:",
+                "options": [
+                  { "text": "liczbę wszystkich zwierząt" },
+                  { "text": "liczbę królików", "correct": true },
+                  { "text": "liczbę zagród" },
+                  { "text": "liczbę pozostałych zwierząt" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Liczba pod kreską ułamkową to:",
+                "options": [
+                  { "text": "licznik" },
+                  { "text": "mianownik", "correct": true },
+                  { "text": "całość" },
+                  { "text": "reszta" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Rodzaje ułamków",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ułamek 7/5 to:",
+                "options": [
+                  { "text": "właściwy" },
+                  { "text": "niewłaściwy", "correct": true },
+                  { "text": "równy 0" },
+                  { "text": "ujemny" }
+                ]
+              },
+              "sport": {
+                "prompt": "Biegacz pokonał 7/5 zaplanowanego dystansu. Jaki to rodzaj ułamka?",
+                "options": [
+                  { "text": "właściwy" },
+                  { "text": "niewłaściwy", "correct": true },
+                  { "text": "równy 0" },
+                  { "text": "ujemny" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Który ułamek jest właściwy?",
+                "options": [
+                  { "text": "3/4", "correct": true },
+                  { "text": "5/4" },
+                  { "text": "4/4" },
+                  { "text": "7/2" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Liczby mieszane",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile pełnych całości mieści się w 9/4?",
+                "options": [
+                  { "text": "1" },
+                  { "text": "2", "correct": true },
+                  { "text": "3" },
+                  { "text": "4" }
+                ]
+              },
+              "jedzenie": {
+                "prompt": "Do deseru potrzeba 9/4 tabliczki czekolady. Ile pełnych tabliczek trzeba użyć?",
+                "options": [
+                  { "text": "1" },
+                  { "text": "2", "correct": true },
+                  { "text": "3" },
+                  { "text": "4" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile pełnych całości mieści się w 11/3? Wpisz liczbę.",
+                "answers": ["3"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Skracanie i rozszerzanie ułamków",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Który ułamek jest równy 3/6?",
+                "options": [
+                  { "text": "1/2", "correct": true },
+                  { "text": "1/3" },
+                  { "text": "2/3" },
+                  { "text": "3/12" }
+                ]
+              },
+              "zwierzeta": {
+                "prompt": "Na obrazku 3/6 zwierząt to koty. Który ułamek oznacza dokładnie tę samą część?",
+                "options": [
+                  { "text": "1/2", "correct": true },
+                  { "text": "1/3" },
+                  { "text": "2/3" },
+                  { "text": "3/12" }
+                ]
+              },
+              "rysowanie": {
+                "prompt": "Na rysunku 4/8 postaci to zwierzęta. Który ułamek oznacza dokładnie tę samą część?",
+                "options": [
+                  { "text": "1/2", "correct": true },
+                  { "text": "1/4" },
+                  { "text": "2/3" },
+                  { "text": "4/4" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Skróć ułamek 4/8.",
+                "options": [
+                  { "text": "1/2", "correct": true },
+                  { "text": "2/4" },
+                  { "text": "1/4" },
+                  { "text": "4/4" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Mnożenie i dzielenie",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 1/2 z 10?",
+                "options": [
+                  { "text": "2" },
+                  { "text": "4" },
+                  { "text": "5", "correct": true },
+                  { "text": "6" }
+                ]
+              },
+              "jedzenie": {
+                "prompt": "Miałeś 10 cukierków i oddałeś połowę koledze. Ile cukierków oddałeś?",
+                "options": [
+                  { "text": "2" },
+                  { "text": "4" },
+                  { "text": "5", "correct": true },
+                  { "text": "6" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Który ułamek jest największy?",
+                "options": [
+                  { "text": "1/4" },
+                  { "text": "1/2" },
+                  { "text": "3/4", "correct": true },
+                  { "text": "1/8" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 3/4 z 20?",
+                "options": [
+                  { "text": "5" },
+                  { "text": "15", "correct": true },
+                  { "text": "16" },
+                  { "text": "20" }
+                ]
+              },
+              "zwierzeta": {
+                "prompt": "W schronisku jest 20 psów, 3/4 z nich to szczeniaki. Ile jest szczeniąt?",
+                "options": [
+                  { "text": "5" },
+                  { "text": "15", "correct": true },
+                  { "text": "16" },
+                  { "text": "20" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 1/4 z 24?",
+                "options": [
+                  { "text": "4" },
+                  { "text": "6", "correct": true },
+                  { "text": "8" },
+                  { "text": "12" }
+                ]
+              },
+              "muzyka": {
+                "prompt": "W klasie jest 24 uczniów, 1/4 z nich gra na instrumencie. Ilu uczniów gra na instrumencie?",
+                "options": [
+                  { "text": "4" },
+                  { "text": "6", "correct": true },
+                  { "text": "8" },
+                  { "text": "12" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 1/2 z 18? Wpisz wynik.",
+                "answers": ["9"]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 1/3 z 12? Wpisz wynik.",
+                "answers": ["4"]
+              },
+              "jedzenie": {
+                "prompt": "Basia miała 12 cukierków i zjadła 1/3 z nich. Ile cukierków zjadła? Wpisz liczbę.",
+                "answers": ["4"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Dodawanie i odejmowanie",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 1/4 + 1/2?",
+                "options": [
+                  { "text": "3/4", "correct": true },
+                  { "text": "2/6" },
+                  { "text": "1/6" },
+                  { "text": "3/6" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "Z 40 przedmiotów zabrano 3/5. Ile przedmiotów zostało?",
+                "options": [
+                  { "text": "16", "correct": true },
+                  { "text": "24" },
+                  { "text": "30" },
+                  { "text": "10" }
+                ]
+              },
+              "jedzenie": {
+                "prompt": "W sklepie było 40 jabłek. Sprzedano 3/5 z nich. Ile jabłek zostało?",
+                "options": [
+                  { "text": "16", "correct": true },
+                  { "text": "24" },
+                  { "text": "30" },
+                  { "text": "10" }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "section": "Ułamki dziesiętne",
+    "subsections": [
+      {
+        "subsection": "Wprowadzenie do \"przecinka\"",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Która z liczb jest równa 0,5?",
+                "options": [
+                  { "text": "0,05" },
+                  { "text": "0,50", "correct": true },
+                  { "text": "5,0" },
+                  { "text": "0,005" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Zapisz jako ułamek dziesiętny: pięć i trzy dziesiąte.",
+                "answers": ["5,3", "5.3"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Porównywanie i oś liczbowa",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Która liczba jest największa?",
+                "options": [
+                  { "text": "0,45" },
+                  { "text": "0,5", "correct": true },
+                  { "text": "0,4" },
+                  { "text": "0,05" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Która liczba jest największa?",
+                "options": [
+                  { "text": "0,3" },
+                  { "text": "0,8", "correct": true },
+                  { "text": "0,08" },
+                  { "text": "0,03" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Dodawanie i odejmowanie",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 1,2 + 0,3?",
+                "options": [
+                  { "text": "1,5", "correct": true },
+                  { "text": "1,4" },
+                  { "text": "1,6" },
+                  { "text": "1,3" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 4 − 1,65?",
+                "options": [
+                  { "text": "2,35", "correct": true },
+                  { "text": "2,45" },
+                  { "text": "3,35" },
+                  { "text": "2,25" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 2,3 + 1,4? Wpisz wynik.",
+                "answers": ["3,7", "3.7"]
+              },
+              "muzyka": {
+                "prompt": "Jedna piosenka trwa 2,3 minuty, a druga 1,4 minuty. Ile minut trwają razem? Wpisz wynik.",
+                "answers": ["3,7", "3.7"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Mnożenie i dzielenie",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 0,96 × 100?",
+                "options": [
+                  { "text": "0,096" },
+                  { "text": "9,6" },
+                  { "text": "96", "correct": true },
+                  { "text": "960" }
+                ]
+              },
+              "lego": {
+                "prompt": "Jeden klocek ma grubość 0,96 cm. Wieża zbudowana jest ze 100 takich klocków. Jaka jest jej wysokość?",
+                "options": [
+                  { "text": "0,096 cm" },
+                  { "text": "9,6 cm" },
+                  { "text": "96 cm", "correct": true },
+                  { "text": "960 cm" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 2,5 × 10? Wpisz wynik.",
+                "answers": ["25"]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "section": "Procenty",
+    "subsections": [
+      {
+        "subsection": "Czym są procenty?",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "1 część z 4 to jaki procent całości?",
+                "options": [
+                  { "text": "10%" },
+                  { "text": "25%", "correct": true },
+                  { "text": "40%" },
+                  { "text": "50%" }
+                ]
+              },
+              "lego": {
+                "prompt": "Budujesz z klocków i zużyłeś już 1 z 4 woreczków. Jaki procent budowli ukończyłeś?",
+                "options": [
+                  { "text": "10%" },
+                  { "text": "25%", "correct": true },
+                  { "text": "40%" },
+                  { "text": "50%" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "100% czegoś to:",
+                "options": [
+                  { "text": "połowa" },
+                  { "text": "ćwierć" },
+                  { "text": "cała całość", "correct": true },
+                  { "text": "nic" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Zamiana ról",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Jaki ułamek odpowiada 25%?",
+                "options": [
+                  { "text": "1/2" },
+                  { "text": "1/4", "correct": true },
+                  { "text": "1/3" },
+                  { "text": "1/5" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Jaki ułamek odpowiada 50%?",
+                "options": [
+                  { "text": "1/4" },
+                  { "text": "1/2", "correct": true },
+                  { "text": "1/3" },
+                  { "text": "1/5" }
+                ]
+              },
+              "gry": {
+                "prompt": "Pasek postępu w grze pokazuje 50%. Jaki to ułamek?",
+                "options": [
+                  { "text": "1/4" },
+                  { "text": "1/2", "correct": true },
+                  { "text": "1/3" },
+                  { "text": "1/5" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Procent z liczby",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 1,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 10% z 50?",
+                "options": [
+                  { "text": "5", "correct": true },
+                  { "text": "10" },
+                  { "text": "15" },
+                  { "text": "20" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 50% z 40?",
+                "options": [
+                  { "text": "10" },
+                  { "text": "20", "correct": true },
+                  { "text": "25" },
+                  { "text": "15" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 25% z 60?",
+                "options": [
+                  { "text": "12" },
+                  { "text": "15", "correct": true },
+                  { "text": "20" },
+                  { "text": "25" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 15% z 60?",
+                "options": [
+                  { "text": "6" },
+                  { "text": "9", "correct": true },
+                  { "text": "12" },
+                  { "text": "15" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 25% z 40? Wpisz wynik.",
+                "answers": ["10"]
+              },
+              "muzyka": {
+                "prompt": "Chór liczy 40 osób. 25% z nich to soliści. Ilu jest solistów? Wpisz liczbę.",
+                "answers": ["10"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "subsection": "Szukanie całości i zniżki",
+        "tasks": [
+          {
+            "type": "single_choice",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 20% z 200?",
+                "options": [
+                  { "text": "20" },
+                  { "text": "40", "correct": true },
+                  { "text": "160" },
+                  { "text": "180" }
+                ]
+              },
+              "lego": {
+                "prompt": "Zestaw klocków kosztuje 200 zł. Rabat wynosi 20%. Ile złotych wynosi rabat?",
+                "options": [
+                  { "text": "20" },
+                  { "text": "40", "correct": true },
+                  { "text": "160" },
+                  { "text": "180" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "single_choice",
+            "difficulty": 3,
+            "themes": {
+              "default": {
+                "prompt": "Cena to 200 zł, a rabat wynosi 20%. Ile kosztuje po rabacie?",
+                "options": [
+                  { "text": "140" },
+                  { "text": "160", "correct": true },
+                  { "text": "180" },
+                  { "text": "220" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "short_answer",
+            "difficulty": 2,
+            "themes": {
+              "default": {
+                "prompt": "Ile to 25% z 80? Wpisz wynik.",
+                "answers": ["20"]
+              },
+              "gry": {
+                "prompt": "Gra kosztuje 80 zł. Rabat wynosi 25%. Ile złotych wynosi rabat? Wpisz liczbę.",
+                "answers": ["20"]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
