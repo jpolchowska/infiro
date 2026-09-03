@@ -1,7 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../components/student/BottomTabBar';
@@ -87,7 +88,7 @@ export default function ProfileScreen() {
           contentContainerStyle={{ paddingTop: 8, paddingBottom: 118 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text className="text-infiro-navy font-extrabold text-[27px] leading-[31px] mb-5">Profil</Text>
+          <Text className="text-infiro-navy font-manrope-extrabold text-[27px] leading-[31px] mb-5">Profil</Text>
 
           <View
             className="flex-row items-center bg-infiro-white"
@@ -116,20 +117,20 @@ export default function ProfileScreen() {
               }}
             >
               {initial ? (
-                <Text className="text-infiro-navy font-bold text-lg">{initial}</Text>
+                <Text className="text-infiro-navy font-manrope-bold text-lg">{initial}</Text>
               ) : (
                 <Ionicons name="person" size={22} color="#142284" />
               )}
             </View>
             <View className="flex-1">
-              <Text className="text-infiro-navy font-extrabold text-xl">{name ?? 'Uczeń'}</Text>
-              <Text style={{ color: '#8b93bd' }} className="font-semibold text-[13px] mt-1">
+              <Text className="text-infiro-navy font-manrope-extrabold text-xl">{name ?? 'Uczeń'}</Text>
+              <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px] mt-1">
                 klasa 5
               </Text>
             </View>
           </View>
 
-          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-bold text-[12px] uppercase mb-3">
+          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-manrope-bold text-[12px] uppercase mb-3">
             Zainteresowania
           </Text>
           {pickedInterest ? (
@@ -153,12 +154,12 @@ export default function ProfileScreen() {
               >
                 <InterestIcon id={pickedInterest.id} size={24} />
               </View>
-              <Text className="flex-1 text-infiro-navy font-extrabold text-[15px]">{pickedInterest.label}</Text>
+              <Text className="flex-1 text-infiro-navy font-manrope-extrabold text-[15px]">{pickedInterest.label}</Text>
               <Pressable
                 onPress={() => router.push('/(student)/interests?from=profile')}
                 style={{ backgroundColor: '#f4f5fb', borderRadius: 100, paddingVertical: 9, paddingHorizontal: 14 }}
               >
-                <Text className="text-infiro-navy font-bold text-xs">Zmień</Text>
+                <Text className="text-infiro-navy font-manrope-bold text-xs">Zmień</Text>
               </Pressable>
             </View>
           ) : (
@@ -182,17 +183,17 @@ export default function ProfileScreen() {
               >
                 <Ionicons name="sparkles-outline" size={22} color="#a7aecd" />
               </View>
-              <Text className="flex-1 text-infiro-navy font-extrabold text-[15px]">Nie wybrano</Text>
+              <Text className="flex-1 text-infiro-navy font-manrope-extrabold text-[15px]">Nie wybrano</Text>
               <Pressable
                 onPress={() => router.push('/(student)/interests?from=profile')}
                 style={{ backgroundColor: '#f4f5fb', borderRadius: 100, paddingVertical: 9, paddingHorizontal: 14 }}
               >
-                <Text className="text-infiro-navy font-bold text-xs">Wybierz</Text>
+                <Text className="text-infiro-navy font-manrope-bold text-xs">Wybierz</Text>
               </Pressable>
             </View>
           )}
 
-          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-bold text-[12px] uppercase mb-3">
+          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-manrope-bold text-[12px] uppercase mb-3">
             Testy poziomujące
           </Text>
           <View
@@ -219,20 +220,20 @@ export default function ProfileScreen() {
                   borderBottomColor: '#f4f5fb',
                 }}
               >
-                <Text className="flex-1 text-infiro-navy font-bold text-[13px]">
+                <Text className="flex-1 text-infiro-navy font-manrope-bold text-[13px]">
                   {formatShortDate(attempt.completedAt)}
                 </Text>
-                <Text className="text-infiro-navy font-extrabold text-[15px]" style={{ width: 44, textAlign: 'right' }}>
+                <Text className="text-infiro-navy font-manrope-extrabold text-[15px]" style={{ width: 44, textAlign: 'right' }}>
                   {attempt.score}/{attempt.total}
                 </Text>
               </View>
             ))}
-            <Text style={{ color: '#8b93bd', paddingVertical: 13 }} className="font-medium text-xs leading-5">
+            <Text style={{ color: '#8b93bd', paddingVertical: 13 }} className="font-manrope-medium text-xs leading-5">
               Test wraca co jakiś czas i sprawdza Twój poziom.
             </Text>
           </View>
 
-          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-bold text-[12px] uppercase mb-3">
+          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-manrope-bold text-[12px] uppercase mb-3">
             Ustawienia
           </Text>
           <View
@@ -252,14 +253,14 @@ export default function ProfileScreen() {
               className="flex-row items-center"
               style={{ borderBottomWidth: 1, borderBottomColor: '#f1f2f9', paddingVertical: 16, paddingHorizontal: 18, gap: 12 }}
             >
-              <Text className="flex-1 text-infiro-navy font-bold text-[15px]">Język</Text>
-              <Text style={{ color: '#8b93bd' }} className="font-semibold text-[13px]">
+              <Text className="flex-1 text-infiro-navy font-manrope-bold text-[15px]">Język</Text>
+              <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px]">
                 Polski
               </Text>
             </View>
             <View className="flex-row items-center" style={{ paddingVertical: 16, paddingHorizontal: 18 }}>
-              <Text className="flex-1 text-infiro-navy font-bold text-[15px]">O aplikacji</Text>
-              <Text style={{ color: '#8b93bd' }} className="font-semibold text-[13px]">
+              <Text className="flex-1 text-infiro-navy font-manrope-bold text-[15px]">O aplikacji</Text>
+              <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px]">
                 Prototyp
               </Text>
             </View>
@@ -270,7 +271,7 @@ export default function ProfileScreen() {
             className="bg-infiro-navy items-center justify-center"
             style={{ borderRadius: 100, height: 56 }}
           >
-            <Text className="text-infiro-white font-extrabold text-base">Wyloguj się</Text>
+            <Text className="text-infiro-white font-manrope-extrabold text-base">Wyloguj się</Text>
           </Pressable>
         </ScrollView>
       </SafeAreaView>

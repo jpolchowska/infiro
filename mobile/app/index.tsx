@@ -3,7 +3,8 @@ import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect } from 'react';
-import { Pressable, Text, View, ActivityIndicator } from 'react-native';
+import { Pressable, View, ActivityIndicator } from 'react-native';
+import { Text } from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAccountType } from '../utils/decodeToken';
 import { CLIENT_ID, KEYCLOAK_URL, REALM } from '../lib/auth';
@@ -111,15 +112,15 @@ useEffect(() => {
 
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
         <View className="flex-1 px-6" style={{ paddingTop: 12, paddingBottom: 20 }}>
-          <Text className="text-infiro-white font-extrabold text-[20px]" style={{ letterSpacing: 2 }}>
+          <Text className="text-infiro-white font-manrope-extrabold text-[20px]" style={{ letterSpacing: 2 }}>
             infiro
           </Text>
 
           <View className="flex-1 justify-center">
-            <Text className="text-infiro-white font-extrabold text-[40px] leading-[44px] mb-3">
+            <Text className="text-infiro-white font-manrope-extrabold text-[40px] leading-[44px] mb-3">
               Cześć!
             </Text>
-            <Text style={{ color: '#b6bdec' }} className="font-medium text-[15px] leading-[22px]">
+            <Text style={{ color: '#b6bdec' }} className="font-manrope-medium text-[15px] leading-[22px]">
               Matematyka krok po kroku, w Twoim tempie.
             </Text>
           </View>
@@ -139,10 +140,10 @@ useEffect(() => {
             {!request ? (
               <ActivityIndicator color="#ffffff" />
             ) : (
-              <Text className="text-infiro-white font-semibold text-base">Zaloguj się</Text>
+              <Text className="text-infiro-white font-manrope-semibold text-base">Zaloguj się</Text>
             )}
           </Pressable>
-          <Text style={{ color: '#8f9adf' }} className="font-medium text-[13px] text-center mt-3">
+          <Text style={{ color: '#8f9adf' }} className="font-manrope-medium text-[13px] text-center mt-3">
             Zaloguj się otrzymanym kontem
           </Text>
         </View>

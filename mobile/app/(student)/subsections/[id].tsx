@@ -1,7 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../../components/Text';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ErrorState } from '../../../components/student/ErrorState';
@@ -108,16 +109,16 @@ export default function SubsectionTasksScreen() {
           }}
         >
           <Pressable onPress={goToSection} hitSlop={8} className="mb-3.5">
-            <Text style={{ color: '#6b74a8' }} className="font-semibold text-[14px]" numberOfLines={1}>
+            <Text style={{ color: '#6b74a8' }} className="font-manrope-semibold text-[14px]" numberOfLines={1}>
               ‹ {detail?.sectionTitle ?? 'Wróć'}
             </Text>
           </Pressable>
 
-          <Text className="text-infiro-navy font-extrabold text-[24px] leading-[28px]">
+          <Text className="text-infiro-navy font-manrope-extrabold text-[24px] leading-[28px]">
             {detail?.title ?? ''}
           </Text>
           {detail?.description && (
-            <Text style={{ color: '#5a6392' }} className="font-medium text-[14px] leading-[20px] mt-2.5">
+            <Text style={{ color: '#5a6392' }} className="font-manrope-medium text-[14px] leading-[20px] mt-2.5">
               {detail.description}
             </Text>
           )}
@@ -134,10 +135,10 @@ export default function SubsectionTasksScreen() {
             <View className={accent?.bg} style={{ height: 8, borderRadius: 100, width: `${pct}%` }} />
           </View>
           <View className="flex-row items-center justify-between" style={{ marginTop: 9 }}>
-            <Text style={{ color: '#5a6392' }} className="font-semibold text-xs">
+            <Text style={{ color: '#5a6392' }} className="font-manrope-semibold text-xs">
               {pluralize(total, 'zadanie', 'zadania', 'zadań')}
             </Text>
-            <Text className="text-infiro-navy font-extrabold text-[13px]">
+            <Text className="text-infiro-navy font-manrope-extrabold text-[13px]">
               {solved} / {total}
             </Text>
           </View>
@@ -146,7 +147,7 @@ export default function SubsectionTasksScreen() {
         <View className="px-5" style={{ marginTop: 22 }}>
           <Text
             style={{ color: '#8b93bd', letterSpacing: 1.4 }}
-            className="font-bold text-[12px] uppercase mb-3.5"
+            className="font-manrope-bold text-[12px] uppercase mb-3.5"
           >
             Zadania
           </Text>
@@ -198,8 +199,8 @@ export default function SubsectionTasksScreen() {
                   </View>
 
                   <View className="flex-1">
-                    <Text className="text-infiro-navy font-extrabold text-[14px] leading-[18px]">{task.title}</Text>
-                    <Text style={{ color: '#8b93bd' }} className="font-semibold text-xs mt-1">
+                    <Text className="text-infiro-navy font-manrope-extrabold text-[14px] leading-[18px]">{task.title}</Text>
+                    <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-1">
                       {DIFFICULTY_LABEL[task.difficulty]}
                     </Text>
                   </View>
@@ -212,7 +213,7 @@ export default function SubsectionTasksScreen() {
                       backgroundColor: pillBg,
                     }}
                   >
-                    <Text style={{ color: pillFg }} className="font-bold text-[11px]">
+                    <Text style={{ color: pillFg }} className="font-manrope-bold text-[11px]">
                       {STATUS_LABEL[task.status]}
                     </Text>
                   </View>
@@ -221,7 +222,7 @@ export default function SubsectionTasksScreen() {
             })}
 
             {detail && tasks.length === 0 && (
-              <Text style={{ color: '#8b93bd' }} className="font-medium text-[13px] text-center mt-6">
+              <Text style={{ color: '#8b93bd' }} className="font-manrope-medium text-[13px] text-center mt-6">
                 Brak zadań w tej podsekcji.
               </Text>
             )}
@@ -258,7 +259,7 @@ export default function SubsectionTasksScreen() {
                   elevation: 6,
                 }}
               >
-                <Text className="text-infiro-white font-extrabold text-base">{cta.label}</Text>
+                <Text className="text-infiro-white font-manrope-extrabold text-base">{cta.label}</Text>
                 <Ionicons name="arrow-forward" size={18} color="#fefefe" />
               </Pressable>
             </View>

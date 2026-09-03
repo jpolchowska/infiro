@@ -1,7 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../../components/student/BottomTabBar';
@@ -66,8 +67,8 @@ export default function SectionsScreen() {
           contentContainerStyle={{ paddingTop: 8, paddingBottom: 118 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text className="text-infiro-navy font-extrabold text-[27px] leading-[31px]">Działy tematyczne</Text>
-          <Text style={{ color: '#6b74a8' }} className="font-medium text-[14px] leading-[20px] mt-1 mb-[22px]">
+          <Text className="text-infiro-navy font-manrope-extrabold text-[27px] leading-[31px]">Działy tematyczne</Text>
+          <Text style={{ color: '#6b74a8' }} className="font-manrope-medium text-[14px] leading-[20px] mt-1 mb-[22px]">
             Wybierz dział, który chcesz dziś poćwiczyć.
           </Text>
 
@@ -97,18 +98,18 @@ export default function SectionsScreen() {
                           className={`items-center justify-center ${accent.bg}`}
                           style={{ width: 40, height: 40, borderRadius: 10 }}
                         >
-                          <Text className="text-infiro-white font-extrabold text-[17px]">{section.index + 1}</Text>
+                          <Text className="text-infiro-white font-manrope-extrabold text-[17px]">{section.index + 1}</Text>
                         </View>
                         <View className="flex-1">
-                          <Text className="text-infiro-navy font-extrabold text-[17px] leading-[21px]">
+                          <Text className="text-infiro-navy font-manrope-extrabold text-[17px] leading-[21px]">
                             {section.title}
                           </Text>
-                          <Text style={{ color: '#4a5488' }} className="font-medium text-xs mt-1">
+                          <Text style={{ color: '#4a5488' }} className="font-manrope-medium text-xs mt-1">
                             {pluralize(section.subsections.length, 'podsekcja', 'podsekcje', 'podsekcji')} ·{' '}
                             {pluralize(totalTasks, 'zadanie', 'zadania', 'zadań')}
                           </Text>
                         </View>
-                        <Text className="text-infiro-navy font-extrabold text-[17px]">{pct}%</Text>
+                        <Text className="text-infiro-navy font-manrope-extrabold text-[17px]">{pct}%</Text>
                       </Pressable>
                       <Pressable
                         onPress={() => setExpandedId((prev) => (prev === section.id ? null : section.id))}
@@ -133,7 +134,7 @@ export default function SectionsScreen() {
                     </View>
 
                     {expanded && section.description && (
-                      <Text style={{ color: '#6b74a8' }} className="font-medium text-[14px] leading-[20px] mt-3.5">
+                      <Text style={{ color: '#6b74a8' }} className="font-manrope-medium text-[14px] leading-[20px] mt-3.5">
                         {section.description}
                       </Text>
                     )}
@@ -184,8 +185,8 @@ export default function SectionsScreen() {
                             )}
                           </View>
                           <View className="flex-1">
-                            <Text className="text-infiro-navy font-bold text-[13px] leading-[17px]">{sub.title}</Text>
-                            <Text style={{ color: '#8b93bd' }} className="font-medium text-xs mt-0.5">
+                            <Text className="text-infiro-navy font-manrope-bold text-[13px] leading-[17px]">{sub.title}</Text>
+                            <Text style={{ color: '#8b93bd' }} className="font-manrope-medium text-xs mt-0.5">
                               {meta}
                             </Text>
                           </View>

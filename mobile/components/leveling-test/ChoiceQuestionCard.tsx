@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Text } from '../Text';
 
 import { ChoiceQuestion, Accent } from '../../lib/levelingTest';
 
@@ -45,11 +46,11 @@ export function ChoiceQuestionCard({ question, accent, onAnswer }: ChoiceQuestio
                 isSelected ? 'bg-infiro-white/20' : accent.bgSoft
               }`}
             >
-              <Text className={`font-bold text-sm ${isSelected ? 'text-infiro-white' : accent.text}`}>
+              <Text className={`font-manrope-bold text-sm ${isSelected ? 'text-infiro-white' : accent.text}`}>
                 {LETTERS[index]}
               </Text>
             </View>
-            <Text className={`text-base font-semibold ${isSelected ? 'text-infiro-white' : 'text-infiro-navy'}`}>
+            <Text className={`text-base font-manrope-semibold ${isSelected ? 'text-infiro-white' : 'text-infiro-navy'}`}>
               {option.text}
             </Text>
           </Pressable>
@@ -63,7 +64,7 @@ export function ChoiceQuestionCard({ question, accent, onAnswer }: ChoiceQuestio
           selectedIndex === null || answered ? accent.bgDisabled : accent.bg
         }`}
       >
-        <Text className="text-infiro-white font-semibold text-base">Dalej</Text>
+        <Text className="text-infiro-white font-manrope-semibold text-base">Dalej</Text>
       </Pressable>
     </View>
   );

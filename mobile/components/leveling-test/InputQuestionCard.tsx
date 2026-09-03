@@ -5,7 +5,8 @@
 
 /*
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
+import { Text } from '../Text';
 
 import { InputQuestion, isInputAnswerCorrect, TOPIC_ACCENT } from '../../lib/levelingTest';
 
@@ -41,7 +42,7 @@ export function InputQuestionCard({ question, onAnswer }: InputQuestionCardProps
         placeholder="Wpisz liczbę"
         placeholderTextColor="#14228466"
         textAlignVertical="center"
-        className="border border-infiro-navy/15 rounded-2xl px-4 text-infiro-navy text-xl font-bold mb-4"
+        className="border border-infiro-navy/15 rounded-2xl px-4 text-infiro-navy text-xl font-manrope-bold mb-4"
         style={{ height: 56, paddingVertical: 0 }}
       />
 
@@ -52,7 +53,7 @@ export function InputQuestionCard({ question, onAnswer }: InputQuestionCardProps
           value.trim().length === 0 || answered ? accent.bgDisabled : accent.bg
         }`}
       >
-        <Text className="text-infiro-white font-semibold text-base">Dalej</Text>
+        <Text className="text-infiro-white font-manrope-semibold text-base">Dalej</Text>
       </Pressable>
 
       <Pressable
@@ -60,7 +61,7 @@ export function InputQuestionCard({ question, onAnswer }: InputQuestionCardProps
         disabled={answered}
         className="bg-infiro-navy/5 rounded-2xl py-3.5 items-center"
       >
-        <Text className="text-infiro-navy/70 font-semibold text-sm">Nie wiem</Text>
+        <Text className="text-infiro-navy/70 font-manrope-semibold text-sm">Nie wiem</Text>
       </Pressable>
     </View>
   );
