@@ -26,8 +26,11 @@ npx expo start
 
 ## Creating Accounts
 
-#### Student (Uczeń), Teacher (Nauczyciel)
-#### Go to keykloak admin (log in), then precede to "matematyka-app" realm and go to "Users" and create accounts using form
+#### Student (Uczeń)
+#### Go to keykloak admin (log in), then precede to "matematyka-app" realm and go to "Users" and create account using form
+
+#### Teacher (Nauczyciel)
+#### Go to keykloak admin (log in), then precede to "matematyka-app" realm and go to "Users" and create account using form, then go to groups select "join Group" select "nauczyciele" and then Join
 
 #### admin (Administrator)
 #### Go to keykloak admin (log in), then precede to "matematyka-app" realm and go to "Users" and create accounts using form

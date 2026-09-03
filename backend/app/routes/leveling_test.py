@@ -47,7 +47,6 @@ def _task_json(task):
 
 @leveling_test_bp.route("/api/student/leveling-test", methods=["GET"])
 @authenticate_token
-@require_role("Uczeń")
 def get_leveling_test():
     user = _current_user()
     if user is None:
@@ -73,7 +72,6 @@ def get_leveling_test():
 
 @leveling_test_bp.route("/api/student/leveling-test/submit", methods=["POST"])
 @authenticate_token
-@require_role("Uczeń")
 def submit_leveling_test():
     user = _current_user()
     if user is None:
