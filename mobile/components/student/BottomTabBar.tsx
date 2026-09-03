@@ -1,5 +1,6 @@
 import { router, usePathname } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Text } from '../Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ACTIVE = '#142284';
@@ -35,7 +36,7 @@ export function BottomTabBar() {
               <View style={{ width: 5, height: 17, borderRadius: 3, backgroundColor: startColor }} />
               <View style={{ width: 5, height: 13, borderRadius: 3, backgroundColor: startColor }} />
             </View>
-            <Text style={{ color: startColor }} className="font-bold text-[12px]">
+            <Text style={{ color: startColor }} className="font-manrope-bold text-[12px]">
               Start
             </Text>
           </Pressable>
@@ -50,7 +51,7 @@ export function BottomTabBar() {
               <View style={{ width: 8.5, height: 8.5, borderRadius: 4, backgroundColor: naukaColor }} />
               <View style={{ width: 8.5, height: 8.5, borderRadius: 4, backgroundColor: naukaColor }} />
             </View>
-            <Text style={{ color: naukaColor }} className="font-bold text-[12px]">
+            <Text style={{ color: naukaColor }} className="font-manrope-bold text-[12px]">
               Nauka
             </Text>
           </Pressable>
@@ -73,7 +74,7 @@ export function BottomTabBar() {
                 }}
               />
             </View>
-            <Text style={{ color: profileColor }} className="font-bold text-[12px]">
+            <Text style={{ color: profileColor }} className="font-manrope-bold text-[12px]">
               Profil
             </Text>
           </Pressable>

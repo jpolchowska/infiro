@@ -1,7 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ErrorState } from '../../../components/student/ErrorState';
@@ -67,15 +68,15 @@ export default function SectionDetailScreen() {
     return (
       <View className="flex-1" style={{ backgroundColor: '#f4f5fb', paddingTop: insets.top + 8 }}>
         <Pressable onPress={() => router.dismissTo('/(student)/sections')} hitSlop={8} className="px-5">
-          <Text style={{ color: '#6b74a8' }} className="font-semibold text-[14px]">
+          <Text style={{ color: '#6b74a8' }} className="font-manrope-semibold text-[14px]">
             ‹ Działy tematyczne
           </Text>
         </Pressable>
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-infiro-navy font-extrabold text-lg text-center mb-2">
+          <Text className="text-infiro-navy font-manrope-extrabold text-lg text-center mb-2">
             Nie znaleziono działu
           </Text>
-          <Text style={{ color: '#8b93bd' }} className="font-medium text-[13px] text-center">
+          <Text style={{ color: '#8b93bd' }} className="font-manrope-medium text-[13px] text-center">
             Ten dział mógł zostać usunięty albo link jest nieaktualny.
           </Text>
         </View>
@@ -103,7 +104,7 @@ export default function SectionDetailScreen() {
           }}
         >
           <Pressable onPress={() => router.dismissTo('/(student)/sections')} hitSlop={8} className="mb-3.5">
-            <Text style={{ color: '#6b74a8' }} className="font-semibold text-[14px]">
+            <Text style={{ color: '#6b74a8' }} className="font-manrope-semibold text-[14px]">
               ‹ Działy tematyczne
             </Text>
           </Pressable>
@@ -115,15 +116,15 @@ export default function SectionDetailScreen() {
                   className={`items-center justify-center ${accent?.bg}`}
                   style={{ width: 42, height: 42, borderRadius: 12 }}
                 >
-                  <Text className="text-infiro-white font-extrabold text-[17px]">{section.index + 1}</Text>
+                  <Text className="text-infiro-white font-manrope-extrabold text-[17px]">{section.index + 1}</Text>
                 </View>
-                <Text className="flex-1 text-infiro-navy font-extrabold text-[24px] leading-[28px]">
+                <Text className="flex-1 text-infiro-navy font-manrope-extrabold text-[24px] leading-[28px]">
                   {section.title}
                 </Text>
               </View>
 
               {section.description && (
-                <Text style={{ color: '#5a6392' }} className="font-medium text-[14px] leading-[20px] mt-2.5">
+                <Text style={{ color: '#5a6392' }} className="font-manrope-medium text-[14px] leading-[20px] mt-2.5">
                   {section.description}
                 </Text>
               )}
@@ -140,11 +141,11 @@ export default function SectionDetailScreen() {
                 <View className={accent?.bg} style={{ height: 8, borderRadius: 100, width: `${pct}%` }} />
               </View>
               <View className="flex-row items-center justify-between" style={{ marginTop: 9 }}>
-                <Text style={{ color: '#5a6392' }} className="font-semibold text-xs">
+                <Text style={{ color: '#5a6392' }} className="font-manrope-semibold text-xs">
                   {pluralize(section.subsections.length, 'podsekcja', 'podsekcje', 'podsekcji')} ·{' '}
                   {pluralize(totalTasks, 'zadanie', 'zadania', 'zadań')}
                 </Text>
-                <Text className="text-infiro-navy font-extrabold text-[13px]">{pct}%</Text>
+                <Text className="text-infiro-navy font-manrope-extrabold text-[13px]">{pct}%</Text>
               </View>
             </>
           )}
@@ -153,10 +154,10 @@ export default function SectionDetailScreen() {
         {section && (
           <View className="px-5" style={{ marginTop: 22 }}>
             <View className="flex-row items-center justify-between mb-3.5">
-              <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-bold text-[12px] uppercase">
+              <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-manrope-bold text-[12px] uppercase">
                 Podsekcje
               </Text>
-              <Text style={{ color: '#8b93bd' }} className="font-semibold text-xs">
+              <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs">
                 {doneCount} z {section.subsections.length} ukończonych
               </Text>
             </View>
@@ -208,16 +209,16 @@ export default function SectionDetailScreen() {
                     </View>
 
                     <View className="flex-1">
-                      <Text className="text-infiro-navy font-extrabold text-[15px] leading-[19px]">{sub.title}</Text>
+                      <Text className="text-infiro-navy font-manrope-extrabold text-[15px] leading-[19px]">{sub.title}</Text>
                       {sub.description && (
                         <Text
                           style={{ color: '#6b74a8' }}
-                          className="font-medium text-[14px] leading-[20px] mt-1"
+                          className="font-manrope-medium text-[14px] leading-[20px] mt-1"
                         >
                           {sub.description}
                         </Text>
                       )}
-                      <Text style={{ color: '#8b93bd' }} className="font-semibold text-xs mt-2">
+                      <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-2">
                         {meta}
                       </Text>
                     </View>

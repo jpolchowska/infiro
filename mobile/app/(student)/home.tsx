@@ -1,7 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../components/student/BottomTabBar';
@@ -73,7 +74,7 @@ export default function HomeScreen() {
             showsVerticalScrollIndicator={false}
           >
             <View className="flex-row items-center justify-between mb-[22px]">
-              <Text className="text-infiro-navy font-extrabold text-[27px] leading-[31px]">
+              <Text className="text-infiro-navy font-manrope-extrabold text-[27px] leading-[31px]">
                 {name ? `Cześć, ${name}!` : 'Cześć!'}
               </Text>
               <Pressable
@@ -89,7 +90,7 @@ export default function HomeScreen() {
                 }}
               >
                 {initial ? (
-                  <Text className="text-infiro-navy font-bold text-[15px]">{initial}</Text>
+                  <Text className="text-infiro-navy font-manrope-bold text-[15px]">{initial}</Text>
                 ) : (
                   <Ionicons name="person" size={18} color="#142284" />
                 )}
@@ -100,14 +101,14 @@ export default function HomeScreen() {
               <View className="bg-infiro-navy" style={{ borderRadius: 20, padding: 20, marginBottom: 20 }}>
                 <Text
                   style={{ color: '#8f9adf', letterSpacing: 1.4 }}
-                  className="font-bold text-[12px] uppercase mb-2.5"
+                  className="font-manrope-bold text-[12px] uppercase mb-2.5"
                 >
                   W trakcie
                 </Text>
-                <Text className="text-infiro-white font-extrabold text-[22px] leading-[26px]">
+                <Text className="text-infiro-white font-manrope-extrabold text-[22px] leading-[26px]">
                   {current.subsectionTitle}
                 </Text>
-                <Text style={{ color: '#b6bdec' }} className="font-medium text-[13px] mt-1.5">
+                <Text style={{ color: '#b6bdec' }} className="font-manrope-medium text-[13px] mt-1.5">
                   {current.sectionTitle} · {current.solvedTasks} z {current.totalTasks} zadań
                 </Text>
                 <View
@@ -130,7 +131,7 @@ export default function HomeScreen() {
                   className="items-center justify-center"
                   style={{ height: 54, borderRadius: 100, backgroundColor: '#ff5f55' }}
                 >
-                  <Text className="text-infiro-white font-extrabold text-base">Rozwiązuj dalej</Text>
+                  <Text className="text-infiro-white font-manrope-extrabold text-base">Rozwiązuj dalej</Text>
                 </Pressable>
               </View>
             )}
@@ -152,10 +153,10 @@ export default function HomeScreen() {
                 >
                   <Ionicons name="sparkles" size={22} color="#fefefe" />
                 </View>
-                <Text className="text-infiro-white font-extrabold text-[20px] leading-[25px]">
+                <Text className="text-infiro-white font-manrope-extrabold text-[20px] leading-[25px]">
                   Zacznij naukę
                 </Text>
-                <Text style={{ color: '#b6bdec' }} className="font-medium text-[13px] leading-[19px] mt-1.5">
+                <Text style={{ color: '#b6bdec' }} className="font-manrope-medium text-[13px] leading-[19px] mt-1.5">
                   Wybierz dział i rozwiąż pierwsze zadania — Twoje postępy pojawią się tutaj.
                 </Text>
                 <Pressable
@@ -163,14 +164,14 @@ export default function HomeScreen() {
                   className="items-center justify-center"
                   style={{ height: 52, borderRadius: 100, backgroundColor: '#ff5f55', marginTop: 18 }}
                 >
-                  <Text className="text-infiro-white font-extrabold text-base">Przejdź do nauki</Text>
+                  <Text className="text-infiro-white font-manrope-extrabold text-base">Przejdź do nauki</Text>
                 </Pressable>
               </View>
             )}
 
             <Text
               style={{ color: '#8b93bd', letterSpacing: 1.4 }}
-              className="font-bold text-[12px] uppercase mb-3"
+              className="font-manrope-bold text-[12px] uppercase mb-3"
             >
               Test poziomujący
             </Text>
@@ -190,23 +191,23 @@ export default function HomeScreen() {
                 className="items-center justify-center"
                 style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#eceffa' }}
               >
-                <Text className="text-infiro-navy font-extrabold text-[13px]">
+                <Text className="text-infiro-navy font-manrope-extrabold text-[13px]">
                   {stats!.lastLevelingTest
                     ? `${stats!.lastLevelingTest.score}/${stats!.lastLevelingTest.total}`
                     : '—'}
                 </Text>
               </View>
               <View className="flex-1">
-                <Text className="text-infiro-navy font-extrabold text-[15px]">
+                <Text className="text-infiro-navy font-manrope-extrabold text-[15px]">
                   {stats!.lastLevelingTest
                     ? `Ostatni test: ${formatShortDate(stats!.lastLevelingTest.completedAt)}`
                     : 'Jeszcze nie rozwiązany'}
                 </Text>
-                <Text style={{ color: '#8b93bd' }} className="font-semibold text-xs mt-0.5">
+                <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
                   Zobacz historię wyników
                 </Text>
               </View>
-              <Text style={{ color: '#b3b9d6' }} className="font-bold text-base">
+              <Text style={{ color: '#b3b9d6' }} className="font-manrope-bold text-base">
                 ›
               </Text>
             </Pressable>
@@ -216,12 +217,12 @@ export default function HomeScreen() {
                 <View className="flex-row items-center justify-between mb-3">
                   <Text
                     style={{ color: '#8b93bd', letterSpacing: 1.4 }}
-                    className="font-bold text-[12px] uppercase"
+                    className="font-manrope-bold text-[12px] uppercase"
                   >
                     Ostatnio ćwiczone
                   </Text>
                   <Pressable onPress={() => router.replace('/(student)/sections')}>
-                    <Text className="text-infiro-coral font-bold text-xs">Wszystkie działy</Text>
+                    <Text className="text-infiro-coral font-manrope-bold text-xs">Wszystkie działy</Text>
                   </Pressable>
                 </View>
 
@@ -240,10 +241,10 @@ export default function HomeScreen() {
                         style={{ borderRadius: 17, padding: 16, paddingHorizontal: 18, gap: 14 }}
                       >
                         <View className="flex-1">
-                          <Text className="text-infiro-navy font-extrabold text-[15px] leading-[19px]">
+                          <Text className="text-infiro-navy font-manrope-extrabold text-[15px] leading-[19px]">
                             {section.sectionTitle}
                           </Text>
-                          <Text style={{ color: '#6b74a8' }} className="font-semibold text-xs mt-1">
+                          <Text style={{ color: '#6b74a8' }} className="font-manrope-semibold text-xs mt-1">
                             {section.solvedTasks} z {section.totalTasks} zadań
                           </Text>
                           <View
@@ -261,7 +262,7 @@ export default function HomeScreen() {
                             />
                           </View>
                         </View>
-                        <Text className="text-infiro-navy font-extrabold text-[17px]">{pct}%</Text>
+                        <Text className="text-infiro-navy font-manrope-extrabold text-[17px]">{pct}%</Text>
                       </Pressable>
                     );
                   })}
@@ -291,8 +292,8 @@ function StatTile({ value, label }: { value: string | number; label: string }) {
         elevation: 2,
       }}
     >
-      <Text className="text-infiro-navy font-extrabold text-[24px]">{value}</Text>
-      <Text style={{ color: '#8b93bd' }} className="font-semibold text-xs mt-1.5">
+      <Text className="text-infiro-navy font-manrope-extrabold text-[24px]">{value}</Text>
+      <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-1.5">
         {label}
       </Text>
     </View>

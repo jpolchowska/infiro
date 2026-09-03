@@ -1,7 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { InterestIcon, InterestId } from '../../components/student/InterestIcon';
@@ -72,14 +73,14 @@ export default function InterestsScreen() {
       >
         <Text
           style={{ color: '#ff5f55', letterSpacing: 1.5 }}
-          className="font-bold text-[12px] uppercase mb-3.5"
+          className="font-manrope-bold text-[12px] uppercase mb-3.5"
         >
           Zanim zaczniemy
         </Text>
-        <Text className="text-infiro-navy font-extrabold text-[30px] leading-[34px] mb-2">
+        <Text className="text-infiro-navy font-manrope-extrabold text-[30px] leading-[34px] mb-2">
           Co lubisz najbardziej?
         </Text>
-        <Text style={{ color: '#6b74a8' }} className="font-medium text-[15px] leading-[22px] mb-[22px]">
+        <Text style={{ color: '#6b74a8' }} className="font-manrope-medium text-[15px] leading-[22px] mb-[22px]">
           Wybierz jedną rzecz — zadania będą o tym, co lubisz. Zawsze możesz to zmienić w profilu.
         </Text>
 
@@ -105,7 +106,7 @@ export default function InterestsScreen() {
                 >
                   <InterestIcon id={item.id} size={24} />
                 </View>
-                <Text className="text-infiro-navy font-extrabold text-[15px]">{item.label}</Text>
+                <Text className="text-infiro-navy font-manrope-extrabold text-[15px]">{item.label}</Text>
                 {isOn && (
                   <View
                     className="absolute top-3 right-3 items-center justify-center bg-infiro-navy"
@@ -130,7 +131,7 @@ export default function InterestsScreen() {
           backgroundColor: '#f4f5fb',
         }}
       >
-        <Text style={{ color: '#8b93bd' }} className="font-semibold text-[13px] text-center mb-3">
+        <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px] text-center mb-3">
           {pickedLabel}
         </Text>
 
@@ -140,10 +141,10 @@ export default function InterestsScreen() {
           className="rounded-full items-center justify-center"
           style={[{ height: 60, backgroundColor: '#ff5f55', opacity: saving ? 0.6 : 1 }, CTA_SHADOW]}
         >
-          <Text className="text-infiro-white font-extrabold text-[17px]">Gotowe</Text>
+          <Text className="text-infiro-white font-manrope-extrabold text-[17px]">Gotowe</Text>
         </Pressable>
         <Pressable onPress={goNext} className="items-center justify-center mt-1" style={{ height: 44 }}>
-          <Text style={{ color: '#8b93bd' }} className="font-semibold text-[13px]">
+          <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px]">
             Pomiń na razie
           </Text>
         </Pressable>

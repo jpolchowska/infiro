@@ -5,7 +5,8 @@
 
 /*
 import { useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Text } from '../Text';
 
 import { MemoryQuestion, TOPIC_ACCENT } from '../../lib/levelingTest';
 
@@ -104,11 +105,11 @@ export function MemoryQuestionCard({ question, onComplete }: MemoryQuestionCardP
               }`}
             >
               {isFlipped ? (
-                <Text className={`text-lg font-extrabold ${isMatched ? 'text-infiro-navy/40' : 'text-infiro-navy'}`}>
+                <Text className={`text-lg font-manrope-extrabold ${isMatched ? 'text-infiro-navy/40' : 'text-infiro-navy'}`}>
                   {card.text}
                 </Text>
               ) : (
-                <Text className="text-infiro-white text-xl font-extrabold">?</Text>
+                <Text className="text-infiro-white text-xl font-manrope-extrabold">?</Text>
               )}
             </Pressable>
           );
@@ -120,7 +121,7 @@ export function MemoryQuestionCard({ question, onComplete }: MemoryQuestionCardP
         disabled={done}
         className="bg-infiro-navy/5 rounded-2xl py-3.5 items-center"
       >
-        <Text className="text-infiro-navy/70 font-semibold text-sm">Pomiń</Text>
+        <Text className="text-infiro-navy/70 font-manrope-semibold text-sm">Pomiń</Text>
       </Pressable>
     </View>
   );
