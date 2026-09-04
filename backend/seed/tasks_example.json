@@ -18,12 +18,7 @@
                 ]
               },
               "gry": {
-                "prompt": "W grze masz 4 skrzynie, a z każdej wystają po 3 kryształy. Które działanie opisuje ich łączną liczbę?",
-                "options": [
-                  { "text": "4 + 3" },
-                  { "text": "4 − 3" },
-                  { "text": "4 × 3", "correct": true }
-                ]
+                "prompt": "W grze masz 4 skrzynie, a z każdej wystają po 3 kryształy. Które działanie opisuje ich łączną liczbę?"
               }
             }
           },
@@ -40,12 +35,7 @@
                 ]
               },
               "rysowanie": {
-                "prompt": "Troje dzieci dostało po 4 kredki. Które dodawanie opisuje łączną liczbę kredek?",
-                "options": [
-                  { "text": "3 + 4" },
-                  { "text": "4 + 4 + 4", "correct": true },
-                  { "text": "3 + 3 + 3" }
-                ]
+                "prompt": "Troje dzieci dostało po 4 kredki. Które dodawanie opisuje łączną liczbę kredek?"
               }
             }
           }
@@ -67,20 +57,10 @@
                 ]
               },
               "jedzenie": {
-                "prompt": "Na 2 talerzach leży po 4 naleśniki. Ile naleśników jest łącznie?",
-                "options": [
-                  { "text": "6" },
-                  { "text": "8", "correct": true },
-                  { "text": "10" }
-                ]
+                "prompt": "Na 2 talerzach leży po 4 naleśniki. Ile naleśników jest łącznie?"
               },
               "zwierzeta": {
-                "prompt": "W 2 klatkach jest po 4 chomiki. Ile chomików jest łącznie?",
-                "options": [
-                  { "text": "6" },
-                  { "text": "8", "correct": true },
-                  { "text": "10" }
-                ]
+                "prompt": "W 2 klatkach jest po 4 chomiki. Ile chomików jest łącznie?"
               }
             }
           },
@@ -97,12 +77,7 @@
                 ]
               },
               "sport": {
-                "prompt": "Do turnieju zgłosiło się 5 drużyn, każda po 5 zawodników. Ilu zawodników jest łącznie?",
-                "options": [
-                  { "text": "20" },
-                  { "text": "25", "correct": true },
-                  { "text": "30" }
-                ]
+                "prompt": "Do turnieju zgłosiło się 5 drużyn, każda po 5 zawodników. Ilu zawodników jest łącznie?"
               }
             }
           },
@@ -119,12 +94,7 @@
                 ]
               },
               "gry": {
-                "prompt": "W grze zbierasz 4 monety na każdym z 7 poziomów. Ile monet masz łącznie?",
-                "options": [
-                  { "text": "11" },
-                  { "text": "24" },
-                  { "text": "28", "correct": true }
-                ]
+                "prompt": "W grze zbierasz 4 monety na każdym z 7 poziomów. Ile monet masz łącznie?"
               }
             }
           },
@@ -141,12 +111,7 @@
                 ]
               },
               "muzyka": {
-                "prompt": "Chór ustawił się w 3 rzędach po 8 osób. Ile osób liczy chór?",
-                "options": [
-                  { "text": "11" },
-                  { "text": "24", "correct": true },
-                  { "text": "16" }
-                ]
+                "prompt": "Chór ustawił się w 3 rzędach po 8 osób. Ile osób liczy chór?"
               }
             }
           },
@@ -159,8 +124,7 @@
                 "answers": ["18"]
               },
               "muzyka": {
-                "prompt": "Zespół ma 3 płyty, a na każdej po 6 piosenek. Ile piosenek jest łącznie? Wpisz wynik.",
-                "answers": ["18"]
+                "prompt": "Zespół ma 3 płyty, a na każdej po 6 piosenek. Ile piosenek jest łącznie? Wpisz wynik."
               }
             }
           },
@@ -195,12 +159,7 @@
                 ]
               },
               "gry": {
-                "prompt": "W grze masz 7 plansz, a na każdej po 6 pól. Ile pól jest łącznie?",
-                "options": [
-                  { "text": "42", "correct": true },
-                  { "text": "48" },
-                  { "text": "49" }
-                ]
+                "prompt": "W grze masz 7 plansz, a na każdej po 6 pól. Ile pól jest łącznie?"
               }
             }
           },
@@ -217,12 +176,7 @@
                 ]
               },
               "zwierzeta": {
-                "prompt": "W schronisku jest 8 boksów, a w każdym po 7 kotów. Ile kotów jest łącznie?",
-                "options": [
-                  { "text": "56", "correct": true },
-                  { "text": "64" },
-                  { "text": "63" }
-                ]
+                "prompt": "W schronisku jest 8 boksów, a w każdym po 7 kotów. Ile kotów jest łącznie?"
               }
             }
           },
@@ -239,12 +193,7 @@
                 ]
               },
               "sport": {
-                "prompt": "Drużyna rozegrała 6 meczów i w każdym strzeliła po 3 bramki. Ile bramek zdobyła łącznie?",
-                "options": [
-                  { "text": "15" },
-                  { "text": "18", "correct": true },
-                  { "text": "12" }
-                ]
+                "prompt": "Drużyna rozegrała 6 meczów i w każdym strzeliła po 3 bramki. Ile bramek zdobyła łącznie?"
               }
             }
           },
@@ -306,12 +255,7 @@
                 ]
               },
               "zwierzeta": {
-                "prompt": "15 kości podzielono na 3 równe miski dla psów. Które działanie opisuje ten podział?",
-                "options": [
-                  { "text": "15 − 3" },
-                  { "text": "15 / 3", "correct": true },
-                  { "text": "15 × 3" }
-                ]
+                "prompt": "15 kości podzielono na 3 równe miski dla psów. Które działanie opisuje ten podział?"
               }
             }
           },
@@ -347,12 +291,7 @@
                 ]
               },
               "sport": {
-                "prompt": "Trasa sztafety ma 42 km i jest podzielona na 6 równych odcinków. Ile km przebiegnie jeden zawodnik?",
-                "options": [
-                  { "text": "6" },
-                  { "text": "7", "correct": true },
-                  { "text": "8" }
-                ]
+                "prompt": "Trasa sztafety ma 42 km i jest podzielona na 6 równych odcinków. Ile km przebiegnie jeden zawodnik?"
               }
             }
           },
@@ -365,8 +304,7 @@
                 "answers": ["5"]
               },
               "jedzenie": {
-                "prompt": "30 ciastek rozłożono po równo na 6 talerzy. Ile ciastek jest na jednym talerzu? Wpisz wynik.",
-                "answers": ["5"]
+                "prompt": "30 ciastek rozłożono po równo na 6 talerzy. Ile ciastek jest na jednym talerzu? Wpisz wynik."
               }
             }
           }
@@ -394,20 +332,10 @@
                 ]
               },
               "jedzenie": {
-                "prompt": "Pizzę podzielono na 4 równe kawałki. Zjedzono 1 kawałek. Jaki ułamek pizzy zjedzono?",
-                "options": [
-                  { "text": "1/4", "correct": true },
-                  { "text": "1/2" },
-                  { "text": "4/1" }
-                ]
+                "prompt": "Pizzę podzielono na 4 równe kawałki. Zjedzono 1 kawałek. Jaki ułamek pizzy zjedzono?"
               },
               "sport": {
-                "prompt": "Boisko podzielono na 4 równe strefy. Rozgrzewka odbywa się w 1 strefie. Jaki ułamek boiska to strefa rozgrzewki?",
-                "options": [
-                  { "text": "1/4", "correct": true },
-                  { "text": "1/2" },
-                  { "text": "4/1" }
-                ]
+                "prompt": "Boisko podzielono na 4 równe strefy. Rozgrzewka odbywa się w 1 strefie. Jaki ułamek boiska to strefa rozgrzewki?"
               }
             }
           },
@@ -424,12 +352,7 @@
                 ]
               },
               "rysowanie": {
-                "prompt": "Kartkę na rysunek podzielono na 8 równych pól. Pomalowano 3 pola. Jaki ułamek kartki pomalowano?",
-                "options": [
-                  { "text": "3/8", "correct": true },
-                  { "text": "8/3" },
-                  { "text": "3/5" }
-                ]
+                "prompt": "Kartkę na rysunek podzielono na 8 równych pól. Pomalowano 3 pola. Jaki ułamek kartki pomalowano?"
               }
             }
           }
@@ -484,7 +407,7 @@
             "difficulty": 2,
             "themes": {
               "default": {
-                "prompt": "Ułamek 7/5 to:",
+                "prompt": "Antek wyznaczył sobie plan na popołudnie. Poszło mu lepiej, niż zakładał, i zrealizował 7/5 swojego planu. Jaki to rodzaj ułamka?",
                 "options": [
                   { "text": "właściwy" },
                   { "text": "niewłaściwy", "correct": true },
@@ -492,12 +415,25 @@
                 ]
               },
               "sport": {
-                "prompt": "Biegacz pokonał 7/5 zaplanowanego dystansu. Jaki to rodzaj ułamka?",
-                "options": [
-                  { "text": "właściwy" },
-                  { "text": "niewłaściwy", "correct": true },
-                  { "text": "równy 0" }
-                ]
+                "prompt": "Biegacz pokonał 7/5 zaplanowanego dystansu. Jaki to rodzaj ułamka?"
+              },
+              "gry": {
+                "prompt": "Kuba planował przejść określoną liczbę poziomów w grze, ale tak dobrze mu szło, że wykonał 7/5 swojego planu. Jaki to rodzaj ułamka?"
+              },
+              "lego": {
+                "prompt": "Maja zaplanowała zbudować część wielkiego zamku z klocków. Wciągnęła się jednak w budowanie i wykonała aż 7/5 zaplanowanej pracy. Jaki to rodzaj ułamka?"
+              },
+              "zwierzeta": {
+                "prompt": "Podczas spaceru pies Fado miał przejść wyznaczoną trasę, ale miał tyle energii, że pokonał 7/5 zaplanowanego dystansu. Jaki to rodzaj ułamka?"
+              },
+              "rysowanie": {
+                "prompt": "Ola zaplanowała, ile rysunków przygotuje do swojego miniportfolio. Miała mnóstwo pomysłów i wykonała 7/5 swojego planu. Jaki to rodzaj ułamka?"
+              },
+              "muzyka": {
+                "prompt": "Bartek ćwiczył układ taneczny i miał wykonać określoną liczbę powtórzeń. Muzyka tak go wciągnęła, że zrobił 7/5 zaplanowanej liczby powtórzeń. Jaki to rodzaj ułamka?"
+              },
+              "jedzenie": {
+                "prompt": "Zosia planowała przygotować określoną liczbę mini pizz na szkolne spotkanie. Gotowanie szło jej świetnie, więc przygotowała 7/5 zaplanowanej liczby porcji. Jaki to rodzaj ułamka?"
               }
             }
           },
@@ -533,12 +469,7 @@
                 ]
               },
               "jedzenie": {
-                "prompt": "Do deseru potrzeba 9/4 tabliczki czekolady. Ile pełnych tabliczek trzeba użyć?",
-                "options": [
-                  { "text": "1" },
-                  { "text": "2", "correct": true },
-                  { "text": "3" }
-                ]
+                "prompt": "Do deseru potrzeba 9/4 tabliczki czekolady. Ile pełnych tabliczek trzeba użyć?"
               }
             }
           },
@@ -570,12 +501,7 @@
                 ]
               },
               "zwierzeta": {
-                "prompt": "Na obrazku 3/6 zwierząt to koty. Który ułamek oznacza dokładnie tę samą część?",
-                "options": [
-                  { "text": "1/2", "correct": true },
-                  { "text": "1/3" },
-                  { "text": "3/12" }
-                ]
+                "prompt": "Na obrazku 3/6 zwierząt to koty. Który ułamek oznacza dokładnie tę samą część?"
               },
               "rysowanie": {
                 "prompt": "Na rysunku 4/8 postaci to zwierzęta. Który ułamek oznacza dokładnie tę samą część?",
@@ -619,12 +545,7 @@
                 ]
               },
               "jedzenie": {
-                "prompt": "Miałeś 10 cukierków i oddałeś połowę koledze. Ile cukierków oddałeś?",
-                "options": [
-                  { "text": "4" },
-                  { "text": "5", "correct": true },
-                  { "text": "6" }
-                ]
+                "prompt": "Miałeś 10 cukierków i oddałeś połowę koledze. Ile cukierków oddałeś?"
               }
             }
           },
@@ -655,12 +576,7 @@
                 ]
               },
               "zwierzeta": {
-                "prompt": "W schronisku jest 20 psów, 3/4 z nich to szczeniaki. Ile jest szczeniąt?",
-                "options": [
-                  { "text": "5" },
-                  { "text": "15", "correct": true },
-                  { "text": "20" }
-                ]
+                "prompt": "W schronisku jest 20 psów, 3/4 z nich to szczeniaki. Ile jest szczeniąt?"
               }
             }
           },
@@ -677,12 +593,7 @@
                 ]
               },
               "muzyka": {
-                "prompt": "W klasie jest 24 uczniów, 1/4 z nich gra na instrumencie. Ilu uczniów gra na instrumencie?",
-                "options": [
-                  { "text": "6", "correct": true },
-                  { "text": "8" },
-                  { "text": "12" }
-                ]
+                "prompt": "W klasie jest 24 uczniów, 1/4 z nich gra na instrumencie. Ilu uczniów gra na instrumencie?"
               }
             }
           },
@@ -705,8 +616,7 @@
                 "answers": ["4"]
               },
               "jedzenie": {
-                "prompt": "Basia miała 12 cukierków i zjadła 1/3 z nich. Ile cukierków zjadła? Wpisz liczbę.",
-                "answers": ["4"]
+                "prompt": "Basia miała 12 cukierków i zjadła 1/3 z nich. Ile cukierków zjadła? Wpisz liczbę."
               }
             }
           }
@@ -742,12 +652,7 @@
                 ]
               },
               "jedzenie": {
-                "prompt": "W sklepie było 40 jabłek. Sprzedano 3/5 z nich. Ile jabłek zostało?",
-                "options": [
-                  { "text": "16", "correct": true },
-                  { "text": "24" },
-                  { "text": "30" }
-                ]
+                "prompt": "W sklepie było 40 jabłek. Sprzedano 3/5 z nich. Ile jabłek zostało?"
               }
             }
           }
@@ -861,8 +766,7 @@
                 "answers": ["3,7", "3.7"]
               },
               "muzyka": {
-                "prompt": "Jedna piosenka trwa 2,3 minuty, a druga 1,4 minuty. Ile minut trwają razem? Wpisz wynik.",
-                "answers": ["3,7", "3.7"]
+                "prompt": "Jedna piosenka trwa 2,3 minuty, a druga 1,4 minuty. Ile minut trwają razem? Wpisz wynik."
               }
             }
           }
@@ -927,12 +831,7 @@
                 ]
               },
               "lego": {
-                "prompt": "Budujesz z klocków i zużyłeś już 1 z 4 woreczków. Jaki procent budowli ukończyłeś?",
-                "options": [
-                  { "text": "25%", "correct": true },
-                  { "text": "40%" },
-                  { "text": "50%" }
-                ]
+                "prompt": "Budujesz z klocków i zużyłeś już 1 z 4 woreczków. Jaki procent budowli ukończyłeś?"
               }
             }
           },
@@ -982,12 +881,7 @@
                 ]
               },
               "gry": {
-                "prompt": "Pasek postępu w grze pokazuje 50%. Jaki to ułamek?",
-                "options": [
-                  { "text": "1/4" },
-                  { "text": "1/2", "correct": true },
-                  { "text": "1/3" }
-                ]
+                "prompt": "Pasek postępu w grze pokazuje 50%. Jaki to ułamek?"
               }
             }
           }
@@ -1061,8 +955,7 @@
                 "answers": ["10"]
               },
               "muzyka": {
-                "prompt": "Chór liczy 40 osób. 25% z nich to soliści. Ilu jest solistów? Wpisz liczbę.",
-                "answers": ["10"]
+                "prompt": "Chór liczy 40 osób. 25% z nich to soliści. Ilu jest solistów? Wpisz liczbę."
               }
             }
           }
@@ -1084,12 +977,7 @@
                 ]
               },
               "lego": {
-                "prompt": "Zestaw klocków kosztuje 200 zł. Rabat wynosi 20%. Ile złotych wynosi rabat?",
-                "options": [
-                  { "text": "40", "correct": true },
-                  { "text": "160" },
-                  { "text": "180" }
-                ]
+                "prompt": "Zestaw klocków kosztuje 200 zł. Rabat wynosi 20%. Ile złotych wynosi rabat?"
               }
             }
           },
@@ -1116,8 +1004,7 @@
                 "answers": ["20"]
               },
               "gry": {
-                "prompt": "Gra kosztuje 80 zł. Rabat wynosi 25%. Ile złotych wynosi rabat? Wpisz liczbę.",
-                "answers": ["20"]
+                "prompt": "Gra kosztuje 80 zł. Rabat wynosi 25%. Ile złotych wynosi rabat? Wpisz liczbę."
               }
             }
           }

@@ -1,6 +1,6 @@
 # Format pliku z zadaniami (JSON)
 
-*Wersja na: 03.09.2026*
+*Wersja na: 04.09.2026*
 
 Pomyśleliśmy, że dobrze byłoby móc kontrolować i zmieniać **kolejność zadań** w podsekcji. Żeby to połączyć z **wariantami zadań pod różne motywy** (zainteresowania), wymyśliliśmy takie rozwiązanie. To **propozycja** — może się jeszcze zmienić. Poniżej opisujemy, jak plik jest zbudowany i jak go wypełniać.
 
@@ -44,12 +44,13 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
                 ]
               },
               "sport": {
-                "prompt": "To samo pytanie w wersji sportowej?",
-                "options": [
-                  { "text": "odpowiedź błędna" },
-                  { "text": "odpowiedź poprawna", "correct": true },
-                  { "text": "odpowiedź błędna" }
-                ]
+                "prompt": "To samo pytanie w wersji sportowej?"
+              },
+              "gry": {
+                "prompt": "To samo pytanie w wersji dla gier?"
+              },
+              "zwierzeta": {
+                "prompt": "To samo pytanie w wersji o zwierzętach?"
               }
             }
           },
@@ -61,6 +62,12 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
               "default": {
                 "prompt": "Treść pytania? Wpisz wynik.",
                 "answers": ["poprawny zapis", "inny akceptowany zapis"]
+              },
+              "sport": {
+                "prompt": "To samo pytanie w wersji sportowej? Wpisz wynik."
+              },
+              "gry": {
+                "prompt": "To samo pytanie w wersji dla gier? Wpisz wynik."
               }
             }
           },
@@ -104,7 +111,7 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
 | `tasks` | lista zadań, w kolejności przechodzenia |
 | `type` | rodzaj zadania: `single_choice`, `short_answer` albo `memory` |
 | `difficulty` | trudność: `1`, `2` albo `3` (przy `memory` się pomija) |
-| `themes` | warianty treści per motyw; `default` musi być zawsze |
+| `themes` | warianty treści per motyw; `default` musi być zawsze; wariant motywu podaje zwykle tylko `prompt`, resztę dziedziczy z `default` |
 | `prompt` | treść pytania lub polecenia |
 | `options` | **zawsze dokładnie 3** opcje odpowiedzi w `single_choice` |
 | `text` / `correct` | treść opcji; `"correct": true` przy dokładnie jednej |
@@ -145,32 +152,52 @@ Zasady:
 - Uczeń z motywem np. `sport` dostaje wariant `sport` **tylko na tych zadaniach, które mają klucz `sport`**. Na pozostałych widzi `default`.
 - Zadanie „bez motywu" = zadanie, które ma **tylko `default`**. Widzą je wszyscy. To jest normalny przypadek — motyw dokłada się tam, gdzie jest dla niego treść, reszta leci na `default`.
 
-Zadanie z dwoma motywami:
+### Co wpisać w wariancie motywu
+
+Motyw zmienia **tylko fabułę**. Liczby, odpowiedzi i to, która odpowiedź jest poprawna, są takie same jak w `default`. Dlatego w wariancie motywu wpisuje się **tylko `prompt`** — `options` / `answers` / `pairs` dziedziczy się z `default`.
+
+Import składa wariant tak: bierze `default` i nadpisuje go tym, co poda motyw. Czego motyw nie poda — zostaje z `default`.
+
+**Wyjątek:** jeśli w danym motywie sama treść opcji jest inna (np. z jednostkami — „96 cm" zamiast „96"), motyw może podać własne `options`. Wtedy **zastępuje** całą listę dla tego motywu (nadal dokładnie 3 opcje, jedna `correct`). Albo dziedziczysz całe pole, albo podajesz całe — bez scalania po jednej opcji.
+
+Zadanie z kilkoma motywami:
 
 ```json
 {
   "type": "single_choice",
-  "difficulty": 1,
+  "difficulty": 2,
   "themes": {
     "default": {
-      "prompt": "W 4 pudełkach jest po 3 przedmioty. Które działanie opisuje ich łączną liczbę?",
+      "prompt": "Antek wyznaczył sobie plan na popołudnie. Poszło mu lepiej, niż zakładał, i zrealizował 7/5 swojego planu. Jaki to rodzaj ułamka?",
       "options": [
-        { "text": "4 + 3" },
-        { "text": "4 − 3" },
-        { "text": "4 × 3", "correct": true }
+        { "text": "właściwy" },
+        { "text": "niewłaściwy", "correct": true },
+        { "text": "równy 0" }
       ]
     },
     "gry": {
-      "prompt": "W grze masz 4 skrzynie, a z każdej wystają po 3 kryształy. Które działanie opisuje ich łączną liczbę?",
-      "options": [
-        { "text": "4 + 3" },
-        { "text": "4 − 3" },
-        { "text": "4 × 3", "correct": true }
-      ]
+      "prompt": "Kuba planował przejść określoną liczbę poziomów w grze, ale tak dobrze mu szło, że wykonał 7/5 swojego planu. Jaki to rodzaj ułamka?"
+    },
+    "lego": {
+      "prompt": "Maja zaplanowała zbudować część wielkiego zamku z klocków. Wciągnęła się jednak w budowanie i wykonała aż 7/5 zaplanowanej pracy. Jaki to rodzaj ułamka?"
+    },
+    "zwierzeta": {
+      "prompt": "Podczas spaceru pies Fado miał przejść wyznaczoną trasę, ale miał tyle energii, że pokonał 7/5 zaplanowanego dystansu. Jaki to rodzaj ułamka?"
+    },
+    "rysowanie": {
+      "prompt": "Ola zaplanowała, ile rysunków przygotuje do swojego miniportfolio. Miała mnóstwo pomysłów i wykonała 7/5 swojego planu. Jaki to rodzaj ułamka?"
+    },
+    "muzyka": {
+      "prompt": "Bartek ćwiczył układ taneczny i miał wykonać określoną liczbę powtórzeń. Muzyka tak go wciągnęła, że zrobił 7/5 zaplanowanej liczby powtórzeń. Jaki to rodzaj ułamka?"
+    },
+    "jedzenie": {
+      "prompt": "Zosia planowała przygotować określoną liczbę mini pizz na szkolne spotkanie. Gotowanie szło jej świetnie, więc przygotowała 7/5 zaplanowanej liczby porcji. Jaki to rodzaj ułamka?"
     }
   }
 }
 ```
+
+Tylko `default` ma `options`. Każdy motyw podaje samą fabułę, a opcje `właściwy` / `niewłaściwy` / `równy 0` (w tym to, że poprawna jest „niewłaściwy") dziedziczą z `default`.
 
 ---
 
@@ -249,6 +276,7 @@ Pole `type` mówi, jakie to zadanie. Trzy typy:
 - `pairs` — **3 pary** (wersja łatwa, 6 kafelków) albo **6 par** (wersja trudniejsza, 12 kafelków). Nic pomiędzy.
 - Każda para to dwie rzeczy, które do siebie pasują (`a` i `b`). Z każdej pary powstają 2 kafelki, przetasowane.
 - `memory` **nie ma pola `difficulty`** — o trudności decyduje liczba par.
+- Motywy: zwykle `memory` ma sam `default`, ale w razie potrzeby może mieć wariant motywu — podaje wtedy tylko `prompt`, `pairs` dziedziczy z `default`.
 
 ---
 
@@ -272,7 +300,7 @@ Liczba `1`, `2` albo `3` przy każdym zadaniu (poza `memory`). To etykieta „ja
 3. W `subsections` — obiekt podsekcji: `"subsection"` + `"tasks": []`.
 4. W `tasks` — zadania **w kolejności**, w jakiej uczeń ma je przechodzić.
 5. Każde zadanie ma: `type`, `difficulty` (poza `memory`), `themes` z **obowiązkowym `default`**.
-6. Motyw to kolejny klucz w `themes` — dodawany tam, gdzie jest dla niego treść.
+6. Wariant motywu to kolejny klucz w `themes` — podaje zwykle tylko `prompt`; `options` / `answers` / `pairs` dziedziczy z `default`.
 7. Kolejne podsekcje, kolejne sekcje — wszystko w kolejności listy.
 
 ---
