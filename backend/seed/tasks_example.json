@@ -14,8 +14,7 @@
                 "options": [
                   { "text": "4 + 3" },
                   { "text": "4 − 3" },
-                  { "text": "4 × 3", "correct": true },
-                  { "text": "4 / 3" }
+                  { "text": "4 × 3", "correct": true }
                 ]
               },
               "gry": {
@@ -23,8 +22,7 @@
                 "options": [
                   { "text": "4 + 3" },
                   { "text": "4 − 3" },
-                  { "text": "4 × 3", "correct": true },
-                  { "text": "4 / 3" }
+                  { "text": "4 × 3", "correct": true }
                 ]
               }
             }
@@ -38,8 +36,7 @@
                 "options": [
                   { "text": "3 + 4" },
                   { "text": "4 + 4 + 4", "correct": true },
-                  { "text": "3 + 3 + 3" },
-                  { "text": "3 + 4 + 4" }
+                  { "text": "3 + 3 + 3" }
                 ]
               },
               "rysowanie": {
@@ -47,8 +44,7 @@
                 "options": [
                   { "text": "3 + 4" },
                   { "text": "4 + 4 + 4", "correct": true },
-                  { "text": "3 + 3 + 3" },
-                  { "text": "3 + 4 + 4" }
+                  { "text": "3 + 3 + 3" }
                 ]
               }
             }
@@ -67,7 +63,6 @@
                 "options": [
                   { "text": "6" },
                   { "text": "8", "correct": true },
-                  { "text": "9" },
                   { "text": "10" }
                 ]
               },
@@ -76,7 +71,6 @@
                 "options": [
                   { "text": "6" },
                   { "text": "8", "correct": true },
-                  { "text": "9" },
                   { "text": "10" }
                 ]
               },
@@ -85,7 +79,6 @@
                 "options": [
                   { "text": "6" },
                   { "text": "8", "correct": true },
-                  { "text": "9" },
                   { "text": "10" }
                 ]
               }
@@ -100,8 +93,7 @@
                 "options": [
                   { "text": "20" },
                   { "text": "25", "correct": true },
-                  { "text": "30" },
-                  { "text": "15" }
+                  { "text": "30" }
                 ]
               },
               "sport": {
@@ -109,8 +101,7 @@
                 "options": [
                   { "text": "20" },
                   { "text": "25", "correct": true },
-                  { "text": "30" },
-                  { "text": "15" }
+                  { "text": "30" }
                 ]
               }
             }
@@ -124,8 +115,7 @@
                 "options": [
                   { "text": "11" },
                   { "text": "24" },
-                  { "text": "28", "correct": true },
-                  { "text": "21" }
+                  { "text": "28", "correct": true }
                 ]
               },
               "gry": {
@@ -133,8 +123,7 @@
                 "options": [
                   { "text": "11" },
                   { "text": "24" },
-                  { "text": "28", "correct": true },
-                  { "text": "21" }
+                  { "text": "28", "correct": true }
                 ]
               }
             }
@@ -148,7 +137,6 @@
                 "options": [
                   { "text": "11" },
                   { "text": "24", "correct": true },
-                  { "text": "21" },
                   { "text": "16" }
                 ]
               },
@@ -157,7 +145,6 @@
                 "options": [
                   { "text": "11" },
                   { "text": "24", "correct": true },
-                  { "text": "21" },
                   { "text": "16" }
                 ]
               }
@@ -202,7 +189,6 @@
               "default": {
                 "prompt": "Ile to 7 × 6?",
                 "options": [
-                  { "text": "36" },
                   { "text": "42", "correct": true },
                   { "text": "48" },
                   { "text": "49" }
@@ -211,7 +197,6 @@
               "gry": {
                 "prompt": "W grze masz 7 plansz, a na każdej po 6 pól. Ile pól jest łącznie?",
                 "options": [
-                  { "text": "36" },
                   { "text": "42", "correct": true },
                   { "text": "48" },
                   { "text": "49" }
@@ -226,7 +211,6 @@
               "default": {
                 "prompt": "Ile to 8 × 7?",
                 "options": [
-                  { "text": "54" },
                   { "text": "56", "correct": true },
                   { "text": "64" },
                   { "text": "63" }
@@ -235,7 +219,6 @@
               "zwierzeta": {
                 "prompt": "W schronisku jest 8 boksów, a w każdym po 7 kotów. Ile kotów jest łącznie?",
                 "options": [
-                  { "text": "54" },
                   { "text": "56", "correct": true },
                   { "text": "64" },
                   { "text": "63" }
@@ -250,7 +233,6 @@
               "default": {
                 "prompt": "Ile to 6 × 3?",
                 "options": [
-                  { "text": "9" },
                   { "text": "15" },
                   { "text": "18", "correct": true },
                   { "text": "12" }
@@ -259,7 +241,6 @@
               "sport": {
                 "prompt": "Drużyna rozegrała 6 meczów i w każdym strzeliła po 3 bramki. Ile bramek zdobyła łącznie?",
                 "options": [
-                  { "text": "9" },
                   { "text": "15" },
                   { "text": "18", "correct": true },
                   { "text": "12" }
@@ -274,7 +255,6 @@
               "default": {
                 "prompt": "Ile to 14 × 3?",
                 "options": [
-                  { "text": "32" },
                   { "text": "42", "correct": true },
                   { "text": "48" },
                   { "text": "52" }
@@ -322,8 +302,7 @@
                 "options": [
                   { "text": "15 − 3" },
                   { "text": "15 / 3", "correct": true },
-                  { "text": "15 × 3" },
-                  { "text": "15 + 3" }
+                  { "text": "15 × 3" }
                 ]
               },
               "zwierzeta": {
@@ -331,8 +310,7 @@
                 "options": [
                   { "text": "15 − 3" },
                   { "text": "15 / 3", "correct": true },
-                  { "text": "15 × 3" },
-                  { "text": "15 + 3" }
+                  { "text": "15 × 3" }
                 ]
               }
             }
@@ -346,8 +324,7 @@
                 "options": [
                   { "text": "dodawania" },
                   { "text": "odejmowania" },
-                  { "text": "mnożenia", "correct": true },
-                  { "text": "porównywania" }
+                  { "text": "mnożenia", "correct": true }
                 ]
               }
             }
@@ -366,8 +343,7 @@
                 "options": [
                   { "text": "6" },
                   { "text": "7", "correct": true },
-                  { "text": "8" },
-                  { "text": "36" }
+                  { "text": "8" }
                 ]
               },
               "sport": {
@@ -375,8 +351,7 @@
                 "options": [
                   { "text": "6" },
                   { "text": "7", "correct": true },
-                  { "text": "8" },
-                  { "text": "36" }
+                  { "text": "8" }
                 ]
               }
             }
@@ -415,7 +390,6 @@
                 "options": [
                   { "text": "1/4", "correct": true },
                   { "text": "1/2" },
-                  { "text": "1/3" },
                   { "text": "4/1" }
                 ]
               },
@@ -424,7 +398,6 @@
                 "options": [
                   { "text": "1/4", "correct": true },
                   { "text": "1/2" },
-                  { "text": "1/3" },
                   { "text": "4/1" }
                 ]
               },
@@ -433,7 +406,6 @@
                 "options": [
                   { "text": "1/4", "correct": true },
                   { "text": "1/2" },
-                  { "text": "1/3" },
                   { "text": "4/1" }
                 ]
               }
@@ -448,7 +420,6 @@
                 "options": [
                   { "text": "3/8", "correct": true },
                   { "text": "8/3" },
-                  { "text": "1/3" },
                   { "text": "3/5" }
                 ]
               },
@@ -457,7 +428,6 @@
                 "options": [
                   { "text": "3/8", "correct": true },
                   { "text": "8/3" },
-                  { "text": "1/3" },
                   { "text": "3/5" }
                 ]
               }
@@ -477,8 +447,7 @@
                 "options": [
                   { "text": "liczbę wszystkich części" },
                   { "text": "liczbę wziętych części", "correct": true },
-                  { "text": "liczbę całości" },
-                  { "text": "kreskę ułamkową" }
+                  { "text": "liczbę całości" }
                 ]
               },
               "zwierzeta": {
@@ -486,7 +455,6 @@
                 "options": [
                   { "text": "liczbę wszystkich zwierząt" },
                   { "text": "liczbę królików", "correct": true },
-                  { "text": "liczbę zagród" },
                   { "text": "liczbę pozostałych zwierząt" }
                 ]
               }
@@ -501,8 +469,7 @@
                 "options": [
                   { "text": "licznik" },
                   { "text": "mianownik", "correct": true },
-                  { "text": "całość" },
-                  { "text": "reszta" }
+                  { "text": "całość" }
                 ]
               }
             }
@@ -521,8 +488,7 @@
                 "options": [
                   { "text": "właściwy" },
                   { "text": "niewłaściwy", "correct": true },
-                  { "text": "równy 0" },
-                  { "text": "ujemny" }
+                  { "text": "równy 0" }
                 ]
               },
               "sport": {
@@ -530,8 +496,7 @@
                 "options": [
                   { "text": "właściwy" },
                   { "text": "niewłaściwy", "correct": true },
-                  { "text": "równy 0" },
-                  { "text": "ujemny" }
+                  { "text": "równy 0" }
                 ]
               }
             }
@@ -545,8 +510,7 @@
                 "options": [
                   { "text": "3/4", "correct": true },
                   { "text": "5/4" },
-                  { "text": "4/4" },
-                  { "text": "7/2" }
+                  { "text": "4/4" }
                 ]
               }
             }
@@ -565,8 +529,7 @@
                 "options": [
                   { "text": "1" },
                   { "text": "2", "correct": true },
-                  { "text": "3" },
-                  { "text": "4" }
+                  { "text": "3" }
                 ]
               },
               "jedzenie": {
@@ -574,8 +537,7 @@
                 "options": [
                   { "text": "1" },
                   { "text": "2", "correct": true },
-                  { "text": "3" },
-                  { "text": "4" }
+                  { "text": "3" }
                 ]
               }
             }
@@ -604,7 +566,6 @@
                 "options": [
                   { "text": "1/2", "correct": true },
                   { "text": "1/3" },
-                  { "text": "2/3" },
                   { "text": "3/12" }
                 ]
               },
@@ -613,7 +574,6 @@
                 "options": [
                   { "text": "1/2", "correct": true },
                   { "text": "1/3" },
-                  { "text": "2/3" },
                   { "text": "3/12" }
                 ]
               },
@@ -622,7 +582,6 @@
                 "options": [
                   { "text": "1/2", "correct": true },
                   { "text": "1/4" },
-                  { "text": "2/3" },
                   { "text": "4/4" }
                 ]
               }
@@ -637,8 +596,7 @@
                 "options": [
                   { "text": "1/2", "correct": true },
                   { "text": "2/4" },
-                  { "text": "1/4" },
-                  { "text": "4/4" }
+                  { "text": "1/4" }
                 ]
               }
             }
@@ -655,7 +613,6 @@
               "default": {
                 "prompt": "Ile to 1/2 z 10?",
                 "options": [
-                  { "text": "2" },
                   { "text": "4" },
                   { "text": "5", "correct": true },
                   { "text": "6" }
@@ -664,7 +621,6 @@
               "jedzenie": {
                 "prompt": "Miałeś 10 cukierków i oddałeś połowę koledze. Ile cukierków oddałeś?",
                 "options": [
-                  { "text": "2" },
                   { "text": "4" },
                   { "text": "5", "correct": true },
                   { "text": "6" }
@@ -681,8 +637,7 @@
                 "options": [
                   { "text": "1/4" },
                   { "text": "1/2" },
-                  { "text": "3/4", "correct": true },
-                  { "text": "1/8" }
+                  { "text": "3/4", "correct": true }
                 ]
               }
             }
@@ -696,7 +651,6 @@
                 "options": [
                   { "text": "5" },
                   { "text": "15", "correct": true },
-                  { "text": "16" },
                   { "text": "20" }
                 ]
               },
@@ -705,7 +659,6 @@
                 "options": [
                   { "text": "5" },
                   { "text": "15", "correct": true },
-                  { "text": "16" },
                   { "text": "20" }
                 ]
               }
@@ -718,7 +671,6 @@
               "default": {
                 "prompt": "Ile to 1/4 z 24?",
                 "options": [
-                  { "text": "4" },
                   { "text": "6", "correct": true },
                   { "text": "8" },
                   { "text": "12" }
@@ -727,7 +679,6 @@
               "muzyka": {
                 "prompt": "W klasie jest 24 uczniów, 1/4 z nich gra na instrumencie. Ilu uczniów gra na instrumencie?",
                 "options": [
-                  { "text": "4" },
                   { "text": "6", "correct": true },
                   { "text": "8" },
                   { "text": "12" }
@@ -773,7 +724,6 @@
                 "options": [
                   { "text": "3/4", "correct": true },
                   { "text": "2/6" },
-                  { "text": "1/6" },
                   { "text": "3/6" }
                 ]
               }
@@ -788,8 +738,7 @@
                 "options": [
                   { "text": "16", "correct": true },
                   { "text": "24" },
-                  { "text": "30" },
-                  { "text": "10" }
+                  { "text": "30" }
                 ]
               },
               "jedzenie": {
@@ -797,8 +746,7 @@
                 "options": [
                   { "text": "16", "correct": true },
                   { "text": "24" },
-                  { "text": "30" },
-                  { "text": "10" }
+                  { "text": "30" }
                 ]
               }
             }
@@ -823,8 +771,7 @@
                 "options": [
                   { "text": "0,05" },
                   { "text": "0,50", "correct": true },
-                  { "text": "5,0" },
-                  { "text": "0,005" }
+                  { "text": "5,0" }
                 ]
               }
             }
@@ -853,8 +800,7 @@
                 "options": [
                   { "text": "0,45" },
                   { "text": "0,5", "correct": true },
-                  { "text": "0,4" },
-                  { "text": "0,05" }
+                  { "text": "0,4" }
                 ]
               }
             }
@@ -868,8 +814,7 @@
                 "options": [
                   { "text": "0,3" },
                   { "text": "0,8", "correct": true },
-                  { "text": "0,08" },
-                  { "text": "0,03" }
+                  { "text": "0,08" }
                 ]
               }
             }
@@ -888,8 +833,7 @@
                 "options": [
                   { "text": "1,5", "correct": true },
                   { "text": "1,4" },
-                  { "text": "1,6" },
-                  { "text": "1,3" }
+                  { "text": "1,6" }
                 ]
               }
             }
@@ -903,8 +847,7 @@
                 "options": [
                   { "text": "2,35", "correct": true },
                   { "text": "2,45" },
-                  { "text": "3,35" },
-                  { "text": "2,25" }
+                  { "text": "3,35" }
                 ]
               }
             }
@@ -935,7 +878,6 @@
               "default": {
                 "prompt": "Ile to 0,96 × 100?",
                 "options": [
-                  { "text": "0,096" },
                   { "text": "9,6" },
                   { "text": "96", "correct": true },
                   { "text": "960" }
@@ -944,7 +886,6 @@
               "lego": {
                 "prompt": "Jeden klocek ma grubość 0,96 cm. Wieża zbudowana jest ze 100 takich klocków. Jaka jest jej wysokość?",
                 "options": [
-                  { "text": "0,096 cm" },
                   { "text": "9,6 cm" },
                   { "text": "96 cm", "correct": true },
                   { "text": "960 cm" }
@@ -980,7 +921,6 @@
               "default": {
                 "prompt": "1 część z 4 to jaki procent całości?",
                 "options": [
-                  { "text": "10%" },
                   { "text": "25%", "correct": true },
                   { "text": "40%" },
                   { "text": "50%" }
@@ -989,7 +929,6 @@
               "lego": {
                 "prompt": "Budujesz z klocków i zużyłeś już 1 z 4 woreczków. Jaki procent budowli ukończyłeś?",
                 "options": [
-                  { "text": "10%" },
                   { "text": "25%", "correct": true },
                   { "text": "40%" },
                   { "text": "50%" }
@@ -1006,8 +945,7 @@
                 "options": [
                   { "text": "połowa" },
                   { "text": "ćwierć" },
-                  { "text": "cała całość", "correct": true },
-                  { "text": "nic" }
+                  { "text": "cała całość", "correct": true }
                 ]
               }
             }
@@ -1026,7 +964,6 @@
                 "options": [
                   { "text": "1/2" },
                   { "text": "1/4", "correct": true },
-                  { "text": "1/3" },
                   { "text": "1/5" }
                 ]
               }
@@ -1041,8 +978,7 @@
                 "options": [
                   { "text": "1/4" },
                   { "text": "1/2", "correct": true },
-                  { "text": "1/3" },
-                  { "text": "1/5" }
+                  { "text": "1/3" }
                 ]
               },
               "gry": {
@@ -1050,8 +986,7 @@
                 "options": [
                   { "text": "1/4" },
                   { "text": "1/2", "correct": true },
-                  { "text": "1/3" },
-                  { "text": "1/5" }
+                  { "text": "1/3" }
                 ]
               }
             }
@@ -1070,8 +1005,7 @@
                 "options": [
                   { "text": "5", "correct": true },
                   { "text": "10" },
-                  { "text": "15" },
-                  { "text": "20" }
+                  { "text": "15" }
                 ]
               }
             }
@@ -1085,8 +1019,7 @@
                 "options": [
                   { "text": "10" },
                   { "text": "20", "correct": true },
-                  { "text": "25" },
-                  { "text": "15" }
+                  { "text": "25" }
                 ]
               }
             }
@@ -1100,8 +1033,7 @@
                 "options": [
                   { "text": "12" },
                   { "text": "15", "correct": true },
-                  { "text": "20" },
-                  { "text": "25" }
+                  { "text": "20" }
                 ]
               }
             }
@@ -1115,8 +1047,7 @@
                 "options": [
                   { "text": "6" },
                   { "text": "9", "correct": true },
-                  { "text": "12" },
-                  { "text": "15" }
+                  { "text": "12" }
                 ]
               }
             }
@@ -1147,7 +1078,6 @@
               "default": {
                 "prompt": "Ile to 20% z 200?",
                 "options": [
-                  { "text": "20" },
                   { "text": "40", "correct": true },
                   { "text": "160" },
                   { "text": "180" }
@@ -1156,7 +1086,6 @@
               "lego": {
                 "prompt": "Zestaw klocków kosztuje 200 zł. Rabat wynosi 20%. Ile złotych wynosi rabat?",
                 "options": [
-                  { "text": "20" },
                   { "text": "40", "correct": true },
                   { "text": "160" },
                   { "text": "180" }
@@ -1171,7 +1100,6 @@
               "default": {
                 "prompt": "Cena to 200 zł, a rabat wynosi 20%. Ile kosztuje po rabacie?",
                 "options": [
-                  { "text": "140" },
                   { "text": "160", "correct": true },
                   { "text": "180" },
                   { "text": "220" }

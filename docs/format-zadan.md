@@ -40,7 +40,6 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
                 "options": [
                   { "text": "odpowiedź błędna" },
                   { "text": "odpowiedź poprawna", "correct": true },
-                  { "text": "odpowiedź błędna" },
                   { "text": "odpowiedź błędna" }
                 ]
               },
@@ -49,7 +48,6 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
                 "options": [
                   { "text": "odpowiedź błędna" },
                   { "text": "odpowiedź poprawna", "correct": true },
-                  { "text": "odpowiedź błędna" },
                   { "text": "odpowiedź błędna" }
                 ]
               }
@@ -108,7 +106,7 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
 | `difficulty` | trudność: `1`, `2` albo `3` (przy `memory` się pomija) |
 | `themes` | warianty treści per motyw; `default` musi być zawsze |
 | `prompt` | treść pytania lub polecenia |
-| `options` | od 2 do 4 opcji odpowiedzi w `single_choice` (zazwyczaj 4) |
+| `options` | **zawsze dokładnie 3** opcje odpowiedzi w `single_choice` |
 | `text` / `correct` | treść opcji; `"correct": true` przy dokładnie jednej |
 | `answers` | lista akceptowanych odpowiedzi w `short_answer` |
 | `pairs` | pary w `memory` — 3 albo 6, każda z `a` i `b` |
@@ -159,8 +157,7 @@ Zadanie z dwoma motywami:
       "options": [
         { "text": "4 + 3" },
         { "text": "4 − 3" },
-        { "text": "4 × 3", "correct": true },
-        { "text": "4 / 3" }
+        { "text": "4 × 3", "correct": true }
       ]
     },
     "gry": {
@@ -168,8 +165,7 @@ Zadanie z dwoma motywami:
       "options": [
         { "text": "4 + 3" },
         { "text": "4 − 3" },
-        { "text": "4 × 3", "correct": true },
-        { "text": "4 / 3" }
+        { "text": "4 × 3", "correct": true }
       ]
     }
   }
@@ -204,7 +200,6 @@ Pole `type` mówi, jakie to zadanie. Trzy typy:
       "options": [
         { "text": "6" },
         { "text": "8", "correct": true },
-        { "text": "9" },
         { "text": "10" }
       ]
     }
@@ -212,7 +207,7 @@ Pole `type` mówi, jakie to zadanie. Trzy typy:
 }
 ```
 
-- `options` — **od 2 do 4 opcji** (aplikacja pokazuje je jako A, B, C, D).
+- `options` — **zawsze dokładnie 3 opcje** (aplikacja pokazuje je jako A, B, C).
 - **Dokładnie jedna** opcja ma `"correct": true`. Przy błędnych `correct` się pomija — nie piszesz `"correct": false`.
 
 ### `short_answer` — uczeń wpisuje odpowiedź
