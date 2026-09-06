@@ -9,6 +9,7 @@ export default function StudentLayout() {
       <Stack.Screen name="profile" options={{ animation: 'fade', animationDuration: 150 }} />
       <Stack.Screen name="interests" options={{ animation: 'fade', animationDuration: 150 }} />
       <Stack.Screen name="leveling-test" options={{ animation: 'fade', animationDuration: 150 }} />
+      <Stack.Screen name="tasks/[id]" options={{ animation: 'fade', animationDuration: 150 }} />
     </Stack>
   );
 }
