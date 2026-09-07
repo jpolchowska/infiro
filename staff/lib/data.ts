@@ -300,8 +300,8 @@ export async function deleteMaterial(token: string, id: number): Promise<void> {
 export async function importTasks(
   token: string,
   payload: unknown
-): Promise<{ task_count: number }> {
-  return apiFetch<{ task_count: number }>("/api/admin/tasks/import", {
+): Promise<{ task_count: number; tasks: unknown[]; data: unknown[] }> {
+  return apiFetch<{ task_count: number; tasks: unknown[]; data: unknown[] }>("/api/admin/tasks/import", {
     token,
     method: "POST",
     json: payload,
