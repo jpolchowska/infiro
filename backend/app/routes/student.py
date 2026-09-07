@@ -11,6 +11,9 @@ from app.models.tasks import Task
 from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.task_answer_options import TaskAnswerOption
+
+import random
+
 student_bp = Blueprint("student", __name__)
 
 
@@ -692,3 +695,61 @@ def get_student_stats():
             ),
         }
     ), 200
+
+
+@student_bp.route("/api/student/subsections/<int:subsection_id>/timed",methods=["GET"])
+@authenticate_token
+def get_timed_tasks(subsection_id):
+    student = _current_user()
+
+    if student is None:
+        return jsonify({
+            "error": "User not found"
+        }), 404
+
+    subsection = db.session.get(Subsection, subsection_id)
+
+    if subsection is None:
+        return jsonify({
+            "error": "Subsection not found"
+        }), 404
+
+    tasks = (
+        Task.query
+        .filter_by(
+            subsection_id=subsection.id,
+            type="single_choice"
+        )
+        .all()
+    )
+
+    random.shuffle(tasks)
+    tasks = tasks[:20]
+
+    questions = []
+
+    for task in tasks:
+        options = (
+            TaskAnswerOption.query
+            .filter_by(task_id=task.id)
+            .all()
+        )
+
+        random.shuffle(options)
+
+        questions.append({
+            "task_id": task.id,
+            "prompt": task.body_text,
+            "options": [
+                {
+                    "id": option.id,
+                    "text": option.option_text
+                }
+                for option in options
+            ]
+        })
+
+    return jsonify({
+        "duration_seconds": 60,
+        "questions": questions
+    }), 200
