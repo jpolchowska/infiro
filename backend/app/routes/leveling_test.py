@@ -1,4 +1,6 @@
 from datetime import datetime
+import re
+import random
 
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from flask import Blueprint, jsonify, request
@@ -26,23 +28,67 @@ def _pick_random_task(section_id, difficulty_level):
     )
 
 
-def _task_json(task):
+def _task_theme(task, interest):
+    themes = task.themes if isinstance(task.themes, dict) else {}
+    default = themes.get("default", {})
+    selected = themes.get(interest, {}) if interest else {}
+    if not isinstance(default, dict):
+        default = {}
+    if not isinstance(selected, dict):
+        selected = {}
+    return {**default, **selected}
+
+
+def _task_options(task, interest):
     options = (
         TaskAnswerOption.query.filter_by(task_id=task.id)
-        .order_by(db.func.random())
+        .order_by(TaskAnswerOption.order_index)
         .all()
     )
-    return {
+    theme_options = _task_theme(task, interest).get("options")
+    if isinstance(theme_options, list) and len(theme_options) == len(options):
+        return [
+            {
+                "id": option.id,
+                "text": option_data["text"],
+                "is_correct": option_data.get("correct") is True,
+            }
+            for option, option_data in zip(options, theme_options)
+        ]
+    return [
+        {
+            "id": option.id,
+            "text": option.option_text,
+            "is_correct": option.is_correct,
+        }
+        for option in options
+    ]
+
+
+def _task_json(task, interest):
+    theme = _task_theme(task, interest)
+    payload = {
         "task_id": task.id,
+        "type": task.type,
         "difficulty_level": task.difficulty_level,
-        "title": task.title,
-        "body_text": task.body_text,
-        "image_url": task.image_url,
-        "options": [
-            {"id": o.id, "option_text": o.option_text, "is_correct": o.is_correct}
-            for o in options
-        ],
+        "prompt": theme.get("prompt", task.body_text),
     }
+    if task.type == "single_choice":
+        options = _task_options(task, interest)
+        random_options = list(options)
+        random.shuffle(random_options)
+        payload["options"] = [
+            {"id": option["id"], "text": option["text"]}
+            for option in random_options
+        ]
+    return payload
+
+
+def _normalize_answer(value):
+    value = value.strip()
+    value = re.sub(r"\s+", " ", value)
+    value = value.lower()
+    return value.replace(",", ".")
 
 
 @leveling_test_bp.route("/api/student/leveling-test", methods=["GET"])
@@ -58,7 +104,7 @@ def get_leveling_test():
         for level in LEVELING_TEST_DIFFICULTY_LEVELS:
             task = _pick_random_task(section.id, level)
             if task is not None:
-                questions.append(_task_json(task))
+                questions.append(_task_json(task, user.interest))
 
         if questions:
             sections_payload.append({
@@ -92,30 +138,55 @@ def submit_leveling_test():
             return jsonify({"error": "each answer must be an object"}), 400
 
         task_id = answer.get("task_id")
-        selected_option_id = answer.get("selected_option_id")
 
         task = Task.query.get(task_id)
         if task is None:
             return jsonify({"error": f"task {task_id} not found"}), 400
 
-        option = TaskAnswerOption.query.filter_by(
-            id=selected_option_id, task_id=task_id
-        ).first()
-        if option is None:
+        if task.type == "single_choice":
+            selected_option_id = answer.get("selected_option_id")
+            if not isinstance(selected_option_id, int):
+                return jsonify({
+                    "error": f"selected_option_id is required for task {task_id}"
+                }), 400
+            option = TaskAnswerOption.query.filter_by(
+                id=selected_option_id, task_id=task_id
+            ).first()
+            if option is None:
+                return jsonify({
+                    "error": f"option {selected_option_id} does not belong to task {task_id}"
+                }), 400
+            theme_options = _task_options(task, user.interest)
+            selected = next(item for item in theme_options if item["id"] == option.id)
+            validated.append((task, selected["is_correct"], option.id, None))
+        elif task.type == "short_answer":
+            answer_text = answer.get("answer_text")
+            if not isinstance(answer_text, str):
+                return jsonify({
+                    "error": f"answer_text is required for task {task_id}"
+                }), 400
+            accepted_answers = _task_theme(task, user.interest).get(
+                "answers",
+                task.accepted_answers or [],
+            )
+            is_correct = any(
+                _normalize_answer(answer_text) == _normalize_answer(accepted)
+                for accepted in accepted_answers
+            )
+            validated.append((task, is_correct, None, answer_text))
+        else:
             return jsonify({
-                "error": f"option {selected_option_id} does not belong to task {task_id}"
+                "error": f"unsupported task type for task {task_id}"
             }), 400
 
-        validated.append((task, option))
-
     # Obliczenie wyniku
-    score = sum(1 for _, option in validated if option.is_correct)
+    score = sum(1 for _, is_correct, _, _ in validated if is_correct)
     max_score = len(validated)
     now = datetime.utcnow()
 
     # Zapis odpowiedzi na poszczególne zadania
     saved = 0
-    for task, option in validated:
+    for task, is_correct, selected_option_id, answer_text in validated:
         last_attempt = (
             StudentAnswer.query.filter_by(task_id=task.id, student_id=user.id)
             .order_by(StudentAnswer.attempt_number.desc())
@@ -127,8 +198,9 @@ def submit_leveling_test():
             StudentAnswer(
                 task_id=task.id,
                 student_id=user.id,
-                selected_option_id=option.id,
-                is_correct=option.is_correct,
+                selected_option_id=selected_option_id,
+                answer_text=answer_text,
+                is_correct=is_correct,
                 attempt_number=attempt_number,
                 submitted_at=now,
             )

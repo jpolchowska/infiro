@@ -173,7 +173,9 @@ def get_subsection(subsection_id):
     if subsection is None:
         return jsonify({"error": "subsection not found"}), 404
 
-    tasks = Task.query.filter_by(subsection_id=subsection_id).order_by(Task.id).all()
+    tasks = Task.query.filter_by(subsection_id=subsection_id).order_by(
+        Task.order_index, Task.id
+    ).all()
     materials = KnowledgeResource.query.filter_by(subsection_id=subsection_id).order_by(
         KnowledgeResource.order_index
     ).all()

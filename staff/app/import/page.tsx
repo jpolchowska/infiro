@@ -51,12 +51,14 @@ export default function ImportPage() {
   const [zipFile, setZipFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<string[] | null>(null);
   const [taskCount, setTaskCount] = useState<number | null>(null);
+  const [importedData, setImportedData] = useState<unknown[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [uploadResult, setUploadResult] = useState<number | null>(null);
 
   async function handleJsonSubmit(e: SubmitEvent) {
     e.preventDefault();
     setTaskCount(null);
+    setImportedData(null);
     if (!jsonFile) {
       setErrors(["Wybierz plik .json."]);
       return;
@@ -82,6 +84,7 @@ export default function ImportPage() {
       const token = await getToken();
       const result = await importTasks(token ?? "", data);
       setTaskCount(result.task_count);
+      setImportedData(result.data);
     } catch (err) {
       if (err instanceof ApiError) {
         setErrors([err.message]);
@@ -123,8 +126,8 @@ export default function ImportPage() {
       <h1 className="text-2xl font-semibold text-infiro-navy">Import treści</h1>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">
         Sekcje i podsekcje dopasowywane są po dokładnym tytule i tworzone,
-        jeśli nie istnieją. Import zawsze dodaje nowe zadania — nie nadpisuje
-        istniejących.
+        jeśli nie istnieją. Zadania z `content_key` są aktualizowane,
+        a nowe zadania otrzymują identyfikator do kolejnego importu.
       </p>
 
       {errors && errors.length > 0 && (
@@ -141,6 +144,26 @@ export default function ImportPage() {
             </p>
           )}
         </div>
+      )}
+
+      {importedData && (
+        <button
+          type="button"
+          className="mt-4 rounded bg-infiro-navy px-4 py-2 text-sm font-medium text-white"
+          onClick={() => {
+            const blob = new Blob([JSON.stringify(importedData, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "tasks-with-ids.json";
+            link.click();
+            URL.revokeObjectURL(url);
+          }}
+        >
+          Pobierz plik z identyfikatorami
+        </button>
       )}
 
       {taskCount !== null && (

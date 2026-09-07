@@ -4,6 +4,7 @@ from datetime import datetime
 from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.subsections import Subsection
+from app.middleware.auth import authenticate_token
 # from app.models.student_answers import StudentAnswer
 
 # from app.extensions import db
@@ -12,6 +13,7 @@ tasks_bp = Blueprint("tasks", __name__)
 
 
 @tasks_bp.route("/api/tasks/<int:task_id>", methods=["GET"])
+@authenticate_token
 def get_task(task_id):
     task = Task.query.get(task_id)
 
@@ -44,6 +46,7 @@ def get_task(task_id):
     }), 200
 
 @tasks_bp.route("/api/tasks", methods=["GET"])
+@authenticate_token
 def get_tasks():
     subsection_id = request.args.get("subsection_id", type=int)
 
@@ -61,7 +64,7 @@ def get_tasks():
 
     tasks = Task.query.filter_by(
         subsection_id=subsection_id
-    ).all()
+    ).order_by(Task.order_index, Task.id).all()
 
     return jsonify([
         {
