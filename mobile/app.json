@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "Infiro",
+    "slug": "infiro",
     "version": "1.0.0",
     "scheme": "infiro",
     "android": {

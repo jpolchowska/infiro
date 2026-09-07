@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../../components/Text';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,21 +34,23 @@ export default function SubsectionTasksScreen() {
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
-  useEffect(() => {
-    let active = true;
-    setError(false);
-    getSubsectionTasks(Number(id))
-      .then((data) => {
-        if (active) setDetail(data);
-      })
-      .catch((err) => {
-        console.warn('Failed to load subsection tasks:', err);
-        if (active) setError(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [id, attempt]);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      setError(false);
+      getSubsectionTasks(Number(id))
+        .then((data) => {
+          if (active) setDetail(data);
+        })
+        .catch((err) => {
+          console.warn('Failed to load subsection tasks:', err);
+          if (active) setError(true);
+        });
+      return () => {
+        active = false;
+      };
+    }, [id, attempt])
+  );
 
   const accent = detail ? getAccent(detail.sectionIndex) : null;
   const accentHex = detail ? ACCENT_HEX[detail.sectionIndex % ACCENT_HEX.length] : '#142284';
@@ -63,6 +65,9 @@ export default function SubsectionTasksScreen() {
     else router.back();
   };
 
+  const currentTask =
+    tasks.find((t) => t.status === 'current') ?? tasks.find((t) => t.status === 'todo') ?? tasks[0];
+
   const cta: { label: string; onPress: () => void } = finished
     ? detail?.nextSubsectionId != null
       ? {
@@ -70,7 +75,12 @@ export default function SubsectionTasksScreen() {
           onPress: () => router.replace(`/(student)/subsections/${detail.nextSubsectionId}`),
         }
       : { label: 'Wróć do działu', onPress: goToSection }
-    : { label: solved === 0 ? 'Zacznij ćwiczyć' : 'Ćwicz dalej', onPress: () => {} };
+    : {
+        label: solved === 0 ? 'Zacznij ćwiczyć' : 'Ćwicz dalej',
+        onPress: () => {
+          if (currentTask) router.push(`/(student)/tasks/${currentTask.id}`);
+        },
+      };
 
   if (error) {
     return (
@@ -144,6 +154,39 @@ export default function SubsectionTasksScreen() {
           </View>
         </View>
 
+        {tasks.length > 0 && (
+          <View className="px-5" style={{ marginTop: 18 }}>
+            <Pressable
+              onPress={() => router.push(`/(student)/timed/${detail.id}`)}
+              className="flex-row items-center bg-infiro-white"
+              style={{
+                borderRadius: 16,
+                padding: 14,
+                gap: 12,
+                shadowColor: '#142284',
+                shadowOpacity: 0.06,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 3 },
+                elevation: 2,
+              }}
+            >
+              <View
+                className="items-center justify-center"
+                style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: 'rgba(20,34,132,0.06)' }}
+              >
+                <Ionicons name="timer-outline" size={18} color={accentHex} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-infiro-navy font-manrope-extrabold text-[14px]">Ćwicz na czas</Text>
+                <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
+                  60 sekund, zadania ABC z tej podsekcji
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
+            </Pressable>
+          </View>
+        )}
+
         <View className="px-5" style={{ marginTop: 22 }}>
           <Text
             style={{ color: '#8b93bd', letterSpacing: 1.4 }}
@@ -168,7 +211,7 @@ export default function SubsectionTasksScreen() {
                 <Pressable
                   key={task.id}
                   disabled={isLocked}
-                  onPress={() => {}}
+                  onPress={() => router.push(`/(student)/tasks/${task.id}`)}
                   className="flex-row items-center bg-infiro-white"
                   style={{
                     borderRadius: 16,
