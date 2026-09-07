@@ -1,14 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MathText } from '../../../components/MathText';
 import { Text } from '../../../components/Text';
 import { AnswerFeedback } from '../../../components/student/AnswerFeedback';
 import { ErrorState } from '../../../components/student/ErrorState';
-import { Task, TaskAnswerResult, getTask, submitTaskAnswer } from '../../../lib/tasks';
+import { Task, TaskAnswerInput, TaskAnswerResult, getTask, submitTaskAnswer } from '../../../lib/tasks';
 
 const NAVY = '#142284';
 const CORAL = '#ff5f55';
@@ -25,6 +25,7 @@ export default function TaskScreen() {
   const [reload, setReload] = useState(0);
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [answerText, setAnswerText] = useState('');
   const [result, setResult] = useState<TaskAnswerResult | null>(null);
   const [attemptsUsed, setAttemptsUsed] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -34,6 +35,7 @@ export default function TaskScreen() {
     setError(false);
     setTask(null);
     setSelectedId(null);
+    setAnswerText('');
     setResult(null);
     setAttemptsUsed(0);
 
@@ -73,10 +75,22 @@ export default function TaskScreen() {
           : 'revealed';
 
   const check = async () => {
-    if (task == null || task.type !== 'single_choice' || selectedId == null || submitting) return;
+    if (task == null || submitting) return;
+
+    let input: TaskAnswerInput;
+    if (task.type === 'single_choice') {
+      if (selectedId == null) return;
+      input = { selectedOptionId: selectedId };
+    } else if (task.type === 'short_answer') {
+      if (answerText.trim() === '') return;
+      input = { answerText: answerText.trim() };
+    } else {
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const r = await submitTaskAnswer(task.id, { selectedOptionId: selectedId });
+      const r = await submitTaskAnswer(task.id, input);
       setResult(r);
       setAttemptsUsed(r.attemptNumber);
     } catch (e) {
@@ -90,6 +104,7 @@ export default function TaskScreen() {
   const retry = () => {
     setResult(null);
     setSelectedId(null);
+    setAnswerText('');
   };
 
   if (error) {
@@ -110,7 +125,7 @@ export default function TaskScreen() {
     );
   }
 
-  if (task.type !== 'single_choice') {
+  if (task.type === 'memory') {
     return (
       <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
         <SafeAreaView className="flex-1 items-center justify-center px-8">
@@ -129,12 +144,19 @@ export default function TaskScreen() {
 
   const correctOptionId =
     result?.solution && 'correctOptionId' in result.solution ? result.solution.correctOptionId : null;
-  const revealedText = task.options.find((o) => o.id === correctOptionId)?.text ?? '';
+  const revealedText =
+    task.type === 'single_choice'
+      ? task.options.find((o) => o.id === correctOptionId)?.text ?? ''
+      : result?.solution && 'answers' in result.solution
+        ? result.solution.answers.join('   •   ')
+        : '';
+
   const locked = phase !== 'answering';
+  const answerEmpty = task.type === 'single_choice' ? selectedId == null : answerText.trim() === '';
 
   const cta: { label: string; onPress: () => void; disabled?: boolean } =
     phase === 'answering'
-      ? { label: 'Sprawdź', onPress: check, disabled: selectedId == null || submitting }
+      ? { label: 'Sprawdź', onPress: check, disabled: answerEmpty || submitting }
       : phase === 'retry'
         ? { label: 'Spróbuj jeszcze raz', onPress: retry }
         : { label: 'Dalej', onPress: () => router.back() };
@@ -142,7 +164,10 @@ export default function TaskScreen() {
   return (
     <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
       <SafeAreaView className="flex-1" edges={['top']}>
-        <View className="flex-row items-center justify-between px-5" style={{ paddingTop: 4, paddingBottom: 8 }}>
+        <View
+          className="flex-row items-center justify-between px-5"
+          style={{ paddingTop: 4, paddingBottom: 8 }}
+        >
           <Pressable
             onPress={() => router.back()}
             hitSlop={12}
@@ -163,66 +188,96 @@ export default function TaskScreen() {
           className="flex-1"
           contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <MathText className="text-infiro-navy font-manrope-extrabold text-[22px] leading-[28px]" color={NAVY}>
+          <MathText
+            className="text-infiro-navy font-manrope-extrabold text-[22px] leading-[28px]"
+            color={NAVY}
+          >
             {task.prompt}
           </MathText>
 
-          <View style={{ gap: 10, marginTop: 24 }}>
-            {task.options.map((opt, i) => {
-              const selected = selectedId === opt.id;
-              const isCorrectOne = phase === 'revealed' && opt.id === correctOptionId;
-              const isWrongPick = phase === 'revealed' && selected && !isCorrectOne;
+          {task.type === 'single_choice' ? (
+            <View style={{ gap: 10, marginTop: 24 }}>
+              {task.options.map((opt, i) => {
+                const selected = selectedId === opt.id;
+                const isCorrectOne = phase === 'revealed' && opt.id === correctOptionId;
+                const isWrongPick = phase === 'revealed' && selected && !isCorrectOne;
 
-              const borderColor = isCorrectOne
-                ? GREEN
-                : isWrongPick
-                  ? CORAL
-                  : selected
-                    ? NAVY
-                    : 'rgba(20,34,132,0.12)';
-              const bg = selected && phase === 'answering' ? NAVY : '#fefefe';
-              const fg = selected && phase === 'answering' ? '#fefefe' : NAVY;
+                const borderColor = isCorrectOne
+                  ? GREEN
+                  : isWrongPick
+                    ? CORAL
+                    : selected
+                      ? NAVY
+                      : 'rgba(20,34,132,0.12)';
+                const bg = selected && phase === 'answering' ? NAVY : '#fefefe';
+                const fg = selected && phase === 'answering' ? '#fefefe' : NAVY;
 
-              return (
-                <Pressable
-                  key={opt.id}
-                  disabled={locked}
-                  onPress={() => setSelectedId(opt.id)}
-                  className="flex-row items-center"
-                  style={{
-                    borderRadius: 16,
-                    borderWidth: 1.5,
-                    borderColor,
-                    backgroundColor: bg,
-                    paddingVertical: 15,
-                    paddingHorizontal: 15,
-                    gap: 13,
-                  }}
-                >
-                  <View
-                    className="items-center justify-center"
+                return (
+                  <Pressable
+                    key={opt.id}
+                    disabled={locked}
+                    onPress={() => setSelectedId(opt.id)}
+                    className="flex-row items-center"
                     style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 100,
-                      backgroundColor:
-                        selected && phase === 'answering' ? 'rgba(254,254,254,0.2)' : 'rgba(20,34,132,0.06)',
+                      borderRadius: 16,
+                      borderWidth: 1.5,
+                      borderColor,
+                      backgroundColor: bg,
+                      paddingVertical: 15,
+                      paddingHorizontal: 15,
+                      gap: 13,
                     }}
                   >
-                    <Text className="font-manrope-bold text-[13px]" style={{ color: fg }}>
-                      {LETTERS[i]}
-                    </Text>
-                  </View>
-                  <MathText className="font-manrope-semibold text-[15px] flex-1" color={fg}>
-                    {opt.text}
-                  </MathText>
-                  {isCorrectOne && <Ionicons name="checkmark" size={18} color={GREEN} />}
-                  {isWrongPick && <Ionicons name="close" size={18} color={CORAL} />}
-                </Pressable>
-              );
-            })}
-          </View>
+                    <View
+                      className="items-center justify-center"
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 100,
+                        backgroundColor:
+                          selected && phase === 'answering'
+                            ? 'rgba(254,254,254,0.2)'
+                            : 'rgba(20,34,132,0.06)',
+                      }}
+                    >
+                      <Text className="font-manrope-bold text-[13px]" style={{ color: fg }}>
+                        {LETTERS[i]}
+                      </Text>
+                    </View>
+                    <MathText className="font-manrope-semibold text-[15px] flex-1" color={fg}>
+                      {opt.text}
+                    </MathText>
+                    {isCorrectOne && <Ionicons name="checkmark" size={18} color={GREEN} />}
+                    {isWrongPick && <Ionicons name="close" size={18} color={CORAL} />}
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : (
+            <View style={{ marginTop: 24 }}>
+              <TextInput
+                value={answerText}
+                onChangeText={setAnswerText}
+                editable={!locked}
+                keyboardType="decimal-pad"
+                placeholder="Wpisz odpowiedź"
+                placeholderTextColor="rgba(20,34,132,0.35)"
+                onSubmitEditing={check}
+                className="font-manrope-extrabold text-[20px] text-infiro-navy"
+                style={{
+                  height: 58,
+                  borderRadius: 16,
+                  borderWidth: 1.5,
+                  borderColor:
+                    phase === 'correct' ? GREEN : phase === 'revealed' ? CORAL : 'rgba(20,34,132,0.12)',
+                  backgroundColor: '#fefefe',
+                  paddingHorizontal: 16,
+                }}
+              />
+            </View>
+          )}
 
           {phase === 'correct' && (
             <View style={{ marginTop: 18 }}>
