@@ -154,6 +154,39 @@ export default function SubsectionTasksScreen() {
           </View>
         </View>
 
+        {tasks.length > 0 && (
+          <View className="px-5" style={{ marginTop: 18 }}>
+            <Pressable
+              onPress={() => router.push(`/(student)/timed/${detail.id}`)}
+              className="flex-row items-center bg-infiro-white"
+              style={{
+                borderRadius: 16,
+                padding: 14,
+                gap: 12,
+                shadowColor: '#142284',
+                shadowOpacity: 0.06,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 3 },
+                elevation: 2,
+              }}
+            >
+              <View
+                className="items-center justify-center"
+                style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: 'rgba(20,34,132,0.06)' }}
+              >
+                <Ionicons name="timer-outline" size={18} color={accentHex} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-infiro-navy font-manrope-extrabold text-[14px]">Ćwicz na czas</Text>
+                <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
+                  60 sekund, zadania ABC z tej podsekcji
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
+            </Pressable>
+          </View>
+        )}
+
         <View className="px-5" style={{ marginTop: 22 }}>
           <Text
             style={{ color: '#8b93bd', letterSpacing: 1.4 }}
