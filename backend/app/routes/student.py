@@ -10,7 +10,7 @@ from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
-
+from app.models.task_answer_options import TaskAnswerOption
 student_bp = Blueprint("student", __name__)
 
 
@@ -151,6 +151,55 @@ def get_student_sections():
             "index": index, "subsections": subsection_data,
             })
     return jsonify(result), 200
+
+@student_bp.route("/api/student/tasks/<int:task_id>", methods=["GET"])
+@authenticate_token
+def get_student_task(task_id):
+    student = _current_user()
+
+    if student is None:
+        return jsonify({
+            "error": "User not found"
+        }), 404
+
+    task = db.session.get(Task, task_id)
+
+    if task is None:
+        return jsonify({
+            "error": "Task not found"
+        }), 404
+
+    options = (
+        TaskAnswerOption.query
+        .filter_by(task_id=task.id)
+        .order_by(TaskAnswerOption.order_index)
+        .all()
+    )
+
+    return jsonify({
+        "id": task.id,
+        "type": "single_choice",
+        "difficulty_level": task.difficulty_level,
+        "prompt": task.body_text,
+        "options": [
+            {
+                "id": option.id,
+                "text": option.option_text
+            }
+            for option in options
+        ],
+        "attempts_used": (
+            StudentAnswer.query
+            .filter_by(
+                task_id=task.id,
+                student_id=student.id
+            )
+            .count()
+        ),
+        "max_attempts": 3,
+        "solution": None
+    }), 200
+
 
 
 @student_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
