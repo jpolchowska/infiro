@@ -132,6 +132,13 @@ Zależało nam na elastyczności — żeby dało się ułożyć kurs w dowolnej 
 
 Kolejność **nie zależy** od trudności ani typu — zadania układa się w takiej kolejności, w jakiej mają się pojawiać. Zwykle łatwiejsze najpierw, ale nie jest to narzucone; można też np. dać najpierw trzy zamknięte, potem otwarte, potem memory.
 
+### Zapis ułamków w treści
+
+Ułamki zwykłe zapisuj bez spacji wokół ukośnika, np. `1/2` albo `7/5`.
+Aplikacja wyrenderuje je jako ułamki piętrowe. Dzielenie zapisuj ze spacjami
+(`15 / 3`) albo z dwukropkiem (`30 : 6`), aby pozostało zwykłym tekstem.
+Ułamki dziesiętne zapisuj z przecinkiem, np. `0,5`.
+
 ---
 
 ## Motywy (`themes`)
