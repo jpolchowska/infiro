@@ -200,6 +200,203 @@ def get_student_task(task_id):
         "solution": None
     }), 200
 
+@student_bp.route("/api/student/tasks/<int:task_id>/answers",methods=["POST"])
+@authenticate_token
+def submit_student_answer(task_id):
+    student = _current_user()
+
+    if student is None:
+        return jsonify({
+            "error": "User not found"
+        }), 404
+
+    task = db.session.get(Task, task_id)
+
+    if task is None:
+        return jsonify({
+            "error": "Task not found"
+        }), 404
+
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "error": "Invalid JSON body"
+        }), 400
+
+    # ---------------------------------------------------------
+    # MEMORY
+    # ---------------------------------------------------------
+
+    if task.type == "memory":
+        if data.get("completed") is not True:
+            return jsonify({
+                "error": "completed must be true"
+            }), 400
+
+        answer = StudentAnswer(
+            task_id=task.id,
+            student_id=student.id,
+            is_correct=True,
+            attempt_number=1
+        )
+
+        db.session.add(answer)
+        db.session.commit()
+
+        return jsonify({
+            "is_correct": True,
+            "attempt_number": 1,
+            "attempts_left": None,
+            "solution": None
+        }), 200
+
+    # ---------------------------------------------------------
+    # SINGLE CHOICE / SHORT ANSWER
+    # ---------------------------------------------------------
+
+    if task.type not in ("single_choice", "short_answer"):
+        return jsonify({
+            "error": "Unsupported task type"
+        }), 400
+
+
+    attempts_used = (
+        StudentAnswer.query
+        .filter_by(
+            task_id=task.id,
+            student_id=student.id
+        )
+        .count()
+    )
+
+    already_solved = (
+        StudentAnswer.query
+        .filter_by(
+            task_id=task.id,
+            student_id=student.id,
+            is_correct=True
+        )
+        .first()
+        is not None
+    )
+
+    if already_solved or attempts_used >= 3:
+        return jsonify({
+            "error": "Task is already closed"
+        }), 409
+
+    attempt_number = attempts_used + 1
+
+    # ---------------------------------------------------------
+    # SINGLE CHOICE
+    # ---------------------------------------------------------
+
+    if task.type == "single_choice":
+        selected_option_id = data.get("selected_option_id")
+
+        if not isinstance(selected_option_id, int):
+            return jsonify({
+                "error": "selected_option_id is required"
+            }), 400
+
+        option = (
+            TaskAnswerOption.query
+            .filter_by(
+                id=selected_option_id,
+                task_id=task.id
+            )
+            .first()
+        )
+
+        if option is None:
+            return jsonify({
+                "error": "Invalid option"
+            }), 400
+
+        is_correct = option.is_correct
+
+        answer = StudentAnswer(
+            task_id=task.id,
+            student_id=student.id,
+            selected_option_id=selected_option_id,
+            is_correct=is_correct,
+            attempt_number=attempt_number
+        )
+
+    # ---------------------------------------------------------
+    # SHORT ANSWER
+    # ---------------------------------------------------------
+
+    else:
+        answer_text = data.get("answer_text")
+
+        if not isinstance(answer_text, str):
+            return jsonify({
+                "error": "answer_text is required"
+            }), 400
+
+        def normalize_answer(value):
+            value = value.strip()
+            value = re.sub(r"\s+", " ", value)
+            value = value.lower()
+            value = value.replace(",", ".")
+            return value
+
+        normalized_answer = normalize_answer(answer_text)
+
+        accepted_answers = task.accepted_answers or []
+
+        is_correct = any(
+            normalized_answer == normalize_answer(accepted)
+            for accepted in accepted_answers
+        )
+
+        answer = StudentAnswer(
+            task_id=task.id,
+            student_id=student.id,
+            answer_text=answer_text,
+            is_correct=is_correct,
+            attempt_number=attempt_number
+        )
+
+    # ---------------------------------------------------------
+    # SAVE
+    # ---------------------------------------------------------
+
+    db.session.add(answer)
+    db.session.commit()
+
+    attempts_left = 3 - attempt_number
+
+    solution = None
+    if not is_correct and attempts_left == 0:
+
+        if task.type == "single_choice":
+            correct_option = (
+                TaskAnswerOption.query
+                .filter_by(
+                    task_id=task.id,
+                    is_correct=True
+                )
+                .first()
+            )
+
+            solution = {
+                "correct_option_id": correct_option.id
+            }
+
+        elif task.type == "short_answer":
+            solution = {
+                "accepted_answers": task.accepted_answers or []
+            }
+
+    return jsonify({
+        "is_correct": is_correct,
+        "attempt_number": attempt_number,
+        "attempts_left": attempts_left,
+        "solution": solution
+    }), 200
 
 
 @student_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
