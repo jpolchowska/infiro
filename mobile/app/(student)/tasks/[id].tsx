@@ -8,6 +8,7 @@ import { MathText } from '../../../components/MathText';
 import { Text } from '../../../components/Text';
 import { AnswerFeedback } from '../../../components/student/AnswerFeedback';
 import { ErrorState } from '../../../components/student/ErrorState';
+import { MemoryBoard } from '../../../components/student/MemoryBoard';
 import { Task, TaskAnswerInput, TaskAnswerResult, getTask, submitTaskAnswer } from '../../../lib/tasks';
 
 const NAVY = '#142284';
@@ -29,6 +30,7 @@ export default function TaskScreen() {
   const [result, setResult] = useState<TaskAnswerResult | null>(null);
   const [attemptsUsed, setAttemptsUsed] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [memorySolved, setMemorySolved] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -38,6 +40,7 @@ export default function TaskScreen() {
     setAnswerText('');
     setResult(null);
     setAttemptsUsed(0);
+    setMemorySolved(false);
 
     getTask(Number(id))
       .then((t) => {
@@ -107,6 +110,16 @@ export default function TaskScreen() {
     setAnswerText('');
   };
 
+  const handleMemorySolved = async () => {
+    if (task == null || task.type !== 'memory' || memorySolved) return;
+    setMemorySolved(true);
+    try {
+      await submitTaskAnswer(task.id, { memoryCompleted: true });
+    } catch (e) {
+      console.warn('Failed to submit memory result:', e);
+    }
+  };
+
   if (error) {
     return (
       <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
@@ -128,15 +141,72 @@ export default function TaskScreen() {
   if (task.type === 'memory') {
     return (
       <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
-        <SafeAreaView className="flex-1 items-center justify-center px-8">
-          <Text className="text-infiro-navy font-manrope-extrabold text-lg text-center">
-            Ten typ zadania będzie wkrótce
-          </Text>
-          <Pressable onPress={() => router.back()} hitSlop={8} className="mt-4">
-            <Text className="font-manrope-semibold text-[14px]" style={{ color: '#6b74a8' }}>
-              ‹ Wróć
+        <SafeAreaView className="flex-1" edges={['top']}>
+          <View
+            className="flex-row items-center justify-between px-5"
+            style={{ paddingTop: 4, paddingBottom: 8 }}
+          >
+            <Pressable
+              onPress={() => router.back()}
+              hitSlop={12}
+              className="w-9 h-9 rounded-full items-center justify-center"
+              style={{ backgroundColor: 'rgba(20,34,132,0.06)' }}
+            >
+              <Ionicons name="close" size={18} color={NAVY} />
+            </Pressable>
+            <Text className="font-manrope-semibold text-[13px]" style={{ color: '#8b93bd' }}>
+              Połącz pary
             </Text>
-          </Pressable>
+            <View className="w-9" />
+          </View>
+
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 24 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <MathText
+              className="text-infiro-navy font-manrope-extrabold text-[22px] leading-[28px]"
+              color={NAVY}
+            >
+              {task.prompt}
+            </MathText>
+            <View style={{ marginTop: 24 }}>
+              <MemoryBoard pairs={task.pairs} onSolved={handleMemorySolved} />
+            </View>
+            {memorySolved && (
+              <View style={{ marginTop: 18 }}>
+                <AnswerFeedback kind="correct" />
+              </View>
+            )}
+          </ScrollView>
+
+          <View
+            className="px-5"
+            style={{
+              paddingTop: 12,
+              paddingBottom: 10,
+              borderTopWidth: 1,
+              borderTopColor: '#e8eaf4',
+              backgroundColor: 'rgba(244,245,251,0.96)',
+            }}
+          >
+            <Pressable
+              onPress={() => router.back()}
+              disabled={!memorySolved}
+              className="flex-row items-center justify-center"
+              style={{
+                height: 54,
+                borderRadius: 100,
+                gap: 8,
+                backgroundColor: GREEN,
+                opacity: memorySolved ? 1 : 0.4,
+              }}
+            >
+              <Text className="text-infiro-white font-manrope-extrabold text-base">Dalej</Text>
+              <Ionicons name="arrow-forward" size={18} color="#fefefe" />
+            </Pressable>
+          </View>
         </SafeAreaView>
       </View>
     );
