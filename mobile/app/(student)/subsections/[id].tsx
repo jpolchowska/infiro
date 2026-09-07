@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../../components/Text';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,21 +34,23 @@ export default function SubsectionTasksScreen() {
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
-  useEffect(() => {
-    let active = true;
-    setError(false);
-    getSubsectionTasks(Number(id))
-      .then((data) => {
-        if (active) setDetail(data);
-      })
-      .catch((err) => {
-        console.warn('Failed to load subsection tasks:', err);
-        if (active) setError(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [id, attempt]);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      setError(false);
+      getSubsectionTasks(Number(id))
+        .then((data) => {
+          if (active) setDetail(data);
+        })
+        .catch((err) => {
+          console.warn('Failed to load subsection tasks:', err);
+          if (active) setError(true);
+        });
+      return () => {
+        active = false;
+      };
+    }, [id, attempt])
+  );
 
   const accent = detail ? getAccent(detail.sectionIndex) : null;
   const accentHex = detail ? ACCENT_HEX[detail.sectionIndex % ACCENT_HEX.length] : '#142284';
@@ -63,6 +65,9 @@ export default function SubsectionTasksScreen() {
     else router.back();
   };
 
+  const currentTask =
+    tasks.find((t) => t.status === 'current') ?? tasks.find((t) => t.status === 'todo') ?? tasks[0];
+
   const cta: { label: string; onPress: () => void } = finished
     ? detail?.nextSubsectionId != null
       ? {
@@ -70,7 +75,12 @@ export default function SubsectionTasksScreen() {
           onPress: () => router.replace(`/(student)/subsections/${detail.nextSubsectionId}`),
         }
       : { label: 'Wróć do działu', onPress: goToSection }
-    : { label: solved === 0 ? 'Zacznij ćwiczyć' : 'Ćwicz dalej', onPress: () => {} };
+    : {
+        label: solved === 0 ? 'Zacznij ćwiczyć' : 'Ćwicz dalej',
+        onPress: () => {
+          if (currentTask) router.push(`/(student)/tasks/${currentTask.id}`);
+        },
+      };
 
   if (error) {
     return (
@@ -168,7 +178,7 @@ export default function SubsectionTasksScreen() {
                 <Pressable
                   key={task.id}
                   disabled={isLocked}
-                  onPress={() => {}}
+                  onPress={() => router.push(`/(student)/tasks/${task.id}`)}
                   className="flex-row items-center bg-infiro-white"
                   style={{
                     borderRadius: 16,
