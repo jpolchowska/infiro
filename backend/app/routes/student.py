@@ -753,3 +753,94 @@ def get_timed_tasks(subsection_id):
         "duration_seconds": 60,
         "questions": questions
     }), 200
+
+@student_bp.route("/api/student/subsections/<int:subsection_id>/timed/submit",methods=["POST"])
+@authenticate_token
+def submit_timed_tasks(subsection_id):
+    student = _current_user()
+
+    if student is None:
+        return jsonify({
+            "error": "User not found"
+        }), 404
+
+    subsection = db.session.get(Subsection, subsection_id)
+
+    if subsection is None:
+        return jsonify({
+            "error": "Subsection not found"
+        }), 404
+
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "error": "Invalid JSON body"
+        }), 400
+
+    answers = data.get("answers")
+    elapsed_seconds = data.get("elapsed_seconds")
+
+    if not isinstance(answers, list):
+        return jsonify({
+            "error": "answers must be a list"
+        }), 400
+
+    if not isinstance(elapsed_seconds, (int, float)):
+        return jsonify({
+            "error": "elapsed_seconds must be a number"
+        }), 400
+
+    tasks = (
+        Task.query
+        .filter_by(
+            subsection_id=subsection.id,
+            type="single_choice"
+        )
+        .all()
+    )
+
+    task_ids = {task.id for task in tasks}
+
+    timed_tasks = tasks[:20]
+
+    timed_task_ids = {task.id for task in timed_tasks}
+
+    correct = 0
+    answered = 0
+
+    for answer_data in answers:
+        if not isinstance(answer_data, dict):
+            continue
+
+        task_id = answer_data.get("task_id")
+        selected_option_id = answer_data.get("selected_option_id")
+
+        if not isinstance(task_id, int):
+            continue
+
+        if not isinstance(selected_option_id, int):
+            continue
+
+        if task_id not in timed_task_ids:
+            continue
+
+        answered += 1
+
+        option = (
+            TaskAnswerOption.query
+            .filter_by(
+                id=selected_option_id,
+                task_id=task_id
+            )
+            .first()
+        )
+
+        if option is not None and option.is_correct:
+            correct += 1
+
+    return jsonify({
+        "correct": correct,
+        "answered": answered,
+        "total": len(timed_tasks)
+    }), 200
