@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint, jsonify, request, redirect, url_for
 
 from app.middleware.auth import authenticate_token
@@ -13,6 +15,7 @@ from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.task_answer_options import TaskAnswerOption
 
 import random
+import re
 
 student_bp = Blueprint("student", __name__)
 
@@ -118,6 +121,92 @@ def _subsection_progress(student_id, subsection):
         "total_tasks": total_tasks,
     }
 
+
+def _task_theme(task, interest):
+    themes = task.themes if isinstance(task.themes, dict) else {}
+    default = themes.get("default", {})
+    selected = themes.get(interest, {}) if interest else {}
+
+    if not isinstance(default, dict):
+        default = {}
+    if not isinstance(selected, dict):
+        selected = {}
+
+    return {**default, **selected}
+
+
+def _task_solution(task, interest=None):
+    if task.type == "single_choice":
+        theme_options = _task_theme(task, interest).get("options")
+        if isinstance(theme_options, list):
+            correct_indexes = [
+                index for index, option in enumerate(theme_options)
+                if isinstance(option, dict) and option.get("correct") is True
+            ]
+            if len(correct_indexes) == 1:
+                option = TaskAnswerOption.query.filter_by(
+                    task_id=task.id,
+                    order_index=correct_indexes[0] + 1,
+                ).first()
+                return {"correct_option_id": option.id} if option else None
+
+        correct_option = TaskAnswerOption.query.filter_by(
+            task_id=task.id,
+            is_correct=True,
+        ).first()
+        return {
+            "correct_option_id": correct_option.id
+        } if correct_option is not None else None
+
+    if task.type == "short_answer":
+        theme = _task_theme(task, interest)
+        return {
+            "accepted_answers": theme.get("answers", task.accepted_answers or [])
+        }
+
+    return None
+
+
+def _attempts_used_in_current_cycle(task_id, student_id):
+    last_answer = (
+        StudentAnswer.query
+        .filter_by(task_id=task_id, student_id=student_id)
+        .order_by(StudentAnswer.id.desc())
+        .first()
+    )
+
+    if last_answer is None or last_answer.is_correct or last_answer.attempt_number >= 3:
+        return 0
+
+    return last_answer.attempt_number
+
+
+def _timed_options(task, interest):
+    options = (
+        TaskAnswerOption.query
+        .filter_by(task_id=task.id)
+        .order_by(TaskAnswerOption.order_index)
+        .all()
+    )
+    theme_options = _task_theme(task, interest).get("options")
+    if isinstance(theme_options, list) and len(theme_options) == len(options):
+        return [
+            {
+                "id": option.id,
+                "text": option_data["text"],
+                "is_correct": option_data.get("correct") is True,
+            }
+            for option, option_data in zip(options, theme_options)
+        ]
+    return [
+        {
+            "id": option.id,
+            "text": option.option_text,
+            "is_correct": option.is_correct,
+        }
+        for option in options
+    ]
+
 @student_bp.route("/api/student/sections")
 @authenticate_token
 def get_student_sections():
@@ -172,36 +261,52 @@ def get_student_task(task_id):
             "error": "Task not found"
         }), 404
 
-    options = (
-        TaskAnswerOption.query
-        .filter_by(task_id=task.id)
-        .order_by(TaskAnswerOption.order_index)
-        .all()
-    )
-
-    return jsonify({
+    theme = _task_theme(task, student.interest)
+    attempts_used = _attempts_used_in_current_cycle(task.id, student.id)
+    response = {
         "id": task.id,
-        "type": "single_choice",
+        "type": task.type,
         "difficulty_level": task.difficulty_level,
-        "prompt": task.body_text,
-        "options": [
-            {
-                "id": option.id,
-                "text": option.option_text
-            }
-            for option in options
-        ],
-        "attempts_used": (
-            StudentAnswer.query
-            .filter_by(
-                task_id=task.id,
-                student_id=student.id
-            )
-            .count()
-        ),
-        "max_attempts": 3,
-        "solution": None
-    }), 200
+        "prompt": theme.get("prompt", task.body_text),
+    }
+
+    if task.type == "single_choice":
+        options = (
+            TaskAnswerOption.query
+            .filter_by(task_id=task.id)
+            .order_by(TaskAnswerOption.order_index)
+            .all()
+        )
+        theme_options = theme.get("options")
+        if isinstance(theme_options, list) and len(theme_options) == len(options):
+            option_data = [
+                {"id": option.id, "text": option_data["text"]}
+                for option, option_data in zip(options, theme_options)
+            ]
+        else:
+            option_data = [
+                {"id": option.id, "text": option.option_text}
+                for option in options
+            ]
+        random.shuffle(option_data)
+        response["options"] = option_data
+        response["attempts_used"] = attempts_used
+        response["max_attempts"] = 3
+        response["solution"] = None
+    elif task.type == "short_answer":
+        response["attempts_used"] = attempts_used
+        response["max_attempts"] = 3
+        response["solution"] = None
+    elif task.type == "memory":
+        pairs = theme.get("pairs", task.memory_pairs or [])
+        response["pairs"] = [
+            {"id": index, "a": pair["a"], "b": pair["b"]}
+            for index, pair in enumerate(pairs, start=1)
+        ]
+    else:
+        return jsonify({"error": "Unsupported task type"}), 400
+
+    return jsonify(response), 200
 
 @student_bp.route("/api/student/tasks/<int:task_id>/answers",methods=["POST"])
 @authenticate_token
@@ -241,7 +346,8 @@ def submit_student_answer(task_id):
             task_id=task.id,
             student_id=student.id,
             is_correct=True,
-            attempt_number=1
+            attempt_number=1,
+            submitted_at=datetime.utcnow(),
         )
 
         db.session.add(answer)
@@ -251,44 +357,15 @@ def submit_student_answer(task_id):
             "is_correct": True,
             "attempt_number": 1,
             "attempts_left": None,
-            "solution": None
+            "solution": None,
         }), 200
-
-    # ---------------------------------------------------------
-    # SINGLE CHOICE / SHORT ANSWER
-    # ---------------------------------------------------------
 
     if task.type not in ("single_choice", "short_answer"):
         return jsonify({
             "error": "Unsupported task type"
         }), 400
 
-
-    attempts_used = (
-        StudentAnswer.query
-        .filter_by(
-            task_id=task.id,
-            student_id=student.id
-        )
-        .count()
-    )
-
-    already_solved = (
-        StudentAnswer.query
-        .filter_by(
-            task_id=task.id,
-            student_id=student.id,
-            is_correct=True
-        )
-        .first()
-        is not None
-    )
-
-    if already_solved or attempts_used >= 3:
-        return jsonify({
-            "error": "Task is already closed"
-        }), 409
-
+    attempts_used = _attempts_used_in_current_cycle(task.id, student.id)
     attempt_number = attempts_used + 1
 
     # ---------------------------------------------------------
@@ -317,14 +394,20 @@ def submit_student_answer(task_id):
                 "error": "Invalid option"
             }), 400
 
-        is_correct = option.is_correct
+        theme_options = _task_theme(task, student.interest).get("options")
+        option_index = option.order_index - 1
+        if isinstance(theme_options, list) and option_index < len(theme_options):
+            is_correct = theme_options[option_index].get("correct") is True
+        else:
+            is_correct = option.is_correct
 
         answer = StudentAnswer(
             task_id=task.id,
             student_id=student.id,
             selected_option_id=selected_option_id,
             is_correct=is_correct,
-            attempt_number=attempt_number
+            attempt_number=attempt_number,
+            submitted_at=datetime.utcnow(),
         )
 
     # ---------------------------------------------------------
@@ -348,7 +431,10 @@ def submit_student_answer(task_id):
 
         normalized_answer = normalize_answer(answer_text)
 
-        accepted_answers = task.accepted_answers or []
+        accepted_answers = _task_theme(task, student.interest).get(
+            "answers",
+            task.accepted_answers or [],
+        )
 
         is_correct = any(
             normalized_answer == normalize_answer(accepted)
@@ -360,7 +446,8 @@ def submit_student_answer(task_id):
             student_id=student.id,
             answer_text=answer_text,
             is_correct=is_correct,
-            attempt_number=attempt_number
+            attempt_number=attempt_number,
+            submitted_at=datetime.utcnow(),
         )
 
     # ---------------------------------------------------------
@@ -376,23 +463,10 @@ def submit_student_answer(task_id):
     if not is_correct and attempts_left == 0:
 
         if task.type == "single_choice":
-            correct_option = (
-                TaskAnswerOption.query
-                .filter_by(
-                    task_id=task.id,
-                    is_correct=True
-                )
-                .first()
-            )
-
-            solution = {
-                "correct_option_id": correct_option.id
-            }
+            solution = _task_solution(task, student.interest)
 
         elif task.type == "short_answer":
-            solution = {
-                "accepted_answers": task.accepted_answers or []
-            }
+            solution = _task_solution(task, student.interest)
 
     return jsonify({
         "is_correct": is_correct,
@@ -423,14 +497,14 @@ def get_student_subsection_tasks(subsection_id):
     tasks = (
         Task.query
         .filter_by(subsection_id=subsection.id)
-        .order_by(Task.difficulty_level, Task.id)
+        .order_by(Task.order_index, Task.id)
         .all()
     )
 
     first_unsolved_found = False
     task_data = []
 
-    for task in tasks:
+    for position, task in enumerate(tasks, start=1):
         if task.id in solved_task_ids:
             status = "done"
         elif not first_unsolved_found:
@@ -442,7 +516,8 @@ def get_student_subsection_tasks(subsection_id):
         task_data.append(
             {
                 "id": task.id,
-                "title": task.title,
+                "position": task.order_index if task.order_index > 0 else position,
+                "type": task.type,
                 "difficulty_level": task.difficulty_level,
                 "status": status,
             }
@@ -729,21 +804,19 @@ def get_timed_tasks(subsection_id):
     questions = []
 
     for task in tasks:
-        options = (
-            TaskAnswerOption.query
-            .filter_by(task_id=task.id)
-            .all()
-        )
-
+        options = _timed_options(task, student.interest)
         random.shuffle(options)
 
         questions.append({
             "task_id": task.id,
-            "prompt": task.body_text,
+            "prompt": _task_theme(task, student.interest).get(
+                "prompt",
+                task.body_text,
+            ),
             "options": [
                 {
-                    "id": option.id,
-                    "text": option.option_text
+                    "id": option["id"],
+                    "text": option["text"]
                 }
                 for option in options
             ]
@@ -786,9 +859,13 @@ def submit_timed_tasks(subsection_id):
             "error": "answers must be a list"
         }), 400
 
-    if not isinstance(elapsed_seconds, (int, float)):
+    if (
+        isinstance(elapsed_seconds, bool)
+        or not isinstance(elapsed_seconds, (int, float))
+        or elapsed_seconds < 0
+    ):
         return jsonify({
-            "error": "elapsed_seconds must be a number"
+            "error": "elapsed_seconds must be a non-negative number"
         }), 400
 
     tasks = (
@@ -800,14 +877,13 @@ def submit_timed_tasks(subsection_id):
         .all()
     )
 
-    task_ids = {task.id for task in tasks}
-
     timed_tasks = tasks[:20]
-
-    timed_task_ids = {task.id for task in timed_tasks}
+    timed_task_ids = {task.id for task in tasks}
+    tasks_by_id = {task.id: task for task in tasks}
 
     correct = 0
     answered = 0
+    answered_task_ids = set()
 
     for answer_data in answers:
         if not isinstance(answer_data, dict):
@@ -825,7 +901,8 @@ def submit_timed_tasks(subsection_id):
         if task_id not in timed_task_ids:
             continue
 
-        answered += 1
+        if task_id in answered_task_ids:
+            continue
 
         option = (
             TaskAnswerOption.query
@@ -836,7 +913,19 @@ def submit_timed_tasks(subsection_id):
             .first()
         )
 
-        if option is not None and option.is_correct:
+        if option is None:
+            continue
+
+        answered_task_ids.add(task_id)
+        answered += 1
+        timed_options = _timed_options(
+            tasks_by_id[task_id],
+            student.interest,
+        )
+        selected = next(
+            item for item in timed_options if item["id"] == option.id
+        )
+        if selected["is_correct"]:
             correct += 1
 
     return jsonify({
