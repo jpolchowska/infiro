@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Text } from '../Text';
+import { MathText } from '../MathText';
 
 import { ChoiceQuestion, Accent } from '../../lib/levelingTest';
 
@@ -9,10 +10,11 @@ const LETTERS = ['A', 'B', 'C', 'D'];
 type ChoiceQuestionCardProps = {
   question: ChoiceQuestion;
   accent: Accent;
-  onAnswer: (selectedOptionId: number, correct: boolean) => void;
+  onAnswer: (selectedOptionId: number) => void;
+  onSkip: () => void;
 };
 
-export function ChoiceQuestionCard({ question, accent, onAnswer }: ChoiceQuestionCardProps) {
+export function ChoiceQuestionCard({ question, accent, onAnswer, onSkip }: ChoiceQuestionCardProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
 
@@ -24,8 +26,13 @@ export function ChoiceQuestionCard({ question, accent, onAnswer }: ChoiceQuestio
   const handleSubmit = () => {
     if (answered || selectedIndex === null) return;
     setAnswered(true);
-    const option = question.options[selectedIndex];
-    onAnswer(option.id, option.isCorrect);
+    onAnswer(question.options[selectedIndex].id);
+  };
+
+  const handleSkip = () => {
+    if (answered) return;
+    setAnswered(true);
+    onSkip();
   };
 
   return (
@@ -50,9 +57,12 @@ export function ChoiceQuestionCard({ question, accent, onAnswer }: ChoiceQuestio
                 {LETTERS[index]}
               </Text>
             </View>
-            <Text className={`text-base font-manrope-semibold ${isSelected ? 'text-infiro-white' : 'text-infiro-navy'}`}>
+            <MathText
+              className={`text-base font-manrope-semibold flex-1 ${isSelected ? 'text-infiro-white' : 'text-infiro-navy'}`}
+              color={isSelected ? '#fefefe' : '#142284'}
+            >
               {option.text}
-            </Text>
+            </MathText>
           </Pressable>
         );
       })}
@@ -65,6 +75,10 @@ export function ChoiceQuestionCard({ question, accent, onAnswer }: ChoiceQuestio
         }`}
       >
         <Text className="text-infiro-white font-manrope-semibold text-base">Dalej</Text>
+      </Pressable>
+
+      <Pressable onPress={handleSkip} disabled={answered} className="py-3.5 items-center mt-1">
+        <Text className="text-infiro-navy/50 font-manrope-semibold text-sm">Nie wiem</Text>
       </Pressable>
     </View>
   );

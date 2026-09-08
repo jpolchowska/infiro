@@ -147,8 +147,15 @@ def submit_leveling_test():
         if task is None:
             return jsonify({"error": f"task {task_id} not found"}), 400
 
+        selected_option_id = answer.get("selected_option_id")
+        answer_text = answer.get("answer_text")
+
+        # "Nie wiem" -- brak odpowiedzi, liczone jako błędne
+        if selected_option_id is None and answer_text is None:
+            validated.append((task, False, None, None))
+            continue
+
         if task.type == "single_choice":
-            selected_option_id = answer.get("selected_option_id")
             if not isinstance(selected_option_id, int):
                 return jsonify({
                     "error": f"selected_option_id is required for task {task_id}"
@@ -164,7 +171,6 @@ def submit_leveling_test():
             selected = next(item for item in theme_options if item["id"] == option.id)
             validated.append((task, selected["is_correct"], option.id, None))
         elif task.type == "short_answer":
-            answer_text = answer.get("answer_text")
             if not isinstance(answer_text, str):
                 return jsonify({
                     "error": f"answer_text is required for task {task_id}"
