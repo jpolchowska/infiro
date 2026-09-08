@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { apiFetch } from "./api";
 import { getGivenName } from "../utils/decodeToken";
+import { TaskType } from "./tasks";
 
 export type StudentMe = {
   id: number;
@@ -189,8 +190,10 @@ export type SubsectionTaskStatus = "done" | "current" | "todo" | "locked";
 
 export type SubsectionTaskSummary = {
   id: number;
-  title: string;
-  difficulty: 1 | 2 | 3;
+  position: number;
+  type: TaskType;
+  // null dla memory -- o trudności decyduje liczba par.
+  difficulty: 1 | 2 | 3 | null;
   status: SubsectionTaskStatus;
 };
 
@@ -209,8 +212,9 @@ export type SubsectionDetail = {
 
 type RawSubsectionTask = {
   id: number;
-  title: string;
-  difficulty_level: number;
+  position: number;
+  type: TaskType;
+  difficulty_level: number | null;
   status: SubsectionTaskStatus;
 };
 
@@ -240,8 +244,9 @@ export async function getSubsectionTasks(subsectionId: number): Promise<Subsecti
     nextSubsectionId: raw.next_subsection_id,
     tasks: raw.tasks.map((t) => ({
       id: t.id,
-      title: t.title,
-      difficulty: (t.difficulty_level as 1 | 2 | 3),
+      position: t.position,
+      type: t.type,
+      difficulty: (t.difficulty_level as 1 | 2 | 3 | null) ?? null,
       status: t.status,
     })),
   };

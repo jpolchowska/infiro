@@ -1,27 +1,27 @@
 import { apiFetch } from "./api";
 
 export type SectionId = string;
-
-export type TaskOption = {
-  id: number;
-  text: string;
-  isCorrect: boolean;
-};
-
 export type Difficulty = 1 | 2 | 3;
 
-export type ChoiceQuestion = {
+type QuestionBase = {
   taskId: number;
   sectionId: SectionId;
   sectionTitle: string;
   sectionIndex: number;
   difficulty: Difficulty;
-  type: 'choice';
   prompt: string;
-  options: TaskOption[];
 };
 
-export type LevelingQuestion = ChoiceQuestion;
+export type ChoiceQuestion = QuestionBase & {
+  type: 'single_choice';
+  options: { id: number; text: string }[];
+};
+
+export type ShortAnswerQuestion = QuestionBase & {
+  type: 'short_answer';
+};
+
+export type LevelingQuestion = ChoiceQuestion | ShortAnswerQuestion;
 
 export type Accent = { text: string; bg: string; bgSoft: string; bgDisabled: string; border: string };
 
@@ -36,14 +36,12 @@ export function getAccent(index: number): Accent {
   return ACCENT_PALETTE[index % ACCENT_PALETTE.length];
 }
 
-type RawOption = { id: number; option_text: string; is_correct: boolean };
 type RawQuestion = {
   task_id: number;
+  type: 'single_choice' | 'short_answer';
   difficulty_level: number;
-  title: string;
-  body_text: string;
-  image_url: string | null;
-  options: RawOption[];
+  prompt: string;
+  options?: { id: number; text: string }[];
 };
 type RawSection = { section_id: number; section_title: string; questions: RawQuestion[] };
 type RawLevelingTestResponse = { sections: RawSection[] };
@@ -54,39 +52,31 @@ export async function fetchLevelingTest(): Promise<LevelingQuestion[]> {
   const questions: LevelingQuestion[] = [];
   data.sections.forEach((section, sectionIndex) => {
     section.questions.forEach((q) => {
-      questions.push({
+      const base: QuestionBase = {
         taskId: q.task_id,
         sectionId: String(section.section_id),
         sectionTitle: section.section_title,
         sectionIndex,
         difficulty: q.difficulty_level as Difficulty,
-        type: 'choice',
-        prompt: q.body_text,
-        options: q.options.map((o) => ({ id: o.id, text: o.option_text, isCorrect: o.is_correct })),
-      });
+        prompt: q.prompt,
+      };
+      if (q.type === 'short_answer') {
+        questions.push({ ...base, type: 'short_answer' });
+      } else {
+        questions.push({ ...base, type: 'single_choice', options: q.options ?? [] });
+      }
     });
   });
   return questions;
 }
 
 export type LevelingAnswer = {
-  sectionId: SectionId;
-  sectionTitle: string;
   taskId: number;
-  selectedOptionId: number;
-  correct: boolean;
+  selectedOptionId?: number;
+  answerText?: string;
 };
 
-export async function submitLevelingTest(answers: LevelingAnswer[]): Promise<void> {
-  await apiFetch("/api/student/leveling-test/submit", {
-    method: "POST",
-    json: {
-      answers: answers.map((a) => ({ task_id: a.taskId, selected_option_id: a.selectedOptionId })),
-    },
-  });
-}
-
-export type SectionProgress = {
+export type LevelingSectionResult = {
   sectionId: SectionId;
   sectionTitle: string;
   score: number;
@@ -96,10 +86,9 @@ export type SectionProgress = {
 export type LevelingResult = {
   total: number;
   maxTotal: number;
-  perSection: SectionProgress[];
+  perSection: LevelingSectionResult[];
   levelLabel: string;
   encouragement: string;
-  recommendedSectionId: SectionId;
 };
 
 const LEVEL_ENCOURAGEMENT: Record<string, string> = {
@@ -108,51 +97,41 @@ const LEVEL_ENCOURAGEMENT: Record<string, string> = {
   'Pewny start': 'Naprawdę mocny wynik! Widać, że dużo już umiesz — czas na prawdziwe wyzwania.',
 };
 
-export function calculateResult(answers: LevelingAnswer[]): LevelingResult {
-  const sectionOrder: SectionId[] = [];
-  const sectionTitles: Record<SectionId, string> = {};
-  const perSectionScore: Record<SectionId, number> = {};
-  const perSectionTotal: Record<SectionId, number> = {};
+function levelLabelFor(score: number): string {
+  if (score >= 9) return 'Pewny start';
+  if (score >= 5) return 'Dobry start';
+  return 'Podstawy';
+}
 
-  answers.forEach((a) => {
-    if (!(a.sectionId in perSectionScore)) {
-      sectionOrder.push(a.sectionId);
-      sectionTitles[a.sectionId] = a.sectionTitle;
-      perSectionScore[a.sectionId] = 0;
-      perSectionTotal[a.sectionId] = 0;
-    }
-    perSectionTotal[a.sectionId] += 1;
-    if (a.correct) perSectionScore[a.sectionId] += 1;
+type RawSubmitResponse = {
+  score: number;
+  max_score: number;
+  per_section: { section_id: number; section_title: string; score: number; total: number }[];
+};
+
+export async function submitLevelingTest(answers: LevelingAnswer[]): Promise<LevelingResult> {
+  const raw = await apiFetch<RawSubmitResponse>("/api/student/leveling-test/submit", {
+    method: "POST",
+    json: {
+      answers: answers.map((a) => ({
+        task_id: a.taskId,
+        ...(a.selectedOptionId != null ? { selected_option_id: a.selectedOptionId } : {}),
+        ...(a.answerText != null ? { answer_text: a.answerText } : {}),
+      })),
+    },
   });
 
-  const perSection: SectionProgress[] = sectionOrder.map((id) => ({
-    sectionId: id,
-    sectionTitle: sectionTitles[id],
-    score: perSectionScore[id],
-    total: perSectionTotal[id],
-  }));
-
-  const total = answers.filter((a) => a.correct).length;
-  const maxTotal = answers.length;
-
-  let levelLabel = 'Podstawy';
-  if (total >= 9) {
-    levelLabel = 'Pewny start';
-  } else if (total >= 5) {
-    levelLabel = 'Dobry start';
-  }
-
-  let weakSectionId = sectionOrder[0] ?? '';
-  sectionOrder.forEach((id) => {
-    if (perSectionScore[id] < perSectionScore[weakSectionId]) weakSectionId = id;
-  });
-
+  const levelLabel = levelLabelFor(raw.score);
   return {
-    total,
-    maxTotal,
-    perSection,
+    total: raw.score,
+    maxTotal: raw.max_score,
+    perSection: raw.per_section.map((s) => ({
+      sectionId: String(s.section_id),
+      sectionTitle: s.section_title,
+      score: s.score,
+      total: s.total,
+    })),
     levelLabel,
     encouragement: LEVEL_ENCOURAGEMENT[levelLabel],
-    recommendedSectionId: weakSectionId,
   };
 }

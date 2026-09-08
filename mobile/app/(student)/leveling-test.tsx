@@ -7,10 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChoiceQuestionCard } from '../../components/leveling-test/ChoiceQuestionCard';
 import { FadeIn } from '../../components/leveling-test/FadeIn';
 import { ProgressBar } from '../../components/leveling-test/ProgressBar';
+import { ShortAnswerCard } from '../../components/leveling-test/ShortAnswerCard';
+import { MathText } from '../../components/MathText';
 import {
   LevelingAnswer,
   LevelingQuestion,
-  calculateResult,
+  LevelingResult,
   fetchLevelingTest,
   getAccent,
   submitLevelingTest,
@@ -32,6 +34,8 @@ export default function LevelingTestScreen() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<LevelingAnswer[]>([]);
+  const [result, setResult] = useState<LevelingResult | null>(null);
+  const [submitError, setSubmitError] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -50,26 +54,26 @@ export default function LevelingTestScreen() {
 
   const currentQuestion = questions?.[index];
 
-  const handleAnswer = (selectedOptionId: number, correct: boolean) => {
+  const sendResult = (all: LevelingAnswer[]) => {
+    setResult(null);
+    setSubmitError(false);
+    submitLevelingTest(all)
+      .then(setResult)
+      .catch((error) => {
+        console.error('Failed to submit leveling test:', error);
+        setSubmitError(true);
+      });
+  };
+
+  const answerCurrent = (partial: Pick<LevelingAnswer, 'selectedOptionId' | 'answerText'>) => {
     if (!currentQuestion || !questions) return;
 
-    const nextAnswers = [
-      ...answers,
-      {
-        sectionId: currentQuestion.sectionId,
-        sectionTitle: currentQuestion.sectionTitle,
-        taskId: currentQuestion.taskId,
-        selectedOptionId,
-        correct,
-      },
-    ];
-    setAnswers(nextAnswers);
+    const next = [...answers, { taskId: currentQuestion.taskId, ...partial }];
+    setAnswers(next);
 
     if (index + 1 >= questions.length) {
       setStep('result');
-      submitLevelingTest(nextAnswers).catch((error) => {
-        console.error('Failed to submit leveling test results:', error);
-      });
+      sendResult(next);
     } else {
       setIndex(index + 1);
     }
@@ -83,6 +87,8 @@ export default function LevelingTestScreen() {
     setStep('intro');
     setIndex(0);
     setAnswers([]);
+    setResult(null);
+    setSubmitError(false);
   };
 
   const handleClose = () => {
@@ -176,11 +182,27 @@ export default function LevelingTestScreen() {
               {currentQuestion.sectionTitle}
             </Text>
 
-            <Text className="text-infiro-navy text-2xl font-manrope-extrabold leading-snug mb-6">
+            <MathText
+              className="text-infiro-navy text-2xl font-manrope-extrabold leading-snug mb-6"
+              color="#142284"
+            >
               {currentQuestion.prompt}
-            </Text>
+            </MathText>
 
-            <ChoiceQuestionCard question={currentQuestion} accent={accent} onAnswer={handleAnswer} />
+            {currentQuestion.type === 'single_choice' ? (
+              <ChoiceQuestionCard
+                question={currentQuestion}
+                accent={accent}
+                onAnswer={(selectedOptionId) => answerCurrent({ selectedOptionId })}
+                onSkip={() => answerCurrent({})}
+              />
+            ) : (
+              <ShortAnswerCard
+                accent={accent}
+                onAnswer={(answerText) => answerCurrent({ answerText })}
+                onSkip={() => answerCurrent({})}
+              />
+            )}
           </FadeIn>
         </View>
       </SafeAreaView>
@@ -188,7 +210,38 @@ export default function LevelingTestScreen() {
   }
 
   if (step === 'result') {
-    const result = calculateResult(answers);
+    if (submitError) {
+      return (
+        <SafeAreaView className="flex-1 bg-infiro-navy">
+          <View className="flex-1 justify-center px-6">
+            <Text className="text-infiro-white text-2xl font-manrope-extrabold mb-3">
+              Nie udało się wysłać wyniku
+            </Text>
+            <Text className="text-infiro-white/80 text-base mb-8">
+              Sprawdź połączenie i spróbuj ponownie.
+            </Text>
+            <Pressable
+              onPress={() => sendResult(answers)}
+              className="bg-infiro-coral rounded-2xl py-4 items-center active:opacity-80"
+              style={CTA_SHADOW}
+            >
+              <Text className="text-infiro-white font-manrope-semibold text-base">Spróbuj ponownie</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      );
+    }
+
+    if (!result) {
+      return (
+        <SafeAreaView className="flex-1 bg-infiro-navy">
+          <View className="flex-1 justify-center items-center px-6">
+            <ActivityIndicator color="#fefefe" />
+            <Text className="text-infiro-white/70 text-base mt-4">Sprawdzamy odpowiedzi…</Text>
+          </View>
+        </SafeAreaView>
+      );
+    }
 
     return (
       <SafeAreaView className="flex-1 bg-infiro-navy">

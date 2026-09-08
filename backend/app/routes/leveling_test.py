@@ -22,7 +22,11 @@ leveling_test_bp = Blueprint("leveling_test", __name__)
 def _pick_random_task(section_id, difficulty_level):
     return (
         Task.query.join(Subsection, Task.subsection_id == Subsection.id)
-        .filter(Subsection.section_id == section_id, Task.difficulty_level == difficulty_level)
+        .filter(
+            Subsection.section_id == section_id,
+            Task.difficulty_level == difficulty_level,
+            Task.type.in_(("single_choice", "short_answer")),
+        )
         .order_by(db.func.random())
         .first()
     )
@@ -143,8 +147,15 @@ def submit_leveling_test():
         if task is None:
             return jsonify({"error": f"task {task_id} not found"}), 400
 
+        selected_option_id = answer.get("selected_option_id")
+        answer_text = answer.get("answer_text")
+
+        # "Nie wiem" -- brak odpowiedzi, liczone jako błędne
+        if selected_option_id is None and answer_text is None:
+            validated.append((task, False, None, None))
+            continue
+
         if task.type == "single_choice":
-            selected_option_id = answer.get("selected_option_id")
             if not isinstance(selected_option_id, int):
                 return jsonify({
                     "error": f"selected_option_id is required for task {task_id}"
@@ -160,7 +171,6 @@ def submit_leveling_test():
             selected = next(item for item in theme_options if item["id"] == option.id)
             validated.append((task, selected["is_correct"], option.id, None))
         elif task.type == "short_answer":
-            answer_text = answer.get("answer_text")
             if not isinstance(answer_text, str):
                 return jsonify({
                     "error": f"answer_text is required for task {task_id}"
@@ -183,6 +193,34 @@ def submit_leveling_test():
     score = sum(1 for _, is_correct, _, _ in validated if is_correct)
     max_score = len(validated)
     now = datetime.utcnow()
+
+    # Podział wyniku na sekcje -- ekran wyniku na mobile nie liczy już nic sam.
+    section_stats = {}
+    for task, is_correct, _, _ in validated:
+        subsection = db.session.get(Subsection, task.subsection_id)
+        section = db.session.get(Section, subsection.section_id) if subsection else None
+        if section is None:
+            continue
+        stats = section_stats.setdefault(section.id, {
+            "section_id": section.id,
+            "section_title": section.title,
+            "order_index": section.order_index,
+            "score": 0,
+            "total": 0,
+        })
+        stats["total"] += 1
+        if is_correct:
+            stats["score"] += 1
+
+    per_section = [
+        {
+            "section_id": s["section_id"],
+            "section_title": s["section_title"],
+            "score": s["score"],
+            "total": s["total"],
+        }
+        for s in sorted(section_stats.values(), key=lambda s: s["order_index"])
+    ]
 
     # Zapis odpowiedzi na poszczególne zadania
     saved = 0
@@ -220,7 +258,12 @@ def submit_leveling_test():
     user.leveling_test_completed_at = now
     db.session.commit()
 
-    return jsonify({"saved": saved}), 201 
+    return jsonify({
+        "saved": saved,
+        "score": score,
+        "max_score": max_score,
+        "per_section": per_section,
+    }), 201
 
 @leveling_test_bp.route("/api/student/leveling-test/history", methods=["GET"])
 @authenticate_token
