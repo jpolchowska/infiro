@@ -48,14 +48,6 @@ export default function TaskScreen() {
         setTask(t);
         if (t.type !== 'memory') {
           setAttemptsUsed(t.attemptsUsed);
-          if (t.solution) {
-            setResult({
-              isCorrect: false,
-              attemptNumber: t.attemptsUsed,
-              attemptsLeft: 0,
-              solution: t.solution,
-            });
-          }
         }
       })
       .catch((e) => {

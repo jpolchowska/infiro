@@ -242,9 +242,11 @@ export default function SubsectionTasksScreen() {
                   </View>
 
                   <View className="flex-1">
-                    <Text className="text-infiro-navy font-manrope-extrabold text-[14px] leading-[18px]">{task.title}</Text>
+                    <Text className="text-infiro-navy font-manrope-extrabold text-[14px] leading-[18px]">
+                      Zadanie {task.position}
+                    </Text>
                     <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-1">
-                      {DIFFICULTY_LABEL[task.difficulty]}
+                      {task.difficulty ? DIFFICULTY_LABEL[task.difficulty] : 'Ćwiczenie pamięciowe'}
                     </Text>
                   </View>
 
