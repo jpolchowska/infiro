@@ -3,7 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect } from 'react';
-import { Pressable, View, ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Image, Pressable, View } from 'react-native';
 import { Text } from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAccountType } from '../utils/decodeToken';
@@ -112,9 +112,11 @@ useEffect(() => {
 
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
         <View className="flex-1 px-6" style={{ paddingTop: 12, paddingBottom: 20 }}>
-          <Text className="text-infiro-white font-manrope-extrabold text-[20px]" style={{ letterSpacing: 2 }}>
-            infiro
-          </Text>
+          <Image
+            source={require('../assets/infiro_logo_negatyw_bez_tla.png')}
+            style={{ width: 168, aspectRatio: 3000 / 1921, marginLeft: -8 }}
+            resizeMode="contain"
+          />
 
           <View className="flex-1 justify-center">
             <Text className="text-infiro-white font-manrope-extrabold text-[40px] leading-[44px] mb-3">
