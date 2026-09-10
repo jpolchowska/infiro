@@ -12,6 +12,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,7 +32,7 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }}>
         {/* Logowanie -> apka i apka -> logowanie to reset sesji, nie nawigacja
@@ -40,6 +41,6 @@ export default function RootLayout() {
         <Stack.Screen name="(student)" options={{ animation: 'fade', animationDuration: 220 }} />
         <Stack.Screen name="(teacher)" options={{ animation: 'fade', animationDuration: 220 }} />
       </Stack>
-    </>
+    </SafeAreaProvider>
   );
 }
