@@ -114,7 +114,7 @@ useEffect(() => {
         <View className="flex-1 px-6" style={{ paddingTop: 12, paddingBottom: 20 }}>
           <Image
             source={require('../assets/infiro_logo_negatyw_bez_tla.png')}
-            style={{ width: 168, aspectRatio: 3000 / 1921, marginLeft: -8 }}
+            style={{ width: 150, height: 96, marginTop: -14, marginLeft: -22 }}
             resizeMode="contain"
           />
 
