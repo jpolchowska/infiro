@@ -4,3 +4,4 @@ PyJWT[crypto]
 Flask-SQLAlchemy
 Flask-Migrate
 psycopg2-binary
+jsonschema

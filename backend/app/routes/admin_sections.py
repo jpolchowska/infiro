@@ -12,7 +12,6 @@ from app.routes.admin_materials import _material_json
 
 admin_sections_bp = Blueprint("admin_sections", __name__)
 
-
 def _section_json(section):
     return {
         "id": section.id,
@@ -25,7 +24,6 @@ def _section_json(section):
         ),
     }
 
-
 def _subsection_json(subsection):
     return {
         "id": subsection.id,
@@ -35,7 +33,6 @@ def _subsection_json(subsection):
         "order_index": subsection.order_index,
         "task_count": Task.query.filter_by(subsection_id=subsection.id).count(),
     }
-
 
 def _validate_options(options):
     """Zwraca komunikat błędu (string), albo None jeśli opcje są poprawne."""
