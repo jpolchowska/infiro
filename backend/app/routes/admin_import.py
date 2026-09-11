@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, request
 from uuid import uuid4
+import json
+import jsonschema
+from jsonschema import validate
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_realm_role
@@ -40,173 +43,82 @@ def validate_import_payload(data):
     pusta lista oznacza poprawny plik. Odzwierciedla logikę
     staff/lib/validateImport.ts -- trzymać oba pliki w zgodzie.
     """
-    errors = []
-    if not isinstance(data, list):
-        return ["The file must contain a JSON array of sections."]
-    if not data:
-        return ["The file contains no sections."]
-
-    for si, section in enumerate(data):
-        slabel = f"section #{si + 1}"
-        if not isinstance(section, dict):
-            errors.append(f"{slabel}: must be an object.")
-            continue
-        if not _is_non_empty_string(section.get("section")):
-            errors.append(f"{slabel}: 'section' must be a non-empty string.")
-        else:
-            slabel = f"section '{section['section']}'"
-
-        subsections = section.get("subsections")
-        if not isinstance(subsections, list):
-            errors.append(f"{slabel}: 'subsections' must be a list.")
-            continue
-
-        for ssi, subsection in enumerate(subsections):
-            sslabel = f"{slabel} / subsection #{ssi + 1}"
-            if not isinstance(subsection, dict):
-                errors.append(f"{sslabel}: must be an object.")
-                continue
-            if not _is_non_empty_string(subsection.get("subsection")):
-                errors.append(f"{sslabel}: 'subsection' must be a non-empty string.")
-            else:
-                sslabel = f"{slabel} / subsection '{subsection['subsection']}'"
-
-            tasks = subsection.get("tasks")
-            if not isinstance(tasks, list):
-                errors.append(f"{sslabel}: 'tasks' must be a list.")
-                continue
-
-            for ti, task in enumerate(tasks):
-                tlabel = f"{sslabel} / task #{ti + 1}"
-                if not isinstance(task, dict):
-                    errors.append(f"{tlabel}: must be an object.")
-                    continue
-                _validate_task(task, tlabel, errors)
-
-    return errors
-
-
-def _validate_task(task, tlabel, errors):
-    content_key = task.get("content_key")
-    if content_key is not None and not _is_non_empty_string(content_key):
-        errors.append(f"{tlabel}: 'content_key' must be a non-empty string.")
-
-    task_type = task.get("type")
-    if task_type not in ALLOWED_TASK_TYPES:
-        errors.append(f"{tlabel}: 'type' must be one of {sorted(ALLOWED_TASK_TYPES)}.")
-        task_type = None  # nieznany typ -> pomijamy dalsze reguły specyficzne dla typu
-
-    if task_type != "memory":
-        difficulty = task.get("difficulty")
-        if isinstance(difficulty, bool) or not isinstance(difficulty, int) or not (1 <= difficulty <= 3):
-            errors.append(f"{tlabel}: 'difficulty' must be an integer 1-3.")
-
-    themes = task.get("themes")
-    if not isinstance(themes, dict):
-        errors.append(f"{tlabel}: 'themes' must be an object.")
-        themes = None
-    else:
-        for key in set(themes.keys()) - ALLOWED_THEMES:
-            errors.append(f"{tlabel}: unknown theme key '{key}'.")
-        if "default" not in themes:
-            errors.append(f"{tlabel}: themes must include 'default'.")
-        for theme_key, variant in themes.items():
-            if theme_key not in ALLOWED_THEMES:
-                continue
-            vlabel = f"{tlabel} theme '{theme_key}'"
-            if not isinstance(variant, dict):
-                errors.append(f"{vlabel}: must be an object.")
-                continue
-            if not _is_non_empty_string(variant.get("prompt")):
-                errors.append(f"{vlabel}: 'prompt' must be a non-empty string.")
-
-    if task_type == "single_choice":
-        _validate_single_choice(themes, tlabel, errors)
-    elif task_type == "short_answer":
-        _validate_short_answer(themes, tlabel, errors)
-    elif task_type == "memory":
-        _validate_memory(task, tlabel, errors)
-
-
-def _validate_single_choice(themes, tlabel, errors):
-    if not isinstance(themes, dict) or not isinstance(themes.get("default"), dict):
-        return  # brak/zły 'default' już zgłoszony wyżej
-    _validate_options(themes["default"].get("options"), f"{tlabel} theme 'default'", errors)
-
-    for theme_key, variant in themes.items():
-        if theme_key == "default" or not isinstance(variant, dict):
-            continue
-        if "options" in variant:  # nadpisuje całą listę; brak -> dziedziczy z default
-            _validate_options(variant.get("options"), f"{tlabel} theme '{theme_key}'", errors)
-
-
-def _validate_options(options, olabel, errors):
-    if not isinstance(options, list) or len(options) != 3:
-        errors.append(f"{olabel}: 'options' must be a list of exactly 3 items.")
-        return
-    correct_count = 0
-    for j, opt in enumerate(options):
-        oplabel = f"{olabel} option #{j + 1}"
-        if not isinstance(opt, dict):
-            errors.append(f"{oplabel}: must be an object.")
-            continue
-        if not _is_non_empty_string(opt.get("text")):
-            errors.append(f"{oplabel}: 'text' must be a non-empty string.")
-        if opt.get("correct") is True:
-            correct_count += 1
-        # błędny/zły typ 'correct' jest pomijany, zgodnie ze specyfikacją
-
-    if correct_count != 1:
-        errors.append(f"{olabel}: exactly one option must have \"correct\": true (found {correct_count}).")
-
-
-def _validate_short_answer(themes, tlabel, errors):
-    if not isinstance(themes, dict) or not isinstance(themes.get("default"), dict):
-        return
-    _validate_answers(themes["default"].get("answers"), f"{tlabel} theme 'default'", errors)
-
-    for theme_key, variant in themes.items():
-        if theme_key == "default" or not isinstance(variant, dict):
-            continue
-        if "answers" in variant:  # zwykle brak -> dziedziczy z default
-            _validate_answers(variant.get("answers"), f"{tlabel} theme '{theme_key}'", errors)
-
-
-def _validate_answers(answers, alabel, errors):
-    if not isinstance(answers, list) or not answers or not all(_is_non_empty_string(a) for a in answers):
-        errors.append(f"{alabel}: 'answers' must be a non-empty list of non-empty strings.")
-
-
-def _validate_memory(task, tlabel, errors):
-    if not isinstance(task.get("themes"), dict):
-        return
-
-    default = task["themes"].get("default")
-    if not isinstance(default, dict):
-        return
-
-    _validate_pairs(default.get("pairs"), f"{tlabel} theme 'default'", errors)
-    for theme_key, variant in task["themes"].items():
-        if theme_key == "default" or not isinstance(variant, dict):
-            continue
-        if "pairs" in variant:
-            _validate_pairs(variant.get("pairs"), f"{tlabel} theme '{theme_key}'", errors)
-
-
-def _validate_pairs(pairs, plabel, errors):
-    if not isinstance(pairs, list) or len(pairs) not in (3, 6):
-        errors.append(f"{plabel}: 'pairs' must be a list of length 3 or 6.")
-        return
-    for pi, pair in enumerate(pairs):
-        label = f"{plabel} pair #{pi + 1}"
-        if not isinstance(pair, dict):
-            errors.append(f"{label}: must be an object.")
-            continue
-        if not _is_non_empty_string(pair.get("a")):
-            errors.append(f"{label}: 'a' must be a non-empty string.")
-        if not _is_non_empty_string(pair.get("b")):
-            errors.append(f"{label}: 'b' must be a non-empty string.")
-
+    schema = {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["section", "subsections"],
+            "properties": {
+                "section": {"type": "string"},
+                "subsections": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["subsection", "tasks"],
+                        "properties": {
+                            "subsection": {"type": "string"},
+                            "tasks": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": ["type", "themes"],
+                                    "properties": {
+                                        "type": {"type": "string"},
+                                        "difficulty": {"type": "integer"},
+                                        "themes": {
+                                            "type": "object",
+                                            "required": ["default"],
+                                            "additionalProperties": {
+                                                "type": "object",
+                                                "required": ["prompt"],
+                                                "properties": {
+                                                    "prompt": {"type": "string"},
+                                                    "options": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "required": ["text"],
+                                                            "properties": {
+                                                                "text": {"type": "string"},
+                                                                "correct": {"type": "boolean"}
+                                                            }
+                                                        }
+                                                    },
+                                                    "answers": {
+                                                        "type": "array",
+                                                        "items": {"type": "string"}
+                                                    },
+                                                    "pairs": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "required": ["a", "b"],
+                                                            "properties": {
+                                                                "a": {"type": "string"},
+                                                                "b": {"type": "string"}
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    try:
+        validate(instance=data, schema=schema)
+        print("✓ JSON jest poprawny!")
+        return True
+    except jsonschema.exceptions.ValidationError as err:
+        print(f"Błąd walidacji: {err.message}")
+        return False
 
 def _resolved_themes(themes):
     default = themes["default"]
@@ -214,7 +126,6 @@ def _resolved_themes(themes):
         key: {**default, **variant}
         for key, variant in themes.items()
     }
-
 
 def _replace_options(task, options):
     existing = TaskAnswerOption.query.filter_by(task_id=task.id).order_by(
@@ -252,9 +163,9 @@ def import_tasks():
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
-    errors = validate_import_payload(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
+    isOk = validate_import_payload(data)
+    if isOk == False:
+        return jsonify({"errors": ["Invalid JSON format"]}), 400
 
     section_cache = {}
     subsection_cache = {}
@@ -306,7 +217,7 @@ def import_tasks():
                     default = themes["default"]
                     task = Task(
                         subsection_id=subsection.id,
-                        title=None,
+                        title="",
                         body_text=default["prompt"].strip(),
                         difficulty_level=task_data.get("difficulty"),
                         type=task_data["type"],
