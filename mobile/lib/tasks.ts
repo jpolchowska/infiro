@@ -108,6 +108,8 @@ export type TaskAnswerResult = {
   attemptNumber: number;
   attemptsLeft: number | null;
   solution: TaskSolution;
+  // Poziom trudności odblokowany tą odpowiedzią (null poza tym jednym momentem przejścia).
+  unlockedDifficulty: number | null;
 };
 
 type RawTaskAnswerResult = {
@@ -115,6 +117,7 @@ type RawTaskAnswerResult = {
   attempt_number: number;
   attempts_left: number | null;
   solution?: RawTaskSolution;
+  unlocked_difficulty?: number | null;
 };
 
 export async function submitTaskAnswer(
@@ -140,5 +143,6 @@ export async function submitTaskAnswer(
     attemptNumber: raw.attempt_number,
     attemptsLeft: raw.attempts_left,
     solution: mapSolution(raw.solution),
+    unlockedDifficulty: raw.unlocked_difficulty ?? null,
   };
 }
