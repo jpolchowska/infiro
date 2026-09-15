@@ -13,6 +13,7 @@ from app.models.tasks import Task
 from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.task_answer_options import TaskAnswerOption
+from app.models.ebooks import ebooks
 
 import random
 import re
@@ -332,6 +333,9 @@ def submit_student_answer(task_id):
             "error": "Invalid JSON body"
         }), 400
 
+    # difficulty level of exercise
+    getStudentLevel = determine_student_difficulty_level_(student.id, task.subsection_id)
+
     # ---------------------------------------------------------
     # MEMORY
     # ---------------------------------------------------------
@@ -468,13 +472,67 @@ def submit_student_answer(task_id):
         elif task.type == "short_answer":
             solution = _task_solution(task, student.interest)
 
+    newDifficultyLevel = determine_student_difficulty_level_(student.id, task.subsection_id)
+
+    if newDifficultyLevel != getStudentLevel:
+        return jsonify({
+            "is_correct": is_correct,
+            "attempt_number": attempt_number,
+            "attempts_left": attempts_left,
+            "solution": solution,
+            "unlocked_difficulty": newDifficultyLevel
+        }), 200
+
     return jsonify({
         "is_correct": is_correct,
         "attempt_number": attempt_number,
         "attempts_left": attempts_left,
-        "solution": solution
+        "solution": solution,
+        "unlocked_difficulty": None
     }), 200
 
+
+def determine_student_difficulty_level_(student_id, subsection_id):
+    tasksDoneByStudent = (
+        db.session.query(
+            StudentAnswer.task_id,
+            Task.difficulty_level,
+            Task.subsection_id,
+        )
+        .join(Task, StudentAnswer.task_id == Task.id)
+        .filter(
+            StudentAnswer.student_id == student_id,
+            StudentAnswer.is_correct.is_(True),
+            Task.subsection_id == subsection_id,
+        )
+        .distinct()
+        .all()
+    )
+
+    AllExercisesInSubsection = (
+        db.session.query(Task.id, Task.difficulty_level, Task.subsection_id)
+        .filter(Task.subsection_id == subsection_id)
+        .all()
+    )
+
+    for i in range(1, 4, 1):
+        countDifficultySub = 0
+
+        for task in AllExercisesInSubsection:
+            if task.difficulty_level == i:
+                countDifficultySub += 1
+
+        for task in tasksDoneByStudent:
+            if (
+                task.subsection_id == subsection_id
+                and task.difficulty_level == i
+            ):
+                countDifficultySub -= 1
+
+        if countDifficultySub > 0:
+            return i
+
+    return 3
 
 @student_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
 @authenticate_token
@@ -494,9 +552,17 @@ def get_student_subsection_tasks(subsection_id):
         subsection.id,
     )
 
+    student_difficulty_level = determine_student_difficulty_level_(
+        student_id,
+        subsection.id
+    )
+
     tasks = (
         Task.query
-        .filter_by(subsection_id=subsection.id)
+        .filter(
+            Task.subsection_id == subsection.id,
+            Task.difficulty_level <= student_difficulty_level
+        )
         .order_by(Task.order_index, Task.id)
         .all()
     )
@@ -933,3 +999,19 @@ def submit_timed_tasks(subsection_id):
         "answered": answered,
         "total": len(timed_tasks)
     }), 200
+
+@student_bp.route("/api/student/subsections/<int:id>/ebook",methods=["GET"])
+@authenticate_token
+def get_student_ebook(id):
+    ebook = ebooks.query.filter_by(subsection_id=id).first()
+
+    if ebook is None:
+        return jsonify({
+            "error": "Ebook not found"
+        }), 404
+    else:
+        return jsonify({
+            "title": ebook.title,
+            "intro": ebook.intro,
+            "blocks": ebook.content
+        }), 200
