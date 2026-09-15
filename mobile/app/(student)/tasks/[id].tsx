@@ -17,7 +17,7 @@ const GREEN = '#1f9d63';
 const LETTERS = ['A', 'B', 'C'];
 const DIFFICULTY_LABEL: Record<1 | 2 | 3, string> = { 1: 'Łatwe', 2: 'Średnie', 3: 'Trudne' };
 
-type Phase = 'answering' | 'correct' | 'retry' | 'revealed';
+type Phase = 'answering' | 'correct' | 'retry' | 'revealed' | 'unlocked';
 
 export default function TaskScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -64,7 +64,9 @@ export default function TaskScreen() {
     result == null
       ? 'answering'
       : result.isCorrect
-        ? 'correct'
+        ? result.unlockedDifficulty != null
+          ? 'unlocked'
+          : 'correct'
         : (result.attemptsLeft ?? 0) > 0
           ? 'retry'
           : 'revealed';
@@ -199,6 +201,37 @@ export default function TaskScreen() {
               <Ionicons name="arrow-forward" size={18} color="#fefefe" />
             </Pressable>
           </View>
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  if (phase === 'unlocked' && result?.unlockedDifficulty) {
+    const unlockedLabel = DIFFICULTY_LABEL[result.unlockedDifficulty as 1 | 2 | 3];
+    return (
+      <View className="flex-1 bg-infiro-navy">
+        <SafeAreaView className="flex-1 justify-center px-6">
+          <Text className="text-infiro-white/60 text-sm uppercase tracking-wide mb-2">Awans</Text>
+          <Text className="text-infiro-white font-manrope-extrabold text-4xl leading-tight mb-3">
+            🎉 Odblokowano poziom: {unlockedLabel}
+          </Text>
+          <Text className="text-infiro-white/80 text-base mb-10">
+            Wszystkie łatwiejsze zadania w tej podsekcji są zrobione — czas na trudniejsze.
+          </Text>
+          <Pressable
+            onPress={() => router.back()}
+            className="rounded-full py-4 items-center"
+            style={{
+              backgroundColor: CORAL,
+              shadowColor: CORAL,
+              shadowOpacity: 0.5,
+              shadowRadius: 16,
+              shadowOffset: { width: 0, height: 8 },
+              elevation: 8,
+            }}
+          >
+            <Text className="text-infiro-white font-manrope-extrabold text-base">Super, dalej!</Text>
+          </Pressable>
         </SafeAreaView>
       </View>
     );
