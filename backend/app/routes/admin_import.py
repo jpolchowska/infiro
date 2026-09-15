@@ -440,7 +440,7 @@ def upload_ebooks():
         db.session.add(ebook)
     ebook.title = content["title"]
     ebook.intro = content.get("intro")
-    ebook.content = content
+    ebook.content = content["blocks"]
     db.session.commit()
 
     return jsonify({
