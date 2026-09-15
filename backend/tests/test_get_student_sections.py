@@ -14,11 +14,10 @@ from app.models.student_answers import StudentAnswer
 
 @pytest.fixture
 def client():
-    app = create_app()
-    app.config.update(
-        TESTING=True,
-        SQLALCHEMY_DATABASE_URI="sqlite://",
-    )
+    app = create_app({
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": "sqlite://",
+    })
 
     with app.app_context():
         db.create_all()

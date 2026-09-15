@@ -6,3 +6,4 @@ from app.models.task_answer_options import TaskAnswerOption
 from app.models.users import User
 from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
+from app.models.ebooks import ebooks
