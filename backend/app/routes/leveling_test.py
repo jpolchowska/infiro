@@ -278,7 +278,7 @@ def get_leveling_test_history():
         {
             "score": a.score,
             "total": a.max_score,
-            "completedAt": a.completed_at.isoformat() if a.completed_at else None,
+            "completedAt": a.completed_at.isoformat() + "Z" if a.completed_at else None,
         }
         for a in leveling_test_attempts
     ]), 200

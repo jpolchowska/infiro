@@ -827,7 +827,7 @@ def get_student_stats():
             "recent_sections": recent_section_data,
             "last_leveling_test": (
                 {
-                    "completed_at": last_leveling_test.completed_at.isoformat(),
+                    "completed_at": last_leveling_test.completed_at.isoformat() + "Z",
                     "score": last_leveling_test.score,
                     "total": last_leveling_test.max_score,
                 }
