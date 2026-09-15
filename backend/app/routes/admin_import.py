@@ -1,8 +1,12 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from uuid import uuid4
 import json
 import jsonschema
+import os
+import posixpath
+import zipfile
 from jsonschema import validate
+from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_realm_role
@@ -10,6 +14,7 @@ from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
+from app.models.ebooks import ebooks
 from app.services.uploads import extract_image_zip
 
 admin_import_bp = Blueprint("admin_import", __name__)
@@ -35,6 +40,10 @@ ALLOWED_THEMES = {
     "default", "sport", "gry", "lego", "zwierzeta",
     "rysowanie", "muzyka", "jedzenie",
 }
+ALLOWED_CALLOUT_STYLES = {
+    "zapamietaj", "wskazowka", "uwaga", "definicja",
+}
+ALLOWED_EBOOK_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 
 def validate_import_payload(data):
@@ -155,6 +164,130 @@ def _task_output(task):
         "themes": task.themes,
     }
 
+
+def _ebook_errors(data):
+    errors = []
+    if not isinstance(data, dict):
+        return ["ebook.json must contain an object"]
+
+    for field in ("section", "subsection", "title"):
+        if not _is_non_empty_string(data.get(field)):
+            errors.append(f"{field} must be a non-empty string")
+    if "intro" in data and not isinstance(data["intro"], str):
+        errors.append("intro must be a string")
+
+    blocks = data.get("blocks")
+    if not isinstance(blocks, list) or not blocks:
+        errors.append("blocks must be a non-empty list")
+        return errors
+
+    for index, block in enumerate(blocks):
+        prefix = f"blocks[{index}]"
+        if not isinstance(block, dict):
+            errors.append(f"{prefix} must be an object")
+            continue
+        block_type = block.get("type")
+        if block_type in {"heading", "subheading", "paragraph"}:
+            if not _is_non_empty_string(block.get("text")):
+                errors.append(f"{prefix}.text must be a non-empty string")
+        elif block_type == "list":
+            items = block.get("items")
+            if not isinstance(items, list) or not items or any(
+                not _is_non_empty_string(item) for item in items
+            ):
+                errors.append(f"{prefix}.items must be a non-empty list of strings")
+        elif block_type == "image":
+            if not _is_non_empty_string(block.get("file")):
+                errors.append(f"{prefix}.file must be a non-empty string")
+            if not _is_non_empty_string(block.get("alt")):
+                errors.append(f"{prefix}.alt must be a non-empty string")
+        elif block_type == "callout":
+            if block.get("style") not in ALLOWED_CALLOUT_STYLES:
+                errors.append(f"{prefix}.style is not allowed")
+            if not _is_non_empty_string(block.get("text")):
+                errors.append(f"{prefix}.text must be a non-empty string")
+        else:
+            errors.append(f"{prefix}.type is unknown")
+    return errors
+
+
+def _zip_member_path(name):
+    path = name.replace("\\", "/")
+    normalized = posixpath.normpath(path)
+    if not path or path.startswith("/") or normalized != path:
+        return None
+    parts = path.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        return None
+    return path
+
+
+def _load_ebook_zip(file_storage):
+    if not file_storage or not file_storage.filename:
+        return None, ["ZIP file is required"]
+    if not file_storage.filename.lower().endswith(".zip"):
+        return None, ["Only .zip files are allowed"]
+    try:
+        archive = zipfile.ZipFile(file_storage.stream)
+    except (OSError, zipfile.BadZipFile):
+        return None, ["The uploaded file is not a valid ZIP archive"]
+
+    with archive:
+        members = {}
+        for item in archive.infolist():
+            path = _zip_member_path(item.filename)
+            if item.is_dir():
+                continue
+            if path is None:
+                return None, ["The ZIP archive contains an unsafe path"]
+            if path in members:
+                return None, [f"Duplicate ZIP path: {path}"]
+            members[path] = item
+
+        ebook_paths = [
+            path for path in members
+            if path.rsplit("/", 1)[-1] == "ebook.json"
+        ]
+        if len(ebook_paths) != 1:
+            return None, ["The ZIP archive must contain exactly one ebook.json"]
+
+        try:
+            data = json.loads(archive.read(members[ebook_paths[0]]).decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            return None, ["ebook.json must contain valid UTF-8 JSON"]
+
+        errors = _ebook_errors(data)
+        ebook_root = posixpath.dirname(ebook_paths[0])
+        image_root = f"{ebook_root}/images/" if ebook_root else "images/"
+        image_paths = {
+            path for path in members
+            if path.startswith(image_root) and path.rsplit("/", 1)[-1]
+        }
+        image_bytes = {}
+        for path in image_paths:
+            extension = os.path.splitext(path)[1].lower().lstrip(".")
+            if extension not in ALLOWED_EBOOK_IMAGE_EXTENSIONS:
+                errors.append(f"Unsupported image file: {path}")
+            else:
+                image_bytes[path] = archive.read(members[path])
+
+        for index, block in enumerate(
+            data.get("blocks", []) if isinstance(data, dict) else []
+        ):
+            if isinstance(block, dict) and block.get("type") == "image":
+                path = block.get("file")
+                if isinstance(path, str):
+                    normalized = posixpath.normpath(path.replace("\\", "/"))
+                    archive_path = posixpath.join(ebook_root, normalized)
+                    if normalized != path or archive_path not in image_paths:
+                        errors.append(
+                            f"blocks[{index}].file does not reference an image in the ZIP"
+                        )
+
+        if errors:
+            return None, errors
+        return {"data": data, "image_bytes": image_bytes, "ebook_root": ebook_root}, None
+
 @admin_import_bp.route("/api/admin/tasks/import", methods=["POST"])
 @authenticate_token
 @require_realm_role("admin")
@@ -253,3 +386,68 @@ def import_tasks():
         "tasks": imported_tasks,
         "data": data,
     }), 201
+
+@admin_import_bp.route("/api/admin/ebooks/import", methods=["POST"])
+@authenticate_token
+@require_realm_role("admin")
+def upload_ebooks():
+    loaded, errors = _load_ebook_zip(request.files.get("file"))
+    if errors:
+        return jsonify({"errors": errors}), 400
+
+    data = loaded["data"]
+    section_title = data["section"].strip()
+    subsection_title = data["subsection"].strip()
+    section = Section.query.filter_by(title=section_title).first()
+    subsection = None
+    if section is not None:
+        subsection = Subsection.query.filter_by(
+            section_id=section.id, title=subsection_title
+        ).first()
+    if section is None:
+        return jsonify({"errors": [f"Section does not exist: {section_title}"]}), 400
+    if subsection is None:
+        return jsonify({"errors": [
+            f"Subsection does not exist in section: {subsection_title}"
+        ]}), 400
+
+    import_prefix = secure_filename(
+        f"ebook_{subsection_title}_{data['title']}_{uuid4().hex}"
+    )
+    image_urls = {}
+    upload_dir = os.path.join(current_app.static_folder, "uploads", import_prefix)
+    os.makedirs(upload_dir, exist_ok=True)
+    for path, image_data in loaded["image_bytes"].items():
+        filename = f"{uuid4().hex}_{secure_filename(os.path.basename(path))}"
+        destination = os.path.join(upload_dir, filename)
+        with open(destination, "wb") as image_file:
+            image_file.write(image_data)
+        relative_path = path[len(loaded["ebook_root"]):].lstrip("/")
+        image_urls[relative_path] = f"/static/uploads/{import_prefix}/{filename}"
+
+    content = dict(data)
+    content["section"] = section_title
+    content["subsection"] = subsection_title
+    content["title"] = data["title"].strip()
+    content["blocks"] = [
+        {**block, "file": image_urls[block["file"]]}
+        if block["type"] == "image" else block
+        for block in data["blocks"]
+    ]
+    ebook = ebooks.query.filter_by(subsection_id=subsection.id).first()
+    if ebook is None:
+        ebook = ebooks(subsection_id=subsection.id, title=content["title"])
+        db.session.add(ebook)
+    ebook.title = content["title"]
+    ebook.intro = content.get("intro")
+    ebook.content = content
+    db.session.commit()
+
+    return jsonify({
+        "id": ebook.id,
+        "subsection_id": subsection.id,
+        "title": ebook.title,
+        "intro": ebook.intro,
+        "blocks": ebook.content,
+    }), 201
+
