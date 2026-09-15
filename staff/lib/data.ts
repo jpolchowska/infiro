@@ -321,6 +321,18 @@ export async function uploadImagesZip(
   });
 }
 
+export async function importEbook(
+  token: string,
+  file: File
+): Promise<{ subsection_id: number; title: string; blocks_count: number }> {
+  const form = new FormData();
+  form.set("file", file);
+  return apiFetch<{ subsection_id: number; title: string; blocks_count: number }>(
+    "/api/admin/ebooks/import",
+    { token, method: "POST", body: form }
+  );
+}
+
 type RawStudent = {
   id: number;
   name: string | null;
