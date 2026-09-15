@@ -11,6 +11,7 @@ export default function StudentLayout() {
       <Stack.Screen name="leveling-test" options={{ animation: 'fade', animationDuration: 150 }} />
       <Stack.Screen name="tasks/[id]" options={{ animation: 'fade', animationDuration: 150 }} />
       <Stack.Screen name="timed/[subsectionId]" options={{ animation: 'fade', animationDuration: 150 }} />
+      <Stack.Screen name="ebooks/[subsectionId]" options={{ animation: 'fade', animationDuration: 150 }} />
     </Stack>
   );
 }

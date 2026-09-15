@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../../components/Text';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ErrorState } from '../../../components/student/ErrorState';
+import { getEbook } from '../../../lib/ebook';
 import { getAccent } from '../../../lib/levelingTest';
 import { pluralize } from '../../../lib/pluralize';
 import { SubsectionDetail, SubsectionTaskStatus, getSubsectionTasks } from '../../../lib/student';
@@ -33,6 +34,21 @@ export default function SubsectionTasksScreen() {
   const [detail, setDetail] = useState<SubsectionDetail | null>(null);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [hasEbook, setHasEbook] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    getEbook(Number(id))
+      .then((data) => {
+        if (active) setHasEbook(data !== null);
+      })
+      .catch(() => {
+        if (active) setHasEbook(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -154,36 +170,69 @@ export default function SubsectionTasksScreen() {
           </View>
         </View>
 
-        {tasks.length > 0 && (
-          <View className="px-5" style={{ marginTop: 18 }}>
-            <Pressable
-              onPress={() => router.push(`/(student)/timed/${detail.id}`)}
-              className="flex-row items-center bg-infiro-white"
-              style={{
-                borderRadius: 16,
-                padding: 14,
-                gap: 12,
-                shadowColor: '#142284',
-                shadowOpacity: 0.06,
-                shadowRadius: 12,
-                shadowOffset: { width: 0, height: 3 },
-                elevation: 2,
-              }}
-            >
-              <View
-                className="items-center justify-center"
-                style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: 'rgba(20,34,132,0.06)' }}
+        {(hasEbook || tasks.length > 0) && (
+          <View className="px-5" style={{ marginTop: 18, gap: 10 }}>
+            {hasEbook && (
+              <Pressable
+                onPress={() => router.push(`/(student)/ebooks/${detail.id}`)}
+                className="flex-row items-center bg-infiro-white"
+                style={{
+                  borderRadius: 16,
+                  padding: 14,
+                  gap: 12,
+                  shadowColor: '#142284',
+                  shadowOpacity: 0.06,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 3 },
+                  elevation: 2,
+                }}
               >
-                <Ionicons name="timer-outline" size={18} color={accentHex} />
-              </View>
-              <View className="flex-1">
-                <Text className="text-infiro-navy font-manrope-extrabold text-[14px]">Ćwicz na czas</Text>
-                <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
-                  60 sekund, zadania ABC z tej podsekcji
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
-            </Pressable>
+                <View
+                  className="items-center justify-center"
+                  style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: 'rgba(20,34,132,0.06)' }}
+                >
+                  <Ionicons name="book-outline" size={18} color={accentHex} />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-infiro-navy font-manrope-extrabold text-[14px]">Teoria</Text>
+                  <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
+                    Przeczytaj przed ćwiczeniem
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
+              </Pressable>
+            )}
+
+            {tasks.length > 0 && (
+              <Pressable
+                onPress={() => router.push(`/(student)/timed/${detail.id}`)}
+                className="flex-row items-center bg-infiro-white"
+                style={{
+                  borderRadius: 16,
+                  padding: 14,
+                  gap: 12,
+                  shadowColor: '#142284',
+                  shadowOpacity: 0.06,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 3 },
+                  elevation: 2,
+                }}
+              >
+                <View
+                  className="items-center justify-center"
+                  style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: 'rgba(20,34,132,0.06)' }}
+                >
+                  <Ionicons name="timer-outline" size={18} color={accentHex} />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-infiro-navy font-manrope-extrabold text-[14px]">Ćwicz na czas</Text>
+                  <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
+                    60 sekund, zadania ABC z tej podsekcji
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
+              </Pressable>
+            )}
           </View>
         )}
 
