@@ -1,4 +1,4 @@
-import { ApiError, apiFetch } from "./api";
+import { ApiError, apiFetch, BACKEND_URL } from "./api";
 
 export type HeadingBlock = { type: "heading"; text: string };
 export type SubheadingBlock = { type: "subheading"; text: string };
@@ -39,7 +39,7 @@ type RawEbook = {
 
 function mapBlock(raw: RawBlock): EbookBlock {
   if (raw.type === "image") {
-    return { type: "image", src: raw.file, alt: raw.alt };
+    return { type: "image", src: `${BACKEND_URL}${raw.file}`, alt: raw.alt };
   }
   return raw;
 }

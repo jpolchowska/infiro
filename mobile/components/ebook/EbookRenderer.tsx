@@ -89,7 +89,7 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
               borderRadius: 18,
               backgroundColor: 'rgba(20,34,132,0.05)',
             }}
-            resizeMode="cover"
+            resizeMode="contain"
           />
           {block.alt ? (
             <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs text-center mt-2">
