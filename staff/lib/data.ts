@@ -35,6 +35,7 @@ type RawSubsection = {
 type RawSubsectionDetail = RawSubsection & {
   tasks: RawTask[];
   materials: RawMaterial[];
+  ebook: { id: number; title: string } | null;
 };
 
 type RawMaterial = {
@@ -177,6 +178,7 @@ export async function getSubsection(
       ...mapSubsection(raw),
       tasks: raw.tasks.map(mapTask),
       materials: raw.materials.map(mapMaterial),
+      ebook: raw.ebook,
     };
   });
 }

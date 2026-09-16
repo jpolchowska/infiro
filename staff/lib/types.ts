@@ -22,6 +22,7 @@ export type Subsection = {
 export type SubsectionDetail = Subsection & {
   tasks: Task[];
   materials: Material[];
+  ebook: { id: number; title: string } | null;
 };
 
 export type TaskDifficulty = 1 | 2 | 3 | 4 | 5;
