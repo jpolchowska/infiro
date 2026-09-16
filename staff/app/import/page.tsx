@@ -55,7 +55,7 @@ export default function ImportPage() {
   const [submitting, setSubmitting] = useState(false);
   const [uploadResult, setUploadResult] = useState<number | null>(null);
   const [ebookFile, setEbookFile] = useState<File | null>(null);
-  const [ebookResult, setEbookResult] = useState<{ title: string; blocksCount: number } | null>(null);
+  const [ebookResult, setEbookResult] = useState<{ title: string } | null>(null);
 
   async function handleJsonSubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -136,7 +136,7 @@ export default function ImportPage() {
     try {
       const token = await getToken();
       const result = await importEbook(token ?? "", ebookFile);
-      setEbookResult({ title: result.title, blocksCount: result.blocks_count });
+      setEbookResult({ title: result.title });
     } catch (err) {
       if (err instanceof ApiError) {
         setErrors([err.message]);
@@ -242,7 +242,7 @@ export default function ImportPage() {
 
       {ebookResult && (
         <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          Zaimportowano e-book „{ebookResult.title}" ({ebookResult.blocksCount} bloków).
+          Zaimportowano e-book „{ebookResult.title}".
         </div>
       )}
 

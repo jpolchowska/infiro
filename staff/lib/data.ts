@@ -324,10 +324,10 @@ export async function uploadImagesZip(
 export async function importEbook(
   token: string,
   file: File
-): Promise<{ subsection_id: number; title: string; blocks_count: number }> {
+): Promise<{ subsection_id: number; title: string }> {
   const form = new FormData();
   form.set("file", file);
-  return apiFetch<{ subsection_id: number; title: string; blocks_count: number }>(
+  return apiFetch<{ subsection_id: number; title: string }>(
     "/api/admin/ebooks/import",
     { token, method: "POST", body: form }
   );
