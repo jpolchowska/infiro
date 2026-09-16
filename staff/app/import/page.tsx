@@ -2,7 +2,7 @@
 
 import { useState, type SubmitEvent } from "react";
 import { validateImportPayload } from "@/lib/validateImport";
-import { importTasks, uploadImagesZip } from "@/lib/data";
+import { importEbook, importTasks, uploadImagesZip } from "@/lib/data";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/components/AuthContext";
 
@@ -54,6 +54,8 @@ export default function ImportPage() {
   const [importedData, setImportedData] = useState<unknown[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [uploadResult, setUploadResult] = useState<number | null>(null);
+  const [ebookFile, setEbookFile] = useState<File | null>(null);
+  const [ebookResult, setEbookResult] = useState<{ title: string } | null>(null);
 
   async function handleJsonSubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -115,6 +117,31 @@ export default function ImportPage() {
         setErrors([err.message]);
       } else {
         setErrors(["Nie udało się rozpakować zdjęć. Spróbuj ponownie."]);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleEbookSubmit(e: SubmitEvent) {
+    e.preventDefault();
+    setEbookResult(null);
+    if (!ebookFile) {
+      setErrors(["Wybierz plik .zip."]);
+      return;
+    }
+
+    setErrors(null);
+    setSubmitting(true);
+    try {
+      const token = await getToken();
+      const result = await importEbook(token ?? "", ebookFile);
+      setEbookResult({ title: result.title });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrors([err.message]);
+      } else {
+        setErrors(["Import e-booka się nie powiódł. Spróbuj ponownie."]);
       }
     } finally {
       setSubmitting(false);
@@ -209,6 +236,32 @@ export default function ImportPage() {
             className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
           >
             {submitting ? "Rozpakowywanie…" : "Rozpakuj i zaimportuj"}
+          </button>
+        </div>
+      </form>
+
+      {ebookResult && (
+        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+          Zaimportowano e-book „{ebookResult.title}".
+        </div>
+      )}
+
+      <form onSubmit={handleEbookSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
+        <h2 className="text-sm font-semibold text-infiro-navy">E-book (ZIP)</h2>
+        <p className="mt-1 text-xs text-gray-500">
+          Folder z <code>ebook.json</code> i podfolderem <code>images/</code>, spakowany w .zip. Format:
+          docs/format-ebookow.md. Sekcja i podsekcja muszą już istnieć.
+        </p>
+        <div className="mt-4">
+          <UploadField accept=".zip" hint=".zip" onFileSelected={setEbookFile} />
+        </div>
+        <div className="mt-4 flex justify-center">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+          >
+            {submitting ? "Importowanie…" : "Importuj e-book"}
           </button>
         </div>
       </form>

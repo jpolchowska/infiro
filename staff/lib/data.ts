@@ -35,6 +35,7 @@ type RawSubsection = {
 type RawSubsectionDetail = RawSubsection & {
   tasks: RawTask[];
   materials: RawMaterial[];
+  ebook: { id: number; title: string } | null;
 };
 
 type RawMaterial = {
@@ -177,6 +178,7 @@ export async function getSubsection(
       ...mapSubsection(raw),
       tasks: raw.tasks.map(mapTask),
       materials: raw.materials.map(mapMaterial),
+      ebook: raw.ebook,
     };
   });
 }
@@ -319,6 +321,18 @@ export async function uploadImagesZip(
     method: "POST",
     body: form,
   });
+}
+
+export async function importEbook(
+  token: string,
+  file: File
+): Promise<{ subsection_id: number; title: string }> {
+  const form = new FormData();
+  form.set("file", file);
+  return apiFetch<{ subsection_id: number; title: string }>(
+    "/api/admin/ebooks/import",
+    { token, method: "POST", body: form }
+  );
 }
 
 type RawStudent = {

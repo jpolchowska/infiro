@@ -270,5 +270,5 @@ def test_get_student_stats(client, monkeypatch):
 
     assert (
         data["last_leveling_test"]["completed_at"]
-        == "2026-08-31T14:00:00"
+        == "2026-08-31T14:00:00Z"
     )

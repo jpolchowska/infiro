@@ -49,9 +49,9 @@ def _student_json(student, total_tasks):
         "accuracy": accuracy,
         "total_attempts": total_attempts,
         "correct_attempts": correct_attempts,
-        "last_activity": last_activity.isoformat() if last_activity else None,
+        "last_activity": last_activity.isoformat() + "Z" if last_activity else None,
         "leveling_test_completed_at": (
-            student.leveling_test_completed_at.isoformat()
+            student.leveling_test_completed_at.isoformat() + "Z"
             if student.leveling_test_completed_at
             else None
         ),
@@ -127,7 +127,7 @@ def _recent_activity(student, limit=10):
             "subsection_title": subsection.title if subsection else None,
             "is_correct": answer.is_correct,
             "attempt_number": answer.attempt_number,
-            "submitted_at": answer.submitted_at.isoformat(),
+            "submitted_at": answer.submitted_at.isoformat() + "Z",
         })
     return items
 

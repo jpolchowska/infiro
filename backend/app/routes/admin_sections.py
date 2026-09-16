@@ -8,6 +8,7 @@ from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.knowledge_resources import KnowledgeResource
 from app.models.student_answers import StudentAnswer
+from app.models.ebooks import ebooks
 from app.routes.admin_materials import _material_json
 
 admin_sections_bp = Blueprint("admin_sections", __name__)
@@ -176,10 +177,12 @@ def get_subsection(subsection_id):
     materials = KnowledgeResource.query.filter_by(subsection_id=subsection_id).order_by(
         KnowledgeResource.order_index
     ).all()
+    ebook = ebooks.query.filter_by(subsection_id=subsection_id).first()
 
     payload = _subsection_json(subsection)
     payload["tasks"] = [_task_json(t) for t in tasks]
     payload["materials"] = [_material_json(m) for m in materials]
+    payload["ebook"] = {"id": ebook.id, "title": ebook.title} if ebook else None
     return jsonify(payload), 200
 
 

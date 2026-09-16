@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
-import { getSection, getSubsection, deleteMaterial, deleteSubsection, deleteTask } from "@/lib/data";
+import { getSection, getSubsection, deleteSubsection, deleteTask } from "@/lib/data";
 import { Badge } from "@/components/Badge";
 import { difficultyLabel } from "@/lib/difficulty";
 import type { Section, SubsectionDetail } from "@/lib/types";
@@ -42,15 +42,6 @@ export default function SubsectionPage() {
     await deleteTask(token ?? "", taskId);
     setSubsection((prev) =>
       prev ? { ...prev, tasks: prev.tasks.filter((t) => t.id !== taskId) } : prev
-    );
-  }
-
-  async function handleDeleteMaterial(materialId: number) {
-    if (!confirm("Usunąć ten materiał?")) return;
-    const token = await getToken();
-    await deleteMaterial(token ?? "", materialId);
-    setSubsection((prev) =>
-      prev ? { ...prev, materials: prev.materials.filter((m) => m.id !== materialId) } : prev
     );
   }
 
@@ -96,51 +87,15 @@ export default function SubsectionPage() {
       </div>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{subsection.description}</p>
 
-      <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Materiały teoretyczne</h2>
-      {subsection.materials.length === 0 ? (
-        <p className="mt-2 text-sm text-gray-400">
-          {isTeacher ? "Brak materiałów." : "Brak materiałów — dodaj pierwszy."}
+      <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Teoria</h2>
+      {subsection.ebook ? (
+        <p className="mt-2 text-sm text-gray-700">
+          Zaimportowano e-book: <span className="font-medium">{subsection.ebook.title}</span>
         </p>
       ) : (
-        <ul className="mt-2 flex flex-col gap-2">
-          {subsection.materials.map((m) => (
-            <li
-              key={m.id}
-              className="flex items-center justify-between rounded-sm border border-gray-200 bg-white px-4 py-2 text-sm"
-            >
-              <span className="text-gray-700">
-                {m.title}{" "}
-                <span className="text-xs text-gray-400">
-                  ({m.type === "text" ? "tekst" : m.type})
-                </span>
-              </span>
-              {!isTeacher && (
-                <span className="flex gap-3">
-                  <Link
-                    href={`/sections/${section.id}/${subsection.id}/materials/${m.id}/edit`}
-                    className="text-xs font-medium text-infiro-navy hover:underline"
-                  >
-                    Edytuj
-                  </Link>
-                  <button
-                    onClick={() => handleDeleteMaterial(m.id)}
-                    className="text-xs font-medium text-red-600 hover:underline"
-                  >
-                    Usuń
-                  </button>
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-      {!isTeacher && (
-        <Link
-          href={`/sections/${section.id}/${subsection.id}/new-material`}
-          className="mt-3 inline-block rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
-        >
-          Dodaj materiał
-        </Link>
+        <p className="mt-2 text-sm text-gray-400">
+          {isTeacher ? "Brak teorii." : "Brak teorii — zaimportuj przez stronę Import."}
+        </p>
       )}
 
       <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Zadania</h2>

@@ -85,7 +85,7 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
             source={{ uri: block.src }}
             style={{
               width: '100%',
-              aspectRatio: 4 / 3,
+              aspectRatio: block.width / block.height,
               borderRadius: 18,
               backgroundColor: 'rgba(20,34,132,0.05)',
             }}
