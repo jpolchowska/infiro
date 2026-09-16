@@ -4,7 +4,7 @@ export type HeadingBlock = { type: "heading"; text: string };
 export type SubheadingBlock = { type: "subheading"; text: string };
 export type ParagraphBlock = { type: "paragraph"; text: string };
 export type ListBlock = { type: "list"; items: string[] };
-export type ImageBlock = { type: "image"; src: string; alt: string };
+export type ImageBlock = { type: "image"; src: string; alt: string; width: number; height: number };
 export type CalloutStyle = "zapamietaj" | "wskazowka" | "uwaga" | "definicja";
 export type CalloutBlock = { type: "callout"; style: CalloutStyle; text: string };
 
@@ -22,7 +22,7 @@ export type Ebook = {
   blocks: EbookBlock[];
 };
 
-type RawImageBlock = { type: "image"; file: string; alt: string };
+type RawImageBlock = { type: "image"; file: string; alt: string; width: number; height: number };
 type RawBlock =
   | HeadingBlock
   | SubheadingBlock
@@ -39,7 +39,7 @@ type RawEbook = {
 
 function mapBlock(raw: RawBlock): EbookBlock {
   if (raw.type === "image") {
-    return { type: "image", src: `${BACKEND_URL}${raw.file}`, alt: raw.alt };
+    return { type: "image", src: `${BACKEND_URL}${raw.file}`, alt: raw.alt, width: raw.width, height: raw.height };
   }
   return raw;
 }

@@ -85,11 +85,11 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
             source={{ uri: block.src }}
             style={{
               width: '100%',
-              aspectRatio: 4 / 3,
+              aspectRatio: block.width / block.height,
               borderRadius: 18,
               backgroundColor: 'rgba(20,34,132,0.05)',
             }}
-            resizeMode="contain"
+            resizeMode="cover"
           />
           {block.alt ? (
             <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs text-center mt-2">

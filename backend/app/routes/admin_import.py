@@ -1,11 +1,13 @@
 from flask import Blueprint, current_app, jsonify, request
 from uuid import uuid4
+import io
 import json
 import jsonschema
 import os
 import posixpath
 import zipfile
 from jsonschema import validate
+from PIL import Image as PILImage
 from werkzeug.utils import secure_filename
 
 from app.extensions import db
@@ -415,6 +417,7 @@ def upload_ebooks():
         f"ebook_{subsection_title}_{data['title']}_{uuid4().hex}"
     )
     image_urls = {}
+    image_dimensions = {}
     upload_dir = os.path.join(current_app.static_folder, "uploads", import_prefix)
     os.makedirs(upload_dir, exist_ok=True)
     for path, image_data in loaded["image_bytes"].items():
@@ -424,13 +427,20 @@ def upload_ebooks():
             image_file.write(image_data)
         relative_path = path[len(loaded["ebook_root"]):].lstrip("/")
         image_urls[relative_path] = f"/static/uploads/{import_prefix}/{filename}"
+        with PILImage.open(io.BytesIO(image_data)) as img:
+            image_dimensions[relative_path] = img.size
 
     content = dict(data)
     content["section"] = section_title
     content["subsection"] = subsection_title
     content["title"] = data["title"].strip()
     content["blocks"] = [
-        {**block, "file": image_urls[block["file"]]}
+        {
+            **block,
+            "file": image_urls[block["file"]],
+            "width": image_dimensions[block["file"]][0],
+            "height": image_dimensions[block["file"]][1],
+        }
         if block["type"] == "image" else block
         for block in data["blocks"]
     ]
