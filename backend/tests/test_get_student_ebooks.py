@@ -75,13 +75,13 @@ def test_get_student_ebooks_existing_ebook(client, monkeypatch):
     db.session.add_all([subsection])
     db.session.commit()
 
-    zip_path = Path(__file__).with_name("testowanie2.zip")
+    zip_path = Path(__file__).with_name("kawalki-calosci-correct.zip")
 
     with zip_path.open("rb") as file:
         response = client.post(
             "/api/admin/ebooks/import",
             data={
-                "file": (file, "testowanie2.zip"),
+                "file": (file, "kawalki-calosci-correct.zip"),
             },
             content_type="multipart/form-data",
             headers={"Authorization": "Bearer test-token"},
