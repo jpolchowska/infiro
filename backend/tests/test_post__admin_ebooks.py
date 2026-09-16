@@ -66,12 +66,12 @@ def test_post_correct_zip(client, monkeypatch):
     db.session.add(subsection)
     db.session.commit()
 
-    zip_path = Path(__file__).with_name("testowanie2.zip")
+    zip_path = Path(__file__).with_name("kawalki-calosci-correct.zip")
     with zip_path.open("rb") as file:
         response = client.post(
             "/api/admin/ebooks/import",
             data={
-                "file": (file, "testowanie2.zip"),
+                "file": (file, "kawalki-calosci-correct.zip"),
             },
             content_type="multipart/form-data",
             headers={"Authorization": "Bearer test-token"},
@@ -120,12 +120,12 @@ def test_post_bad_zip(client, monkeypatch):
     db.session.add(subsection)
     db.session.commit()
 
-    zip_path = Path(__file__).with_name("badZip.zip")
+    zip_path = Path(__file__).with_name("kawalki-calosci-incorrect.zip")
     with zip_path.open("rb") as file:
         response = client.post(
             "/api/admin/ebooks/import",
             data={
-                "file": (file, "badZip.zip"),
+                "file": (file, "kawalki-calosci-incorrect.zip"),
             },
             content_type="multipart/form-data",
             headers={"Authorization": "Bearer test-token"},
@@ -156,12 +156,12 @@ def test_post_zip_without_subsection(client, monkeypatch):
     db.session.add(admin)
     db.session.commit()
 
-    zip_path = Path(__file__).with_name("testowanie2.zip")
+    zip_path = Path(__file__).with_name("kawalki-calosci-correct.zip")
     with zip_path.open("rb") as file:
         response = client.post(
             "/api/admin/ebooks/import",
             data={
-                "file": (file, "testowanie2.zip"),
+                "file": (file, "kawalki-calosci-correct.zip"),
             },
             content_type="multipart/form-data",
             headers={"Authorization": "Bearer test-token"},
