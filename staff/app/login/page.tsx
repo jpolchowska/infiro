@@ -8,9 +8,8 @@ export default function LoginPage() {
       <div className="-mt-16 w-full max-w-sm rounded-sm bg-white p-10 text-center shadow-md">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/infiro-logo.png" alt="Infiro" className="mx-auto h-[60px] w-auto" />
-        <h1 className="mt-4 text-xl font-semibold text-infiro-navy">Panel Infiro</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Zaloguj się, aby zarządzać treścią aplikacji albo przeglądać postępy uczniów.
+        <p className="mt-5 text-sm text-gray-600">
+          Zaloguj się, aby zarządzać treścią aplikacji lub przeglądać postępy uczniów.
         </p>
         <button
           type="button"

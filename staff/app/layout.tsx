@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Panel Infiro",
-  description: "Panel Infiro",
+  title: "Logowanie - Panel zarządzania",
+  description: "Logowanie - Panel zarządzania",
 };
 
 export default function RootLayout({
