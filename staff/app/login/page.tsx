@@ -6,21 +6,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="-mt-16 w-full max-w-sm rounded-sm bg-white p-10 text-center shadow-md">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="mx-auto h-14 w-14">
-          <circle cx="32" cy="32" r="32" fill="#142284" />
-          <text
-            x="32"
-            y="33"
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontFamily="Arial, Helvetica, sans-serif"
-            fontSize="36"
-            fontWeight="500"
-            fill="#fff"
-          >
-            I
-          </text>
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/infiro-logo.png" alt="Infiro" className="mx-auto h-[60px] w-auto" />
         <h1 className="mt-4 text-xl font-semibold text-infiro-navy">Panel Infiro</h1>
         <p className="mt-2 text-sm text-gray-600">
           Zaloguj się, aby zarządzać treścią aplikacji albo przeglądać postępy uczniów.
