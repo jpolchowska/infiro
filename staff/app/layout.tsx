@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Logowanie - Panel zarządzania",
-  description: "Logowanie - Panel zarządzania",
+  title: "Panel zarządzania",
+  description: "Panel zarządzania",
 };
 
 export default function RootLayout({

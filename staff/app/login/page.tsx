@@ -16,14 +16,14 @@ export default function LoginPage() {
           onClick={() => keycloak.login({ redirectUri: `${window.location.origin}/` })}
           className="mt-6 w-full rounded-sm bg-infiro-navy px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
         >
-          Zaloguj się jako administrator
+          Zaloguj się jako nauczyciel
         </button>
         <button
           type="button"
           onClick={() => keycloak.login({ redirectUri: `${window.location.origin}/` })}
           className="mt-3 w-full rounded-sm border border-infiro-navy px-4 py-2.5 text-sm font-medium text-infiro-navy hover:bg-infiro-navy/5"
         >
-          Zaloguj się jako nauczyciel
+          Zaloguj się jako administrator
         </button>
       </div>
     </div>
