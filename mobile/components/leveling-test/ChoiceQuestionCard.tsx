@@ -80,9 +80,9 @@ export function ChoiceQuestionCard({ question, accent, onAnswer, onSkip }: Choic
       <Pressable
         onPress={handleSkip}
         disabled={answered}
-        className="rounded-2xl py-4 items-center mt-2 bg-infiro-navy/5"
+        className="rounded-2xl py-4 items-center mt-2 bg-infiro-navy/10"
       >
-        <Text className="text-infiro-navy font-manrope-semibold text-sm">Nie wiem</Text>
+        <Text className="text-infiro-navy font-manrope-semibold text-base">Nie wiem</Text>
       </Pressable>
     </View>
   );
