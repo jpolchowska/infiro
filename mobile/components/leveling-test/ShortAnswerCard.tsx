@@ -48,8 +48,12 @@ export function ShortAnswerCard({ accent, onAnswer, onSkip }: ShortAnswerCardPro
         <Text className="text-infiro-white font-manrope-semibold text-base">Dalej</Text>
       </Pressable>
 
-      <Pressable onPress={handleSkip} disabled={answered} className="py-3.5 items-center mt-1">
-        <Text className="text-infiro-navy/50 font-manrope-semibold text-sm">Nie wiem</Text>
+      <Pressable
+        onPress={handleSkip}
+        disabled={answered}
+        className="rounded-2xl py-4 items-center mt-2 bg-infiro-navy/5"
+      >
+        <Text className="text-infiro-navy font-manrope-semibold text-sm">Nie wiem</Text>
       </Pressable>
     </View>
   );
