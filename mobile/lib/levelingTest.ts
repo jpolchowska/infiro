@@ -92,14 +92,17 @@ export type LevelingResult = {
 };
 
 const LEVEL_ENCOURAGEMENT: Record<string, string> = {
-  Podstawy: 'Dobry początek! Zaczniemy od podstaw, żeby wszystko było jasne — a potem pójdzie z górki.',
-  'Dobry start': 'Świetnie Ci poszło! Trzymaj tak dalej, zaraz zmierzymy się z odrobinę trudniejszymi zadaniami.',
-  'Pewny start': 'Naprawdę mocny wynik! Widać, że dużo już umiesz — czas na prawdziwe wyzwania.',
+  Podstawy: 'Dobry początek — zaczynamy od podstaw.',
+  'Dobry start': 'Świetnie Ci poszło! Czas na nieco trudniejsze zadania.',
+  'Pewny start': 'Mocny wynik! Czas na prawdziwe wyzwania.',
+  'Mistrzowski start': 'Bezbłędnie! Czas na największe wyzwania.',
 };
 
-function levelLabelFor(score: number): string {
-  if (score >= 9) return 'Pewny start';
-  if (score >= 5) return 'Dobry start';
+function levelLabelFor(score: number, maxScore: number): string {
+  const ratio = maxScore > 0 ? score / maxScore : 0;
+  if (ratio >= 1) return 'Mistrzowski start';
+  if (ratio >= 0.7) return 'Pewny start';
+  if (ratio >= 0.4) return 'Dobry start';
   return 'Podstawy';
 }
 
@@ -121,7 +124,7 @@ export async function submitLevelingTest(answers: LevelingAnswer[]): Promise<Lev
     },
   });
 
-  const levelLabel = levelLabelFor(raw.score);
+  const levelLabel = levelLabelFor(raw.score, raw.max_score);
   return {
     total: raw.score,
     maxTotal: raw.max_score,

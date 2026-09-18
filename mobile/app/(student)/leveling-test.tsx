@@ -1,6 +1,7 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -99,57 +100,87 @@ export default function LevelingTestScreen() {
   };
 
   if (step === 'intro') {
+    const features: { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string; label: string }[] = [
+      {
+        icon: 'list-outline',
+        color: '#c873d9',
+        bg: 'bg-infiro-purple/15',
+        label: questions ? `${questions.length} pytań` : 'Ładowanie pytań…',
+      },
+      { icon: 'person-outline', color: '#f0b67e', bg: 'bg-infiro-peach/15', label: 'Ten test jest dla ciebie' },
+      {
+        icon: 'shapes-outline',
+        color: '#ff5f55',
+        bg: 'bg-infiro-coral/15',
+        label: 'Zadania są z różnych działów matematyki',
+      },
+    ];
+
     return (
       <SafeAreaView className="flex-1 bg-infiro-navy">
-        <View className="flex-1 justify-center px-6">
-          <Text className="text-infiro-white text-4xl font-manrope-extrabold leading-tight mb-4">
-            Test poziomujący
-          </Text>
-          <Text className="text-infiro-white/70 text-base mb-8">
-            Krótki test bez oceny. Możesz się pomylić — dzięki temu dobierzemy zadania na Twój poziom.
-          </Text>
+        <View className="flex-1 px-6 pb-6">
+          <View className="flex-1 items-center justify-center">
+            <View
+              className="w-24 h-24 rounded-full bg-infiro-purple/15 items-center justify-center mb-7"
+              style={{
+                shadowColor: '#c873d9',
+                shadowOpacity: 0.4,
+                shadowRadius: 22,
+                shadowOffset: { width: 0, height: 0 },
+                elevation: 6,
+              }}
+            >
+              <Ionicons name="speedometer-outline" size={42} color="#c873d9" />
+            </View>
 
-          <View className="mb-10">
-            <View className="flex-row items-center mb-3">
-              <View className="w-2 h-2 rounded-full bg-infiro-purple mr-3" />
-              <Text className="text-infiro-white text-base">
-                {questions ? `${questions.length} pytań` : 'Ładowanie pytań…'}
-              </Text>
-            </View>
-            <View className="flex-row items-center mb-3">
-              <View className="w-2 h-2 rounded-full bg-infiro-purple mr-3" />
-              <Text className="text-infiro-white text-base">Ten test jest dla ciebie</Text>
-            </View>
-            <View className="flex-row items-center mb-3">
-              <View className="w-2 h-2 rounded-full bg-infiro-purple mr-3" />
-              <Text className="text-infiro-white text-base">Zadania są z różnych działów matematyki</Text>
+            <Text className="text-infiro-white text-3xl font-manrope-extrabold leading-tight text-center mb-3">
+              Test poziomujący
+            </Text>
+            <Text className="text-infiro-white/70 text-base leading-relaxed text-center mb-8">
+              Ten test pomoże nam poznać Twój poziom. Odpowiadaj tak, jak potrafisz.
+            </Text>
+
+            <View className="w-full bg-infiro-white/10 rounded-2xl p-4 gap-4">
+              {features.map((feature) => (
+                <View key={feature.label} className="flex-row items-center gap-3">
+                  <View className={`w-9 h-9 rounded-full items-center justify-center ${feature.bg}`}>
+                    <Ionicons name={feature.icon} size={18} color={feature.color} />
+                  </View>
+                  <Text className="text-infiro-white text-base flex-1">{feature.label}</Text>
+                </View>
+              ))}
             </View>
           </View>
 
-          {loadError && (
-            <Text className="text-infiro-coral text-sm mb-4">{loadError}</Text>
-          )}
-
-          {questions && questions.length === 0 && (
-            <Text className="text-infiro-white/70 text-sm mb-4">
-              Nie ma jeszcze żadnych zadań do testu — wróć tu, gdy nauczyciel doda treść.
-            </Text>
-          )}
-
-          <Pressable
-            onPress={() => setStep('quiz')}
-            disabled={!questions || questions.length === 0}
-            className={`rounded-2xl py-4 items-center active:opacity-80 ${
-              questions && questions.length > 0 ? 'bg-infiro-coral' : 'bg-infiro-coral/40'
-            }`}
-            style={CTA_SHADOW}
-          >
-            {!questions ? (
-              <ActivityIndicator color="#fefefe" />
-            ) : (
-              <Text className="text-infiro-white font-manrope-semibold text-base">Zaczynamy</Text>
+          <View>
+            {loadError && (
+              <Text className="text-infiro-coral text-sm mb-4">{loadError}</Text>
             )}
-          </Pressable>
+
+            {questions && questions.length === 0 && (
+              <Text className="text-infiro-white/70 text-sm mb-4">
+                Nie ma jeszcze żadnych zadań do testu — wróć tu, gdy nauczyciel doda treść.
+              </Text>
+            )}
+
+            <Pressable
+              onPress={() => setStep('quiz')}
+              disabled={!questions || questions.length === 0}
+              className={`rounded-2xl py-4 flex-row items-center justify-center gap-2 active:opacity-80 ${
+                questions && questions.length > 0 ? 'bg-infiro-coral' : 'bg-infiro-coral/40'
+              }`}
+              style={CTA_SHADOW}
+            >
+              {!questions ? (
+                <ActivityIndicator color="#fefefe" />
+              ) : (
+                <>
+                  <Text className="text-infiro-white font-manrope-semibold text-base">Zaczynamy</Text>
+                  <Ionicons name="arrow-forward" size={18} color="#fefefe" />
+                </>
+              )}
+            </Pressable>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -245,31 +276,70 @@ export default function LevelingTestScreen() {
 
     return (
       <SafeAreaView className="flex-1 bg-infiro-navy">
-        <View className="flex-1 justify-center px-6">
-          <Text className="text-infiro-white/60 text-sm uppercase tracking-wide mb-2">Twój wynik</Text>
-          <Text className="text-infiro-white text-4xl font-manrope-extrabold leading-tight mb-2">
-            {result.total}/{result.maxTotal}
-          </Text>
-          <Text className="text-infiro-white text-2xl font-manrope-bold mb-4">Poziom: {result.levelLabel}</Text>
-          <Text className="text-infiro-white/80 text-base mb-8">{result.encouragement}</Text>
-
-          <View className="bg-infiro-white/10 rounded-2xl p-4 mb-10">
-            {result.perSection.map((section) => (
-              <View key={section.sectionId} className="flex-row items-center justify-between py-2">
-                <Text className="text-infiro-white text-base">{section.sectionTitle}</Text>
-                <Text className="text-infiro-white/70 text-base font-manrope-semibold">
-                  {section.score}/{section.total}
-                </Text>
+        <View className="flex-1 px-6 pb-6">
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          >
+            <View className="items-center">
+              <View
+                className="w-24 h-24 rounded-full bg-infiro-purple/15 items-center justify-center mb-6"
+                style={{
+                  shadowColor: '#c873d9',
+                  shadowOpacity: 0.4,
+                  shadowRadius: 22,
+                  shadowOffset: { width: 0, height: 0 },
+                  elevation: 6,
+                }}
+              >
+                <Ionicons name="trophy-outline" size={42} color="#c873d9" />
               </View>
-            ))}
-          </View>
+
+              <Text className="text-infiro-white/60 text-sm uppercase tracking-wide text-center mb-1">
+                Twój wynik
+              </Text>
+              <Text className="text-infiro-white text-5xl font-manrope-extrabold leading-tight text-center mb-4">
+                {result.total}/{result.maxTotal}
+              </Text>
+
+              <View className="bg-infiro-purple/20 rounded-full px-4 py-1.5 mb-4">
+                <Text className="text-infiro-white font-manrope-bold text-sm">Poziom: {result.levelLabel}</Text>
+              </View>
+
+              <Text className="text-infiro-white/80 text-base leading-relaxed text-center mb-8">
+                {result.encouragement}
+              </Text>
+
+              <View className="w-full bg-infiro-white/10 rounded-2xl p-5 gap-6">
+                {result.perSection.map((section) => {
+                  const percent = section.total > 0 ? Math.min(100, Math.round((section.score / section.total) * 100)) : 0;
+                  return (
+                    <View key={section.sectionId}>
+                      <View className="flex-row items-center justify-between mb-2">
+                        <Text className="text-infiro-white text-sm font-manrope-semibold flex-1 mr-2">
+                          {section.sectionTitle}
+                        </Text>
+                        <Text className="text-infiro-white/70 text-sm font-manrope-semibold">
+                          {section.score}/{section.total}
+                        </Text>
+                      </View>
+                      <View className="w-full h-2 bg-infiro-white/15 rounded-full overflow-hidden">
+                        <View className="h-2 bg-infiro-coral rounded-full" style={{ width: `${percent}%` }} />
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          </ScrollView>
 
           <Pressable
             onPress={goToApp}
-            className="bg-infiro-coral rounded-2xl py-4 items-center active:opacity-80"
+            className="bg-infiro-coral rounded-2xl py-4 flex-row items-center justify-center gap-2 active:opacity-80"
             style={CTA_SHADOW}
           >
             <Text className="text-infiro-white font-manrope-semibold text-base">Przejdź do nauki</Text>
+            <Ionicons name="arrow-forward" size={18} color="#fefefe" />
           </Pressable>
         </View>
       </SafeAreaView>
