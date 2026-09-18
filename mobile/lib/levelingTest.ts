@@ -92,9 +92,9 @@ export type LevelingResult = {
 };
 
 const LEVEL_ENCOURAGEMENT: Record<string, string> = {
-  Podstawy: 'Dobry początek! Zaczniemy od podstaw, żeby wszystko było jasne — a potem pójdzie z górki.',
-  'Dobry start': 'Świetnie Ci poszło! Trzymaj tak dalej, zaraz zmierzymy się z odrobinę trudniejszymi zadaniami.',
-  'Pewny start': 'Naprawdę mocny wynik! Widać, że dużo już umiesz — czas na prawdziwe wyzwania.',
+  Podstawy: 'Dobry początek — zaczynamy od podstaw.',
+  'Dobry start': 'Świetnie Ci poszło! Czas na nieco trudniejsze zadania.',
+  'Pewny start': 'Mocny wynik! Czas na prawdziwe wyzwania.',
 };
 
 function levelLabelFor(score: number): string {
