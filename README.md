@@ -5,7 +5,7 @@ An educational mathematics platform — structured course content, adaptive leve
 <p>
   <img alt="Flask" src="https://img.shields.io/badge/Flask-Python%203.12-000000?logo=flask&logoColor=white">
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-black?logo=next.js">
-  <img alt="Expo" src="https://img.shields.io/badge/Expo-React%20Native-000020?logo=expo&logoColor=white">
+  <img alt="Expo" src="https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white">
   <img alt="Keycloak" src="https://img.shields.io/badge/Keycloak-26-4D4D4D?logo=keycloak&logoColor=white">
   <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white">
   <img alt="Docker" src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white">
@@ -71,8 +71,8 @@ The project organizes course content into sections → subsections → tasks, wi
 ```mermaid
 graph LR
   subgraph Clients
-    MOBILE["mobile\nExpo / React Native\nStudent"]
-    STAFF["staff\nNext.js panel\nAdmin + Teacher"]
+    MOBILE["mobile\nExpo / React Native\nStudent\nclient: matematyka-mobile"]
+    STAFF["staff\nNext.js panel\nAdmin + Teacher\nclient: nextjs-app"]
   end
 
   subgraph "Docker network"
@@ -80,6 +80,7 @@ graph LR
     KC["Keycloak\nmatematyka-app realm"]
     API["backend :5000\nFlask REST API + JWKS validation"]
     DB[("PostgreSQL")]
+    UPLOADS[("static/uploads\nvolume")]
   end
 
   MOBILE -- "Authorization Code + PKCE" --> NGINX
@@ -90,6 +91,7 @@ graph LR
   NGINX -- "/api, /static" --> API
   NGINX -- "/" --> STAFF
   API -- "SQL" --> DB
+  API -- "task images, e-book images" --> UPLOADS
 ```
 
 ## Tech Stack
@@ -97,11 +99,13 @@ graph LR
 | Layer | Technology |
 |---|---|
 | Authorization Server | Keycloak 26 |
-| Backend | Python 3.12, Flask, Flask-SQLAlchemy, Flask-Migrate, PyJWT |
-| Web panel (staff) | Next.js 15 (App Router), keycloak-js |
-| Mobile app | Expo, React Native, Expo Router, expo-auth-session, NativeWind |
+| Backend | Python 3.12, Flask, Flask-SQLAlchemy, Flask-Migrate (applied on startup), PyJWT, jsonschema, Pillow |
+| Web panel (staff) | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4, keycloak-js |
+| Mobile app | Expo SDK 57, React Native 0.86, React 19, TypeScript, Expo Router, expo-auth-session, NativeWind |
 | Database | PostgreSQL 16 |
+| File storage | Docker bind mount (`backend/app/static/uploads`) for task and e-book images |
 | Reverse proxy | nginx |
+| Testing | pytest |
 | Infrastructure | Docker Compose |
 
 ## Getting Started
