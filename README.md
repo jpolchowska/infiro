@@ -299,24 +299,38 @@ Still served by the backend, but not used by the current mobile app or admin pan
 infiro/
 ├── backend/
 │   ├── app/
-│   │   ├── models/            # SQLAlchemy models
-│   │   ├── middleware/auth.py # JWT/JWKS verification
-│   │   ├── routes/            # public, student, tasks, leveling test, admin routes
-│   │   └── services/
-│   ├── migrations/            # Flask-Migrate migrations
-│   ├── seed/                  # seed data
-│   └── tests/
-├── staff/                     # Next.js panel (admin + teacher)
-├── mobile/                    # Expo app (student + teacher), Expo Router
+│   │   ├── models/                # SQLAlchemy models (users, sections, tasks, ebooks, answers, ...)
+│   │   ├── middleware/auth.py     # JWT/JWKS verification, realm role checks
+│   │   ├── routes/
+│   │   │   ├── student*.py        # profile, sections/subsections, tasks, timed practice, stats
+│   │   │   ├── leveling_test.py   # leveling test, submit, history
+│   │   │   ├── admin_*.py         # sections, materials, students, task/e-book import
+│   │   │   ├── tasks.py           # legacy task endpoints
+│   │   │   └── public.py          # status check
+│   │   ├── services/              # user handling, image upload/ZIP extraction
+│   │   ├── static/uploads/        # uploaded task and e-book images (bind-mounted)
+│   │   └── utills.py              # task themes, attempts, difficulty unlocking helpers
+│   ├── migrations/                # Flask-Migrate migrations, applied on startup
+│   ├── seed/                      # sample task import file (tasks_example.json)
+│   └── tests/                     # pytest suite, including e-book ZIP fixtures
+├── staff/                         # Next.js panel (admin + teacher)
+│   ├── app/                       # pages: sections, results, teachers, import, login
+│   ├── components/                # AuthGate, header nav, shared UI
+│   └── lib/                       # API client, Keycloak setup, import validation
+├── mobile/                        # Expo app (student), Expo Router
+│   ├── app/(student)/             # home, sections, tasks, timed practice, e-books, leveling test
+│   ├── components/                # MathText, e-book renderer, task and test cards
+│   └── lib/                       # API clients, auth, types
 ├── infrastructure/
-│   ├── realm-export.json      # Keycloak realm — auto-imported on startup
-│   ├── nginx.conf             # single entrypoint / reverse proxy config
+│   ├── realm-export.json          # Keycloak realm — auto-imported on startup
+│   ├── nginx.conf                 # single entrypoint / reverse proxy config
 │   └── secrets/db_password.txt
-├── docs/                      # task JSON format spec, etc.
+├── docs/                          # task and e-book JSON format specs
 ├── compose.yaml
 └── .env.example
 ```
 
 ## Documentation
 
-- [docs/format-zadan.md](docs/format-zadan.md) — JSON format spec for the task import file used by the admin panel's import feature.
+- [docs/format-zadan.md](docs/format-zadan.md) — JSON format spec for the task import file used by the admin panel's import feature. A sample file is in [backend/seed/tasks_example.json](backend/seed/tasks_example.json).
+- [docs/format-ebookow.md](docs/format-ebookow.md) — format spec for e-book ZIP archives (`ebook.json` + `images/`) imported through the admin panel.
