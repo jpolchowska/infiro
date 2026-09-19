@@ -29,9 +29,11 @@ The project organizes course content into sections → subsections → tasks, wi
     - [Environment Variables](#environment-variables)
     - [Run Backend \& Infrastructure](#run-backend--infrastructure)
     - [Run the Mobile App](#run-the-mobile-app)
+    - [Run Tests](#run-tests)
   - [Services](#services)
   - [User Roles](#user-roles)
   - [Creating Accounts](#creating-accounts)
+  - [Content Import](#content-import)
   - [API Reference](#api-reference)
   - [Project Structure](#project-structure)
   - [Documentation](#documentation)
@@ -155,6 +157,8 @@ Every time while developing (rebuilds and syncs on file changes):
 docker compose watch
 ```
 
+Database migrations are applied automatically when the backend starts. A fresh database contains no content, so once the stack is up, [create an admin account](#creating-accounts) and [import content](#content-import) before opening the mobile app.
+
 ### Run the Mobile App
 
 ```bash
@@ -171,6 +175,14 @@ npx expo start
 
 - **Android Studio:** press `a` once the dev server starts.
 - **Expo Go:** scan the printed QR code.
+
+### Run Tests
+
+Backend tests run with pytest inside the running `backend` container:
+
+```bash
+docker compose exec backend python -m pytest tests -q
+```
 
 ## Services
 
@@ -206,6 +218,14 @@ Account creation and role assignment currently happen directly in the Keycloak a
 1. Create the user as above.
 2. Create an `admin` role under **Realm roles** (if it doesn't exist yet).
 3. On the user, go to **Role mapping** → **Assign role**, filter by realm roles, and assign `admin`.
+
+## Content Import
+
+Course content is loaded through the admin panel (`http://localhost`, **Import treści** tab), which is available to admins only. Every file is validated before anything is saved, and errors are listed in the panel.
+
+1. **Tasks (JSON)** — a single file describing sections → subsections → tasks. Missing sections and subsections are created automatically. Format: [docs/format-zadan.md](docs/format-zadan.md).
+2. **Images (ZIP, optional)** — a ZIP archive with images used by tasks; the panel returns the uploaded file URLs.
+3. **E-books (ZIP)** — one archive per subsection with an `ebook.json` file and an `images/` folder. The section and subsection must already exist, so import tasks first. Format: [docs/format-ebookow.md](docs/format-ebookow.md).
 
 ## API Reference
 
