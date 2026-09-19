@@ -13,7 +13,7 @@ An educational mathematics platform — structured course content, adaptive leve
 
 ## Overview
 
-The project organizes course content into sections → subsections → tasks, each task carrying per-theme variants so the same exercise can be presented with different interest-based framing. Students work through this content and a randomized leveling test from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to student results, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin` role and the `nauczyciele` (teachers) group, everyone else is treated as a student.
+The project organizes course content into sections → subsections → tasks, with a short theory e-book attached to each subsection. Tasks come in three types and three difficulty levels, and every task carries per-theme variants so the same exercise can be framed around a student's interests. Students work through this content, a leveling test, and timed practice from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to sections and student results, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin`, `ROLE_TEACHER`, and `ROLE_STUDENT` roles, and members of the `nauczyciele` (teachers) group receive `ROLE_TEACHER`.
 
 ## Table of Contents
 
@@ -40,19 +40,25 @@ The project organizes course content into sections → subsections → tasks, ea
 
 **Course content**
 - Content structured as sections → subsections → tasks
-- Tasks support per-theme (interest-based) variants of the same exercise
-- Admin panel — create, edit, and delete sections, subsections, and tasks
-- Bulk task import from a JSON file, including image uploads
-- Knowledge materials attached to sections and subsections
+- Three task types — single choice, short answer, and memory (pair matching)
+- Three difficulty levels per subsection
+- Per-theme variants of every task, chosen from seven student interests (sport, games, LEGO, animals, drawing, music, food)
+- One theory e-book per subsection, with text, images, lists, and callouts
+- Bulk import of tasks (JSON) and e-books (ZIP with images) from the admin panel
 
 **Students**
-- Browse sections and subsections, work through tasks
-- Randomized leveling (diagnostic) test with attempt history
+- Browse sections and subsections, work through tasks with instant feedback
+- Three attempts per task; the solution is revealed after the last failed attempt
+- Higher difficulty levels unlock once every task on the level below is solved
+- Timed practice — up to 20 single-choice questions in 60 seconds
+- Leveling (diagnostic) test with per-section results and attempt history
+- Theory e-book reader
+- Fractions rendered in stacked notation
 - Personal stats, interests, and profile
 
 **Teachers & Admins**
-- Teacher panel — view student results
-- Admin panel — manage students and teachers, review student details
+- Teacher panel — read-only view of sections and student results
+- Admin panel — manage sections, subsections, tasks, students, and teachers, and import content
 - Role and access control fully driven by Keycloak (realm roles + groups)
 
 **Authentication**
@@ -176,9 +182,9 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 
 | Role | Permissions |
 |---|---|
-| **Admin** | manage sections, subsections, tasks, materials, students, and teachers |
-| **Teacher** (`nauczyciele` group) | view student results |
-| **Student** (default) | browse content, complete tasks, take the leveling test |
+| **Admin** (`admin`) | manage sections, subsections, tasks, students, and teachers; import tasks and e-books |
+| **Teacher** (`ROLE_TEACHER`, via the `nauczyciele` group) | view sections and student results (read-only) |
+| **Student** (`ROLE_STUDENT`) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
 
 ## Creating Accounts
 
