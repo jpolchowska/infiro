@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import request, jsonify
 import jwt
+from app.models.users import User
 from jwt import PyJWKClient
 
 KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/matematyka-app/protocol/openid-connect/certs"
@@ -106,3 +107,12 @@ def require_realm_role(role):
         return decorated
 
     return decorator
+
+def _current_user():
+    """Znajduje User po claimie 'sub' z JWT. Zwraca None, jeśli nie ma
+    jeszcze lokalnego wiersza -- używane tam, gdzie brak wiersza ma być
+    błędem (np. leveling-test wymaga wcześniejszego wywołania /me),
+    w odróżnieniu od get_or_create_user(), który go zakłada.
+    """
+    sub = request.user.get("sub")
+    return User.query.filter_by(keycloak_sub=sub).first()
