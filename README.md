@@ -216,8 +216,7 @@ Account creation and role assignment currently happen directly in the Keycloak a
 
 **Admin (Administrator)**
 1. Create the user as above.
-2. Create an `admin` role under **Realm roles** (if it doesn't exist yet).
-3. On the user, go to **Role mapping** → **Assign role**, filter by realm roles, and assign `admin`.
+2. On the user, go to **Role mapping** → **Assign role**, filter by realm roles, and assign `admin` (the role is imported with the realm).
 
 ## Content Import
 
