@@ -13,7 +13,7 @@ An educational mathematics platform — structured course content, adaptive leve
 
 ## Overview
 
-The project organizes course content into sections → subsections → tasks, with a short theory e-book attached to each subsection. Tasks come in three types and three difficulty levels, and every task carries per-theme variants so the same exercise can be framed around a student's interests. Students work through this content, a leveling test, and timed practice from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to sections and student results, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin`, `ROLE_TEACHER`, and `ROLE_STUDENT` roles, and members of the `nauczyciele` (teachers) group receive `ROLE_TEACHER`.
+The project organizes course content into sections → subsections → tasks, with a short theory e-book attached to each subsection. Tasks come in three types and three difficulty levels, and every task carries per-theme variants so the same exercise can be framed around a student's interests. Students work through this content, a leveling test, and timed practice from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to sections and the results of their assigned students, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin`, `ROLE_TEACHER`, and `ROLE_STUDENT` roles, and members of the `nauczyciele` (teachers) group receive `ROLE_TEACHER`.
 
 ## Table of Contents
 
@@ -59,7 +59,7 @@ The project organizes course content into sections → subsections → tasks, wi
 - Personal stats, interests, and profile
 
 **Teachers & Admins**
-- Teacher panel — read-only view of sections and student results
+- Teacher panel — read-only view of sections and the results of assigned students
 - Admin panel — manage sections, subsections, tasks, students, and teachers, and import content
 - Role and access control fully driven by Keycloak (realm roles + groups)
 
@@ -199,7 +199,7 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 | Role | Permissions |
 |---|---|
 | **Admin** (`admin`) | manage sections, subsections, tasks, students, and teachers; import tasks and e-books |
-| **Teacher** (`ROLE_TEACHER`, via the `nauczyciele` group) | view sections and student results (read-only) |
+| **Teacher** (`ROLE_TEACHER`, via the `nauczyciele` group) | view sections and the results of their assigned students (read-only) |
 | **Student** (`ROLE_STUDENT`) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
 
 ## Creating Accounts
@@ -229,37 +229,69 @@ Course content is loaded through the admin panel (`http://localhost`, **Import t
 
 ## API Reference
 
-All endpoints require `Authorization: Bearer <token>` unless noted otherwise.
+All endpoints except `/api/public` require `Authorization: Bearer <token>`. Errors return a JSON body with an `error` (or `message`) field and an appropriate status code.
+
+### Public
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/public` | Health/status check (public) |
-| `GET` | `/api/tasks` | List tasks |
-| `GET` | `/api/tasks/:id` | Get a single task |
-| `GET` | `/api/student` | Student overview |
-| `GET` | `/api/student/me` | Current student's profile |
-| `PATCH` | `/api/student/interest` | Update student interests |
-| `GET` | `/api/student/sections` | List sections for the student |
-| `GET` | `/api/student/subsections/:id/tasks` | List tasks in a subsection |
-| `GET` | `/api/student/stats` | Student statistics |
-| `GET` | `/api/student/leveling-test` | Get a leveling test attempt |
-| `POST` | `/api/student/leveling-test/submit` | Submit a leveling test attempt |
+| `GET` | `/api/public` | Health/status check |
+
+### Student
+
+Available to any authenticated user; the local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call).
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/student` | Authenticated ping |
+| `GET` | `/api/student/me` | Current student's profile (interest, leveling test status) |
+| `PATCH` | `/api/student/interest` | Set the student's interest (theme) |
+| `GET` | `/api/student/stats` | Solved tasks, accuracy, current subsection, recent sections |
+| `GET` | `/api/student/sections` | List sections with progress |
+| `GET` | `/api/student/subsections/:id/tasks` | List tasks in a subsection, with unlocked difficulty level |
+| `GET` | `/api/student/tasks/:id` | Get a task rendered in the student's theme |
+| `POST` | `/api/student/tasks/:id/answers` | Submit an answer; returns correctness, attempts left, solution, and newly unlocked level |
+| `GET` | `/api/student/subsections/:id/ebook` | Get the subsection's theory e-book |
+| `GET` | `/api/student/subsections/:id/timed` | Get timed practice questions (60 s) |
+| `POST` | `/api/student/subsections/:id/timed/submit` | Submit timed practice answers |
+| `GET` | `/api/student/leveling-test` | Get a leveling test |
+| `POST` | `/api/student/leveling-test/submit` | Submit a leveling test; returns score with per-section breakdown |
 | `GET` | `/api/student/leveling-test/history` | List past leveling test attempts |
-| `GET` | `/api/admin/sections` | List sections |
-| `POST` | `/api/admin/sections` | Create a section |
-| `GET`/`PATCH`/`DELETE` | `/api/admin/sections/:id` | Get, update, or delete a section |
-| `POST` | `/api/admin/sections/:id/subsections` | Create a subsection |
-| `GET`/`PATCH`/`DELETE` | `/api/admin/subsections/:id` | Get, update, or delete a subsection |
-| `POST` | `/api/admin/subsections/:id/tasks` | Create a task |
-| `PATCH`/`DELETE` | `/api/admin/tasks/:id` | Update or delete a task |
-| `POST` | `/api/admin/tasks/import` | Bulk-import tasks from JSON |
-| `POST` | `/api/admin/uploads/images` | Upload a task image |
-| `POST` | `/api/admin/sections/:id/materials` | Add a material to a section |
-| `POST` | `/api/admin/subsections/:id/materials` | Add a material to a subsection |
-| `PATCH`/`DELETE` | `/api/admin/materials/:id` | Update or delete a material |
-| `GET` | `/api/admin/teachers` | List teachers |
-| `GET` | `/api/admin/students` | List students |
-| `GET`/`PATCH` | `/api/admin/students/:id` | Get or update a student |
+
+### Staff panel (admin & teacher)
+
+Used by the Next.js panel and served under `/api/admin/`. Access is enforced by Keycloak realm roles; teachers get read-only endpoints and only see students assigned to them.
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/admin/sections` | admin, teacher | List sections |
+| `POST` | `/api/admin/sections` | admin | Create a section |
+| `GET` | `/api/admin/sections/:id` | admin, teacher | Get a section |
+| `PATCH`/`DELETE` | `/api/admin/sections/:id` | admin | Update or delete a section |
+| `POST` | `/api/admin/sections/:id/subsections` | admin | Create a subsection |
+| `GET` | `/api/admin/subsections/:id` | admin, teacher | Get a subsection |
+| `PATCH`/`DELETE` | `/api/admin/subsections/:id` | admin | Update or delete a subsection |
+| `POST` | `/api/admin/subsections/:id/tasks` | admin | Create a task |
+| `PATCH`/`DELETE` | `/api/admin/tasks/:id` | admin | Update or delete a task |
+| `POST` | `/api/admin/tasks/import` | admin | Bulk-import tasks from JSON |
+| `POST` | `/api/admin/uploads/images` | admin | Upload a ZIP with images |
+| `POST` | `/api/admin/ebooks/import` | admin | Import an e-book from a ZIP |
+| `GET` | `/api/admin/teachers` | admin | List teachers |
+| `GET` | `/api/admin/students` | admin, teacher | List students |
+| `GET` | `/api/admin/students/:id` | admin, teacher | Get a student's progress details |
+| `PATCH` | `/api/admin/students/:id` | admin | Update a student (e.g. assign a teacher) |
+
+### Legacy
+
+Still served by the backend, but not used by the current mobile app or admin panel UI.
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/tasks` | authenticated | List tasks |
+| `GET` | `/api/tasks/:id` | authenticated | Get a single task |
+| `POST` | `/api/admin/sections/:id/materials` | admin | Add a material to a section |
+| `POST` | `/api/admin/subsections/:id/materials` | admin | Add a material to a subsection |
+| `PATCH`/`DELETE` | `/api/admin/materials/:id` | admin | Update or delete a material |
 
 ## Project Structure
 
