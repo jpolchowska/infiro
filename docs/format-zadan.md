@@ -280,9 +280,9 @@ Pole `type` mówi, jakie to zadanie. Trzy typy:
 }
 ```
 
-- `pairs` — **3 pary** (wersja łatwa, 6 kafelków) albo **6 par** (wersja trudniejsza, 12 kafelków). Nic pomiędzy.
+- `pairs` — **3 pary** (wersja łatwiejsza, 6 kafelków, trudność 2) albo **6 par** (wersja trudniejsza, 12 kafelków, trudność 3). Nic pomiędzy — import odrzuci inną liczbę par.
 - Każda para to dwie rzeczy, które do siebie pasują (`a` i `b`). Z każdej pary powstają 2 kafelki, przetasowane.
-- `memory` **nie ma pola `difficulty`** — o trudności decyduje liczba par.
+- `memory` **nie ma pola `difficulty`** — o trudności decyduje liczba par (3 pary → poziom 2, 6 par → poziom 3) i system ustawia ją sam przy imporcie. Memory liczy się do odblokowywania poziomów tak samo jak inne zadania.
 - Motywy: zwykle `memory` ma sam `default`, ale w razie potrzeby może mieć wariant motywu — podaje wtedy tylko `prompt`, `pairs` dziedziczy z `default`.
 
 ---
