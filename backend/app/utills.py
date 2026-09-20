@@ -368,11 +368,14 @@ def determine_student_difficulty_level_(student_id, subsection_id):
     maxDifficulty = (
         db.
         session.query(Task.difficulty_level)
-        .filter(Task.subsection_id == subsection_id)
+        .filter(
+            Task.subsection_id == subsection_id,
+            Task.difficulty_level.isnot(None),
+        )
         .order_by(Task.difficulty_level.desc())
         .first()
     )
-    return maxDifficulty.difficulty_level
+    return maxDifficulty.difficulty_level if maxDifficulty else 3
 
 def _attempts_used_in_current_cycle(task_id, student_id):
     last_answer = (
