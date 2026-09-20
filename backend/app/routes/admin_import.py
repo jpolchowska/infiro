@@ -131,6 +131,15 @@ def validate_import_payload(data):
         print(f"Błąd walidacji: {err.message}")
         return False
 
+MEMORY_DIFFICULTY_BY_PAIRS = {3: 2, 6: 3}
+
+
+def _task_difficulty(task_data, default):
+    if task_data["type"] != "memory":
+        return task_data.get("difficulty")
+    return MEMORY_DIFFICULTY_BY_PAIRS.get(len(default.get("pairs") or []))
+
+
 def _resolved_themes(themes):
     default = themes["default"]
     return {
@@ -347,6 +356,13 @@ def import_tasks():
                     ]}), 400
                 content_keys.add(content_key)
 
+                if task_data["type"] == "memory":
+                    pair_count = len(themes["default"].get("pairs") or [])
+                    if pair_count not in MEMORY_DIFFICULTY_BY_PAIRS:
+                        return jsonify({"errors": [
+                            f"memory task must have 3 or 6 pairs, got {pair_count}"
+                        ]}), 400
+
                 task = Task.query.filter_by(content_key=content_key).first()
                 if task is None:
                     default = themes["default"]
@@ -354,7 +370,7 @@ def import_tasks():
                         subsection_id=subsection.id,
                         title="",
                         body_text=default["prompt"].strip(),
-                        difficulty_level=task_data.get("difficulty"),
+                        difficulty_level=_task_difficulty(task_data, default),
                         type=task_data["type"],
                         order_index=task_order,
                         content_key=content_key,
@@ -368,7 +384,7 @@ def import_tasks():
                 task.order_index = task_order
                 task.title = None
                 task.body_text = default["prompt"].strip()
-                task.difficulty_level = task_data.get("difficulty")
+                task.difficulty_level = _task_difficulty(task_data, default)
                 task.accepted_answers = default.get("answers")
                 task.memory_pairs = default.get("pairs")
                 task.themes = themes
