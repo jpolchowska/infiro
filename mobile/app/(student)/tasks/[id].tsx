@@ -341,7 +341,12 @@ export default function TaskScreen() {
                         {LETTERS[i]}
                       </Text>
                     </View>
-                    <MathText className="font-manrope-semibold text-[15px] flex-1" color={fg}>
+                    <MathText
+                      className={`font-manrope-semibold text-[15px] flex-1 ${
+                        selected && phase === 'answering' ? 'text-infiro-white' : 'text-infiro-navy'
+                      }`}
+                      color={fg}
+                    >
                       {opt.text}
                     </MathText>
                     {isCorrectOne && <Ionicons name="checkmark" size={18} color={GREEN} />}

@@ -216,7 +216,7 @@ export default function TimedScreen() {
                       {LETTERS[i]}
                     </Text>
                   </View>
-                  <MathText className="font-manrope-semibold text-[15px] flex-1" color={NAVY}>
+                  <MathText className="font-manrope-semibold text-[15px] flex-1 text-infiro-navy" color={NAVY}>
                     {opt.text}
                   </MathText>
                 </Pressable>

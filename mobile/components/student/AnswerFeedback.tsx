@@ -48,7 +48,7 @@ export function AnswerFeedback(props: AnswerFeedbackProps) {
       >
         Poprawna odpowiedź
       </Text>
-      <MathText className="font-manrope-extrabold text-[16px]" color={NAVY}>
+      <MathText className="font-manrope-extrabold text-[16px] text-infiro-navy" color={NAVY}>
         {props.solution}
       </MathText>
     </View>

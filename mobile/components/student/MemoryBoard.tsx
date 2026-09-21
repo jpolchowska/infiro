@@ -79,7 +79,10 @@ export function MemoryBoard({ pairs, onSolved }: { pairs: MemoryPair[]; onSolved
             }}
           >
             {isFlipped ? (
-              <MathText className="font-manrope-extrabold text-[16px]" color={isMatched ? GREEN : NAVY}>
+              <MathText
+                className={`font-manrope-extrabold text-[16px] ${isMatched ? 'text-[#1f9d63]' : 'text-infiro-navy'}`}
+                color={isMatched ? GREEN : NAVY}
+              >
                 {tile.text}
               </MathText>
             ) : (

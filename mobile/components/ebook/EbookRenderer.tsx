@@ -46,7 +46,7 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
     case 'subheading':
       return (
         <View style={{ marginTop: 18, marginBottom: 4 }}>
-          <MathText className="font-manrope-extrabold text-[16px]" color="#2d3a97">
+          <MathText className="font-manrope-extrabold text-[16px] text-[#2d3a97]" color="#2d3a97">
             {block.text}
           </MathText>
         </View>
@@ -121,7 +121,7 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
               {config.label}
             </Text>
           </View>
-          <MathText className="font-manrope-semibold text-[15px]" color={NAVY}>
+          <MathText className="font-manrope-semibold text-[15px] text-infiro-navy" color={NAVY}>
             {block.text}
           </MathText>
         </View>
