@@ -1,11 +1,13 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { MathText } from '../MathText';
-import { Text } from '../Text';
 import { MemoryPair } from '../../lib/tasks';
 
 const NAVY = '#142284';
 const GREEN = '#1f9d63';
+const GAP = 10;
+const COLUMNS = 3;
 
 type Tile = { key: string; pairId: number; text: string };
 
@@ -33,6 +35,8 @@ export function MemoryBoard({ pairs, onSolved }: { pairs: MemoryPair[]; onSolved
   const [flipped, setFlipped] = useState<string[]>([]);
   const [matched, setMatched] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
+  const [boardWidth, setBoardWidth] = useState(0);
+  const tileSize = boardWidth > 0 ? Math.floor((boardWidth - GAP * (COLUMNS - 1)) / COLUMNS) : 0;
 
   const handlePress = (tile: Tile) => {
     if (busy || matched.has(tile.pairId) || flipped.includes(tile.key) || flipped.length === 2) return;
@@ -58,8 +62,13 @@ export function MemoryBoard({ pairs, onSolved }: { pairs: MemoryPair[]; onSolved
   };
 
   return (
-    <View className="flex-row flex-wrap justify-between" style={{ rowGap: 10 }}>
-      {tiles.map((tile) => {
+    <View
+      className="flex-row flex-wrap"
+      style={{ gap: GAP }}
+      onLayout={(e) => setBoardWidth(e.nativeEvent.layout.width)}
+    >
+      {boardWidth > 0 &&
+        tiles.map((tile) => {
         const isMatched = matched.has(tile.pairId);
         const isFlipped = isMatched || flipped.includes(tile.key);
         return (
@@ -69,24 +78,25 @@ export function MemoryBoard({ pairs, onSolved }: { pairs: MemoryPair[]; onSolved
             disabled={isMatched}
             className="items-center justify-center"
             style={{
-              width: '31%',
-              aspectRatio: 1,
+              width: tileSize,
+              height: tileSize,
               borderRadius: 16,
               borderWidth: 1.5,
               borderColor: isMatched ? GREEN : isFlipped ? NAVY : 'rgba(20,34,132,0.12)',
               backgroundColor: isMatched ? 'rgba(31,157,99,0.1)' : isFlipped ? '#fefefe' : NAVY,
               paddingHorizontal: 6,
+              overflow: 'hidden',
             }}
           >
             {isFlipped ? (
               <MathText
-                className={`font-manrope-extrabold text-[16px] ${isMatched ? 'text-[#1f9d63]' : 'text-infiro-navy'}`}
+                className={`font-manrope-extrabold text-[22px] ${isMatched ? 'text-[#1f9d63]' : 'text-infiro-navy'}`}
                 color={isMatched ? GREEN : NAVY}
               >
                 {tile.text}
               </MathText>
             ) : (
-              <Text className="text-infiro-white font-manrope-extrabold text-[20px]">?</Text>
+              <Ionicons name="help" size={30} color="#fefefe" />
             )}
           </Pressable>
         );
