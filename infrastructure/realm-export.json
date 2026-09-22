@@ -725,7 +725,8 @@
         "matematykaapp://callback",
         "exp://*",
         "http://localhost:5173/",
-        "https://oauth.pstmn.io/v1/callback"
+        "https://oauth.pstmn.io/v1/callback",
+        "https://mathiro.test/*"
       ],
       "webOrigins": [
         "+"
@@ -793,11 +794,13 @@
         "http://localhost/login",
         "http://localhost/*",
         "http://localhost:3000/",
-        "http://localhost:3000/login"
+        "http://localhost:3000/login",
+        "https://mathiro.test/*",
+        "https://attitudes-switch-uncertainty-supplied.trycloudflare.com/*",
+        "https://192.168.1.20.sslip.io/*"
       ],
       "webOrigins": [
-        "http://localhost",
-        "http://localhost:3000"
+        "+"
       ],
       "notBefore": 0,
       "bearerOnly": false,

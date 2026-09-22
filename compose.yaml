@@ -34,12 +34,13 @@ services:
   backend:
     build:
       context: ./backend/
+      target: dev
     environment:
       DB_USER: $DB_USER
       DB_PASSWORD: $DB_PASSWORD
       DB_NAME: $DB_NAME
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
       FLASK_APP: run.py
     expose:
       - "5000"
@@ -68,6 +69,7 @@ services:
   staff:
     build:
       context: ./staff/
+      target: dev
     environment:
       NEXT_PUBLIC_KEYCLOAK_URL: $NEXT_PUBLIC_KEYCLOAK_URL
       NEXT_PUBLIC_KEYCLOAK_REALM: $NEXT_PUBLIC_KEYCLOAK_REALM

@@ -184,6 +184,52 @@ Backend tests run with pytest inside the running `backend` container:
 docker compose exec backend python -m pytest tests -q
 ```
 
+### Run production (test version)
+
+**Prerequisites (one-time setup):**
+- Install `mkcert` and run `mkcert -install`
+- Generate a certificate:
+```bash
+  cd infrastructure/certs && mkcert mathiro.test "*.mathiro.test"
+```
+- Add `mathiro.test` to your hosts file:
+```bash
+  echo "127.0.0.1 mathiro.test" | sudo tee -a /etc/hosts
+```
+- Install `cloudflared`
+
+**Steps:**
+
+1. When starting production for the first time, you have to run `docker compose down -v`. This removes all data. It's needed because `infrastructure/postgres-init/` contains a script that creates a separate database for Keycloak, and that script only runs when the Postgres volume is freshly initialized. It is also possible to create the database manually, without wiping existing data:
+```bash
+   docker compose exec postgres psql -U $DB_USER -d postgres \
+     -c "CREATE USER keycloak WITH PASSWORD 'your_password';" \
+     -c "CREATE DATABASE keycloak OWNER keycloak;"
+```
+
+2. Create the tunnel (leave this terminal open for the whole testing session):
+```bash
+   cloudflared tunnel --url https://localhost:443 --no-tls-verify
+```
+   Copy the generated `https://xxxx.trycloudflare.com` address — it changes every time the tunnel is restarted.
+
+3. Go to all `.env.prod.example` files and, using the info inside them, fill in the actual `.env` files.
+
+4. Build and start the stack:
+```bash
+   docker compose -f compose.yaml -f compose.prod.yaml up --build -d
+```
+   Check that everything came up healthy:
+```bash
+   docker compose -f compose.yaml -f compose.prod.yaml ps
+```
+
+5. Log into Keycloak as admin (`https://mathiro.test/admin/` or through link), switch to the `matematyka-app` realm, open the `nextjs-staff` client, and add the tunnel URL from step 2 to both **Valid Redirect URIs** and **Web Origins** — add it alongside the existing `mathiro.test` entries, don't replace them. Keep in mind that during adding link from step 2, you have to add /* in the bacl for expample https://broader-teaches-pitch-hurricane.trycloudflare.com/* .
+
+6. Open the app:
+   - Browser, this machine: `https://mathiro.test`
+   - emulator / Expo / Browser: the tunnel address from step 2
+
 ## Services
 
 Everything is served through the nginx entrypoint on `http://localhost`:

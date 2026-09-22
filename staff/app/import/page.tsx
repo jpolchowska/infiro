@@ -242,7 +242,7 @@ export default function ImportPage() {
 
       {ebookResult && (
         <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          Zaimportowano e-book „{ebookResult.title}".
+          Zaimportowano e-book &quot;{ebookResult.title}&quot;.
         </div>
       )}
 

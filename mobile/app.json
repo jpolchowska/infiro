@@ -4,17 +4,19 @@
     "slug": "infiro",
     "version": "1.0.0",
     "scheme": "infiro",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
     "android": {
+      "package": "com.infiro.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "predictiveBackGestureEnabled": false
     },
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
     "ios": {
+      "bundleIdentifier": "com.infiro.app",
       "supportsTablet": true
     },
     "web": {
