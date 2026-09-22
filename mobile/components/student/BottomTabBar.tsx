@@ -2,12 +2,14 @@ import { router, usePathname } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { Text } from '../Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const ACTIVE = '#142284';
-const INACTIVE = '#b3b9d6';
+import { useTheme, withAlpha } from '../../lib/theme';
 
 export function BottomTabBar() {
+  const theme = useTheme();
   const pathname = usePathname();
+
+  const ACTIVE = theme.accent;
+  const INACTIVE = theme.textSecondary;
 
   const startColor = pathname === '/home' ? ACTIVE : INACTIVE;
   const naukaColor = pathname.startsWith('/sections') || pathname.startsWith('/subsections') ? ACTIVE : INACTIVE;
@@ -20,9 +22,9 @@ export function BottomTabBar() {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(254,254,254,0.94)',
+        backgroundColor: withAlpha(theme.surface, 0.94),
         borderTopWidth: 1,
-        borderTopColor: '#e8eaf4',
+        borderTopColor: theme.surfaceBorder,
       }}
     >
       <SafeAreaView edges={['bottom']}>
