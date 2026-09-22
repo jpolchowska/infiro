@@ -9,7 +9,7 @@ import {
   useFonts,
 } from '@expo-google-fonts/manrope';
 import { Baloo2_700Bold } from '@expo-google-fonts/baloo-2';
-import { Caveat_700Bold } from '@expo-google-fonts/caveat';
+import { BodoniModa_700Bold } from '@expo-google-fonts/bodoni-moda';
 import { Fraunces_700Bold } from '@expo-google-fonts/fraunces';
 import { Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
@@ -34,7 +34,7 @@ export default function RootLayout() {
     Rajdhani_700Bold,
     TitanOne_400Regular,
     Baloo2_700Bold,
-    Caveat_700Bold,
+    BodoniModa_700Bold,
     PlayfairDisplay_700Bold_Italic,
     Fraunces_700Bold,
   });

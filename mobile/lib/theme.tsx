@@ -17,8 +17,6 @@ export type ThemeTokens = {
   headingFontFamily: string;
 };
 
-// Motyw dla ucznia, który jeszcze nie wybrał zainteresowania (albo je wyczyścił) --
-// to dotychczasowy, neutralny wygląd panelu, bez zmian.
 export const NEUTRAL_THEME: ThemeTokens = {
   bg: '#f4f5fb',
   textPrimary: '#142284',
@@ -34,9 +32,6 @@ export const NEUTRAL_THEME: ThemeTokens = {
   headingFontFamily: 'Manrope_800ExtraBold',
 };
 
-// Rejestr motywów per zainteresowanie. Żeby dodać nowy motyw: dopisz tu jeden
-// wpis (i, jeśli nagłówek ma dostać własny font, dołóż go w app/_layout.tsx
-// do useFonts) -- żaden ekran nie wymaga wtedy zmian.
 export const THEMES: Record<InterestId, ThemeTokens> = {
   sport: {
     bg: '#F2F7FC',
@@ -80,8 +75,6 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     topicColors: ['#D8232A', '#0055BF', '#FFC400', '#237841'],
     headingFontFamily: 'TitanOne_400Regular',
   },
-  // Safari/wildlife, nie zoo -- równowaga zieleni sawanny i brązu ziemi,
-  // zamiast dominującej zieleni z pierwszej wersji.
   zwierzeta: {
     bg: '#F5EFDD',
     textPrimary: '#3B2A1A',
@@ -108,7 +101,7 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     accent: '#E4457A',
     accentInk: '#FFFFFF',
     topicColors: ['#E4457A', '#FFC24B', '#22B8CF', '#7C3AED'],
-    headingFontFamily: 'Caveat_700Bold',
+    headingFontFamily: 'BodoniModa_700Bold',
   },
   muzyka: {
     bg: '#F7F3FF',
@@ -145,6 +138,20 @@ export function themeFor(interest: string | null | undefined): ThemeTokens {
   return NEUTRAL_THEME;
 }
 
+export function topicColor(theme: ThemeTokens, index: number): string {
+  return theme.topicColors[((index % 4) + 4) % 4];
+}
+
+export function withAlpha(hex: string, alpha: number): string {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  const value = parseInt(full, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 type ThemeContextValue = { theme: ThemeTokens; refresh: () => void };
 
 const ThemeContext = createContext<ThemeContextValue>({
@@ -169,8 +176,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
-// Wołaj po udanym saveInterest(), żeby motyw przemalował się od razu, bez
-// czekania na ponowne zamontowanie ThemeProvider.
 export function useThemeRefresh(): () => void {
   return useContext(ThemeContext).refresh;
 }
