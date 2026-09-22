@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,21 +19,23 @@ export default function SectionsScreen() {
   const [attempt, setAttempt] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    setError(false);
-    getSections()
-      .then((data) => {
-        if (active) setSections(data);
-      })
-      .catch((err) => {
-        console.warn('Failed to load sections:', err);
-        if (active) setError(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [attempt]);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      setError(false);
+      getSections()
+        .then((data) => {
+          if (active) setSections(data);
+        })
+        .catch((err) => {
+          console.warn('Failed to load sections:', err);
+          if (active) setError(true);
+        });
+      return () => {
+        active = false;
+      };
+    }, [attempt])
+  );
 
   if (error) {
     return (
@@ -140,8 +142,6 @@ export default function SectionsScreen() {
                     )}
                   </View>
 
-                  {/* Podsekcje -- w tej samej karcie, jasne wiersze rozdzielone
-                      cienką linią, zaokrąglenia dziedziczone z kafla. */}
                   {expanded &&
                     section.subsections.map((sub) => {
                       const full = sub.totalTasks > 0 && sub.solvedTasks === sub.totalTasks;
@@ -155,7 +155,10 @@ export default function SectionsScreen() {
                       return (
                         <Pressable
                           key={sub.id}
-                          onPress={() => router.push(`/(student)/subsections/${sub.id}`)}
+                          onPress={() => {
+                            router.push(`/(student)/sections/${section.id}`);
+                            router.push(`/(student)/subsections/${sub.id}`);
+                          }}
                           className="flex-row items-center"
                           style={{
                             backgroundColor: 'rgba(255,255,255,0.6)',

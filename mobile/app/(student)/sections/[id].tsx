@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,21 +19,23 @@ export default function SectionDetailScreen() {
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
-  useEffect(() => {
-    let active = true;
-    setError(false);
-    getSections()
-      .then((data) => {
-        if (active) setSections(data);
-      })
-      .catch((err) => {
-        console.warn('Failed to load section:', err);
-        if (active) setError(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [attempt]);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      setError(false);
+      getSections()
+        .then((data) => {
+          if (active) setSections(data);
+        })
+        .catch((err) => {
+          console.warn('Failed to load section:', err);
+          if (active) setError(true);
+        });
+      return () => {
+        active = false;
+      };
+    }, [attempt])
+  );
 
   const section = sections?.find((s) => s.id === Number(id)) ?? null;
   const accent = section ? getAccent(section.index) : null;
