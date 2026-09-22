@@ -250,28 +250,33 @@ export default function TaskScreen() {
     const unlockedLabel = DIFFICULTY_LABEL[result.unlockedDifficulty as 1 | 2 | 3];
     return (
       <View className="flex-1 bg-infiro-navy">
-        <SafeAreaView className="flex-1 justify-center px-6">
-          <Text className="text-infiro-white/60 text-sm uppercase tracking-wide mb-2">Awans</Text>
-          <Text className="text-infiro-white font-manrope-extrabold text-4xl leading-tight mb-3">
-            🎉 Odblokowano poziom: {unlockedLabel}
-          </Text>
-          <Text className="text-infiro-white/80 text-base mb-10">
-            Wszystkie łatwiejsze zadania w tej podsekcji są zrobione — czas na trudniejsze.
-          </Text>
-          <Pressable
-            onPress={() => router.back()}
-            className="rounded-full py-4 items-center"
-            style={{
-              backgroundColor: CORAL,
-              shadowColor: CORAL,
-              shadowOpacity: 0.5,
-              shadowRadius: 16,
-              shadowOffset: { width: 0, height: 8 },
-              elevation: 8,
-            }}
-          >
-            <Text className="text-infiro-white font-manrope-extrabold text-base">Super, dalej!</Text>
-          </Pressable>
+        <SafeAreaView className="flex-1 px-6 pb-6">
+          <View className="flex-1 items-center justify-center">
+            <View
+              className="w-24 h-24 rounded-full bg-infiro-purple/15 items-center justify-center mb-7"
+              style={{
+                shadowColor: '#c873d9',
+                shadowOpacity: 0.4,
+                shadowRadius: 22,
+                shadowOffset: { width: 0, height: 0 },
+                elevation: 6,
+              }}
+            >
+              <Ionicons name="trending-up-outline" size={42} color="#c873d9" />
+            </View>
+
+            <Text className="text-infiro-white/60 text-sm uppercase tracking-wide text-center mb-2">
+              Awans
+            </Text>
+            <Text className="text-infiro-white font-manrope-extrabold text-4xl leading-tight text-center mb-4">
+              Odblokowano poziom: {unlockedLabel}
+            </Text>
+            <Text className="text-infiro-white/80 text-base leading-relaxed text-center">
+              Wszystkie łatwiejsze zadania w tej podsekcji są zrobione — czas na trudniejsze.
+            </Text>
+          </View>
+
+          <TaskCta label="Super, dalej!" onPress={() => router.back()} tone="warning" showArrow />
         </SafeAreaView>
       </View>
     );
