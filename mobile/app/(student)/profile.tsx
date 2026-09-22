@@ -17,8 +17,10 @@ import {
   getLevelingTestHistory,
   getMe,
 } from '../../lib/student';
+import { useTheme, withAlpha } from '../../lib/theme';
 
 export default function ProfileScreen() {
+  const theme = useTheme();
   const [me, setMe] = useState<StudentMe | null>(null);
   const [history, setHistory] = useState<LastLevelingTest[] | null>(null);
   const [error, setError] = useState(false);
@@ -58,7 +60,7 @@ export default function ProfileScreen() {
 
   if (error) {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1" edges={['top']}>
           <ErrorState onRetry={() => setAttempt((a) => a + 1)} />
         </SafeAreaView>
@@ -69,10 +71,10 @@ export default function ProfileScreen() {
 
   if (!me || !history) {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1" edges={['top']}>
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#142284" />
+            <ActivityIndicator color={theme.textPrimary} />
           </View>
         </SafeAreaView>
         <BottomTabBar />
@@ -80,29 +82,41 @@ export default function ProfileScreen() {
     );
   }
 
+  const cardStyle = {
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.surfaceBorder,
+    shadowColor: theme.textPrimary,
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  };
+
   return (
-    <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+    <View className="flex-1" style={{ backgroundColor: theme.bg }}>
       <SafeAreaView className="flex-1" edges={['top']}>
         <ScrollView
           className="flex-1 px-5"
           contentContainerStyle={{ paddingTop: 8, paddingBottom: 118 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text className="text-infiro-navy font-manrope-extrabold text-[27px] leading-[31px] mb-5">Profil</Text>
+          <Text
+            className="text-[27px] leading-[31px] mb-5"
+            style={{ color: theme.textPrimary, fontFamily: theme.headingFontFamily }}
+          >
+            Profil
+          </Text>
 
           <View
-            className="flex-row items-center bg-infiro-white"
+            className="flex-row items-center"
             style={{
+              ...cardStyle,
               borderRadius: 20,
               paddingVertical: 20,
               paddingHorizontal: 18,
               gap: 16,
               marginBottom: 24,
-              shadowColor: '#142284',
-              shadowOpacity: 0.06,
-              shadowRadius: 10,
-              shadowOffset: { width: 0, height: 2 },
-              elevation: 2,
             }}
           >
             <View
@@ -111,42 +125,39 @@ export default function ProfileScreen() {
                 width: 52,
                 height: 52,
                 borderRadius: 100,
-                backgroundColor: '#eceffa',
+                backgroundColor: withAlpha(theme.textPrimary, 0.08),
                 borderWidth: 1,
-                borderColor: 'rgba(20,34,132,0.12)',
+                borderColor: withAlpha(theme.textPrimary, 0.15),
               }}
             >
               {initial ? (
-                <Text className="text-infiro-navy font-manrope-bold text-lg">{initial}</Text>
+                <Text className="font-manrope-bold text-lg" style={{ color: theme.textPrimary }}>
+                  {initial}
+                </Text>
               ) : (
-                <Ionicons name="person" size={22} color="#142284" />
+                <Ionicons name="person" size={22} color={theme.textPrimary} />
               )}
             </View>
             <View className="flex-1">
-              <Text className="text-infiro-navy font-manrope-extrabold text-xl">{name ?? 'Uczeń'}</Text>
-              <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px] mt-1">
+              <Text className="font-manrope-extrabold text-xl" style={{ color: theme.textPrimary }}>
+                {name ?? 'Uczeń'}
+              </Text>
+              <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-[13px] mt-1">
                 klasa 5
               </Text>
             </View>
           </View>
 
-          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-manrope-bold text-[12px] uppercase mb-3">
+          <Text
+            style={{ color: theme.textSecondary, letterSpacing: 1.4 }}
+            className="font-manrope-bold text-[12px] uppercase mb-3"
+          >
             Zainteresowania
           </Text>
           {pickedInterest ? (
             <View
-              className="flex-row items-center bg-infiro-white mb-6"
-              style={{
-                borderRadius: 17,
-                paddingVertical: 14,
-                paddingHorizontal: 18,
-                gap: 14,
-                shadowColor: '#142284',
-                shadowOpacity: 0.06,
-                shadowRadius: 10,
-                shadowOffset: { width: 0, height: 2 },
-                elevation: 2,
-              }}
+              className="flex-row items-center mb-6"
+              style={{ ...cardStyle, borderRadius: 17, paddingVertical: 14, paddingHorizontal: 18, gap: 14 }}
             >
               <View
                 className="items-center justify-center"
@@ -154,61 +165,56 @@ export default function ProfileScreen() {
               >
                 <InterestIcon id={pickedInterest.id} size={24} />
               </View>
-              <Text className="flex-1 text-infiro-navy font-manrope-extrabold text-[15px]">{pickedInterest.label}</Text>
+              <Text
+                className="flex-1 font-manrope-extrabold text-[15px]"
+                style={{ color: theme.textPrimary }}
+              >
+                {pickedInterest.label}
+              </Text>
               <Pressable
                 onPress={() => router.push('/(student)/interests?from=profile')}
-                style={{ backgroundColor: '#f4f5fb', borderRadius: 100, paddingVertical: 9, paddingHorizontal: 14 }}
+                style={{ backgroundColor: theme.surfaceMuted, borderRadius: 100, paddingVertical: 9, paddingHorizontal: 14 }}
               >
-                <Text className="text-infiro-navy font-manrope-bold text-xs">Zmień</Text>
+                <Text className="font-manrope-bold text-xs" style={{ color: theme.textPrimary }}>
+                  Zmień
+                </Text>
               </Pressable>
             </View>
           ) : (
             <View
-              className="flex-row items-center bg-infiro-white mb-6"
-              style={{
-                borderRadius: 17,
-                paddingVertical: 14,
-                paddingHorizontal: 18,
-                gap: 14,
-                shadowColor: '#142284',
-                shadowOpacity: 0.06,
-                shadowRadius: 10,
-                shadowOffset: { width: 0, height: 2 },
-                elevation: 2,
-              }}
+              className="flex-row items-center mb-6"
+              style={{ ...cardStyle, borderRadius: 17, paddingVertical: 14, paddingHorizontal: 18, gap: 14 }}
             >
               <View
                 className="items-center justify-center"
-                style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#eef0f8' }}
+                style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: theme.surfaceMuted }}
               >
-                <Ionicons name="sparkles-outline" size={22} color="#a7aecd" />
+                <Ionicons name="sparkles-outline" size={22} color={theme.textSecondary} />
               </View>
-              <Text className="flex-1 text-infiro-navy font-manrope-extrabold text-[15px]">Nie wybrano</Text>
+              <Text
+                className="flex-1 font-manrope-extrabold text-[15px]"
+                style={{ color: theme.textPrimary }}
+              >
+                Nie wybrano
+              </Text>
               <Pressable
                 onPress={() => router.push('/(student)/interests?from=profile')}
-                style={{ backgroundColor: '#f4f5fb', borderRadius: 100, paddingVertical: 9, paddingHorizontal: 14 }}
+                style={{ backgroundColor: theme.surfaceMuted, borderRadius: 100, paddingVertical: 9, paddingHorizontal: 14 }}
               >
-                <Text className="text-infiro-navy font-manrope-bold text-xs">Wybierz</Text>
+                <Text className="font-manrope-bold text-xs" style={{ color: theme.textPrimary }}>
+                  Wybierz
+                </Text>
               </Pressable>
             </View>
           )}
 
-          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-manrope-bold text-[12px] uppercase mb-3">
+          <Text
+            style={{ color: theme.textSecondary, letterSpacing: 1.4 }}
+            className="font-manrope-bold text-[12px] uppercase mb-3"
+          >
             Testy poziomujące
           </Text>
-          <View
-            className="bg-infiro-white"
-            style={{
-              borderRadius: 17,
-              paddingHorizontal: 18,
-              marginBottom: 24,
-              shadowColor: '#142284',
-              shadowOpacity: 0.06,
-              shadowRadius: 10,
-              shadowOffset: { width: 0, height: 2 },
-              elevation: 2,
-            }}
-          >
+          <View style={{ ...cardStyle, borderRadius: 17, paddingHorizontal: 18, marginBottom: 24 }}>
             {history.map((attempt, index) => (
               <View
                 key={`${attempt.completedAt}-${index}`}
@@ -217,50 +223,48 @@ export default function ProfileScreen() {
                   gap: 12,
                   paddingVertical: 13,
                   borderBottomWidth: 1,
-                  borderBottomColor: '#f4f5fb',
+                  borderBottomColor: theme.surfaceBorder,
                 }}
               >
-                <Text className="flex-1 text-infiro-navy font-manrope-bold text-[13px]">
+                <Text className="flex-1 font-manrope-bold text-[13px]" style={{ color: theme.textPrimary }}>
                   {formatShortDate(attempt.completedAt)}
                 </Text>
-                <Text className="text-infiro-navy font-manrope-extrabold text-[15px]" style={{ width: 44, textAlign: 'right' }}>
+                <Text
+                  className="font-manrope-extrabold text-[15px]"
+                  style={{ width: 44, textAlign: 'right', color: theme.textPrimary }}
+                >
                   {attempt.score}/{attempt.total}
                 </Text>
               </View>
             ))}
-            <Text style={{ color: '#8b93bd', paddingVertical: 13 }} className="font-manrope-medium text-xs leading-5">
+            <Text style={{ color: theme.textSecondary, paddingVertical: 13 }} className="font-manrope-medium text-xs leading-5">
               Test wraca co jakiś czas i sprawdza Twój poziom.
             </Text>
           </View>
 
-          <Text style={{ color: '#8b93bd', letterSpacing: 1.4 }} className="font-manrope-bold text-[12px] uppercase mb-3">
+          <Text
+            style={{ color: theme.textSecondary, letterSpacing: 1.4 }}
+            className="font-manrope-bold text-[12px] uppercase mb-3"
+          >
             Ustawienia
           </Text>
-          <View
-            className="bg-infiro-white"
-            style={{
-              borderRadius: 17,
-              overflow: 'hidden',
-              marginBottom: 24,
-              shadowColor: '#142284',
-              shadowOpacity: 0.06,
-              shadowRadius: 10,
-              shadowOffset: { width: 0, height: 2 },
-              elevation: 2,
-            }}
-          >
+          <View style={{ ...cardStyle, borderRadius: 17, overflow: 'hidden', marginBottom: 24 }}>
             <View
               className="flex-row items-center"
-              style={{ borderBottomWidth: 1, borderBottomColor: '#f1f2f9', paddingVertical: 16, paddingHorizontal: 18, gap: 12 }}
+              style={{ borderBottomWidth: 1, borderBottomColor: theme.surfaceBorder, paddingVertical: 16, paddingHorizontal: 18, gap: 12 }}
             >
-              <Text className="flex-1 text-infiro-navy font-manrope-bold text-[15px]">Język</Text>
-              <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px]">
+              <Text className="flex-1 font-manrope-bold text-[15px]" style={{ color: theme.textPrimary }}>
+                Język
+              </Text>
+              <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-[13px]">
                 Polski
               </Text>
             </View>
             <View className="flex-row items-center" style={{ paddingVertical: 16, paddingHorizontal: 18 }}>
-              <Text className="flex-1 text-infiro-navy font-manrope-bold text-[15px]">O aplikacji</Text>
-              <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-[13px]">
+              <Text className="flex-1 font-manrope-bold text-[15px]" style={{ color: theme.textPrimary }}>
+                O aplikacji
+              </Text>
+              <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-[13px]">
                 Prototyp
               </Text>
             </View>
@@ -268,10 +272,12 @@ export default function ProfileScreen() {
 
           <Pressable
             onPress={handleLogout}
-            className="bg-infiro-navy items-center justify-center"
-            style={{ borderRadius: 100, height: 56 }}
+            className="items-center justify-center"
+            style={{ borderRadius: 100, height: 56, backgroundColor: theme.accent }}
           >
-            <Text className="text-infiro-white font-manrope-extrabold text-base">Wyloguj się</Text>
+            <Text className="font-manrope-extrabold text-base" style={{ color: theme.accentInk }}>
+              Wyloguj się
+            </Text>
           </Pressable>
         </ScrollView>
       </SafeAreaView>
