@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { InterestIcon, InterestId } from '../../components/student/InterestIcon';
 import { INTERESTS } from '../../lib/interests';
 import { getMe, saveInterest } from '../../lib/student';
+import { useThemeRefresh } from '../../lib/theme';
 
 const CTA_SHADOW = {
   shadowColor: '#ff5f55',
@@ -20,6 +21,7 @@ const CTA_SHADOW = {
 export default function InterestsScreen() {
   const { from } = useLocalSearchParams<{ from?: string }>();
   const [picked, setPicked] = useState<InterestId | null>(null);
+  const refreshTheme = useThemeRefresh();
   const [levelingTestCompleted, setLevelingTestCompleted] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -52,6 +54,7 @@ export default function InterestsScreen() {
     try {
       // picked === null czyści wybór (backend przyjmuje null).
       await saveInterest(picked);
+      refreshTheme();
     } catch (error) {
       console.error('Failed to save interest:', error);
     } finally {
