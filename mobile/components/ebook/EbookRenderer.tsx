@@ -4,22 +4,30 @@ import { Image, View } from 'react-native';
 import { MathText } from '../MathText';
 import { Text } from '../Text';
 import { CalloutStyle, EbookBlock } from '../../lib/ebook';
-
-const NAVY = '#142284';
-const CORAL = '#ff5f55';
-const PURPLE = '#c873d9';
+import { ThemeTokens, useTheme, withAlpha } from '../../lib/theme';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
-const CALLOUT_CONFIG: Record<
-  CalloutStyle,
-  { label: string; bg: string; border: string; icon: IoniconName; accent: string }
-> = {
-  zapamietaj: { label: 'Zapamiętaj', bg: 'rgba(240,182,126,0.2)', border: '#f0b67e', icon: 'bookmark', accent: '#b9772e' },
-  wskazowka: { label: 'Wskazówka', bg: 'rgba(200,115,217,0.15)', border: PURPLE, icon: 'bulb', accent: '#8a3fa3' },
-  uwaga: { label: 'Uwaga', bg: 'rgba(255,95,85,0.1)', border: CORAL, icon: 'alert-circle', accent: '#d6483f' },
-  definicja: { label: 'Definicja', bg: 'rgba(20,34,132,0.06)', border: NAVY, icon: 'information-circle', accent: NAVY },
-};
+function calloutConfig(
+  style: CalloutStyle,
+  theme: ThemeTokens
+): { label: string; bg: string; border: string; icon: IoniconName; accent: string } {
+  const CONFIG: Record<Exclude<CalloutStyle, 'definicja'>, { label: string; bg: string; border: string; icon: IoniconName; accent: string }> = {
+    zapamietaj: { label: 'Zapamiętaj', bg: 'rgba(240,182,126,0.2)', border: '#f0b67e', icon: 'bookmark', accent: '#b9772e' },
+    wskazowka: { label: 'Wskazówka', bg: 'rgba(200,115,217,0.15)', border: '#c873d9', icon: 'bulb', accent: '#8a3fa3' },
+    uwaga: { label: 'Uwaga', bg: 'rgba(255,95,85,0.1)', border: '#ff5f55', icon: 'alert-circle', accent: '#d6483f' },
+  };
+  if (style === 'definicja') {
+    return {
+      label: 'Definicja',
+      bg: withAlpha(theme.textPrimary, 0.06),
+      border: theme.textPrimary,
+      icon: 'information-circle',
+      accent: theme.textPrimary,
+    };
+  }
+  return CONFIG[style];
+}
 
 export function EbookRenderer({ blocks }: { blocks: EbookBlock[] }) {
   return (
@@ -32,12 +40,19 @@ export function EbookRenderer({ blocks }: { blocks: EbookBlock[] }) {
 }
 
 function EbookBlockView({ block }: { block: EbookBlock }) {
+  const theme = useTheme();
+  const textClass = theme.isDark ? 'text-infiro-white' : 'text-infiro-navy';
+
   switch (block.type) {
     case 'heading':
       return (
         <View className="flex-row items-center" style={{ gap: 9, marginTop: 26, marginBottom: 8 }}>
-          <View style={{ width: 9, height: 9, borderRadius: 3, backgroundColor: CORAL }} />
-          <MathText className="text-infiro-navy font-manrope-extrabold text-[19px] flex-1" color={NAVY}>
+          <View style={{ width: 9, height: 9, borderRadius: 3, backgroundColor: theme.accent }} />
+          <MathText
+            className={`${textClass} text-[19px] flex-1`}
+            color={theme.textPrimary}
+            style={{ fontFamily: theme.headingFontFamily }}
+          >
             {block.text}
           </MathText>
         </View>
@@ -46,7 +61,11 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
     case 'subheading':
       return (
         <View style={{ marginTop: 18, marginBottom: 4 }}>
-          <MathText className="font-manrope-extrabold text-[16px] text-[#2d3a97]" color="#2d3a97">
+          <MathText
+            className={`${textClass} text-[16px]`}
+            color={theme.textPrimary}
+            style={{ fontFamily: theme.headingFontFamily }}
+          >
             {block.text}
           </MathText>
         </View>
@@ -55,7 +74,10 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
     case 'paragraph':
       return (
         <View style={{ marginBottom: 8 }}>
-          <MathText className="text-infiro-navy font-manrope-medium text-[16px] leading-[24px]" color={NAVY}>
+          <MathText
+            className={`${textClass} font-manrope-medium text-[16px] leading-[24px]`}
+            color={theme.textPrimary}
+          >
             {block.text}
           </MathText>
         </View>
@@ -66,10 +88,10 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
         <View style={{ marginBottom: 8, gap: 8 }}>
           {block.items.map((item, i) => (
             <View key={i} className="flex-row items-start" style={{ gap: 10 }}>
-              <View style={{ width: 7, height: 7, borderRadius: 3, backgroundColor: PURPLE, marginTop: 8 }} />
+              <View style={{ width: 7, height: 7, borderRadius: 3, backgroundColor: theme.accent, marginTop: 8 }} />
               <MathText
-                className="text-infiro-navy font-manrope-medium text-[16px] leading-[24px] flex-1"
-                color={NAVY}
+                className={`${textClass} font-manrope-medium text-[16px] leading-[24px] flex-1`}
+                color={theme.textPrimary}
               >
                 {item}
               </MathText>
@@ -87,12 +109,12 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
               width: '100%',
               aspectRatio: block.width / block.height,
               borderRadius: 18,
-              backgroundColor: 'rgba(20,34,132,0.05)',
+              backgroundColor: withAlpha(theme.textPrimary, 0.05),
             }}
             resizeMode="cover"
           />
           {block.alt ? (
-            <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs text-center mt-2">
+            <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs text-center mt-2">
               {block.alt}
             </Text>
           ) : null}
@@ -100,7 +122,7 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
       );
 
     case 'callout': {
-      const config = CALLOUT_CONFIG[block.style];
+      const config = calloutConfig(block.style, theme);
       return (
         <View
           style={{
@@ -121,7 +143,7 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
               {config.label}
             </Text>
           </View>
-          <MathText className="font-manrope-semibold text-[15px] text-infiro-navy" color={NAVY}>
+          <MathText className={`${textClass} font-manrope-semibold text-[15px]`} color={theme.textPrimary}>
             {block.text}
           </MathText>
         </View>
