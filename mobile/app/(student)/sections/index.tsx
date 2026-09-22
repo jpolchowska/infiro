@@ -142,8 +142,6 @@ export default function SectionsScreen() {
                     )}
                   </View>
 
-                  {/* Podsekcje -- w tej samej karcie, jasne wiersze rozdzielone
-                      cienką linią, zaokrąglenia dziedziczone z kafla. */}
                   {expanded &&
                     section.subsections.map((sub) => {
                       const full = sub.totalTasks > 0 && sub.solvedTasks === sub.totalTasks;
@@ -157,7 +155,10 @@ export default function SectionsScreen() {
                       return (
                         <Pressable
                           key={sub.id}
-                          onPress={() => router.push(`/(student)/subsections/${sub.id}`)}
+                          onPress={() => {
+                            router.push(`/(student)/sections/${section.id}`);
+                            router.push(`/(student)/subsections/${sub.id}`);
+                          }}
                           className="flex-row items-center"
                           style={{
                             backgroundColor: 'rgba(255,255,255,0.6)',
