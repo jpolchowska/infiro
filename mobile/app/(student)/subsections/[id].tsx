@@ -84,6 +84,18 @@ export default function SubsectionTasksScreen() {
   const currentTask =
     tasks.find((t) => t.status === 'current') ?? tasks.find((t) => t.status === 'todo') ?? tasks[0];
 
+  const openTask = (task: { id: number; position: number }) =>
+    router.push({
+      pathname: '/(student)/tasks/[id]',
+      params: {
+        id: String(task.id),
+        position: String(task.position),
+        total: String(tasks.length),
+        sectionTitle: detail?.sectionTitle ?? '',
+        sectionIndex: String(detail?.sectionIndex ?? 0),
+      },
+    });
+
   const cta: { label: string; onPress: () => void } = finished
     ? detail?.nextSubsectionId != null
       ? {
@@ -94,7 +106,7 @@ export default function SubsectionTasksScreen() {
     : {
         label: solved === 0 ? 'Zacznij ćwiczyć' : 'Ćwicz dalej',
         onPress: () => {
-          if (currentTask) router.push(`/(student)/tasks/${currentTask.id}`);
+          if (currentTask) openTask(currentTask);
         },
       };
 
@@ -260,7 +272,7 @@ export default function SubsectionTasksScreen() {
                 <Pressable
                   key={task.id}
                   disabled={isLocked}
-                  onPress={() => router.push(`/(student)/tasks/${task.id}`)}
+                  onPress={() => openTask(task)}
                   className="flex-row items-center bg-infiro-white"
                   style={{
                     borderRadius: 16,
