@@ -7,13 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../../components/student/BottomTabBar';
 import { ErrorState } from '../../../components/student/ErrorState';
-import { getAccent } from '../../../lib/levelingTest';
 import { pluralize } from '../../../lib/pluralize';
 import { SectionSummary, getSections } from '../../../lib/student';
-
-const ACCENT_HEX = ['#ff5f55', '#c873d9', '#f0b67e', '#142284'];
+import { topicColor, useTheme, withAlpha } from '../../../lib/theme';
 
 export default function SectionsScreen() {
+  const theme = useTheme();
   const [sections, setSections] = useState<SectionSummary[] | null>(null);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -39,7 +38,7 @@ export default function SectionsScreen() {
 
   if (error) {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1" edges={['top']}>
           <ErrorState onRetry={() => setAttempt((a) => a + 1)} />
         </SafeAreaView>
@@ -50,10 +49,10 @@ export default function SectionsScreen() {
 
   if (!sections) {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1" edges={['top']}>
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color="#142284" />
+            <ActivityIndicator color={theme.textPrimary} />
           </View>
         </SafeAreaView>
         <BottomTabBar />
@@ -62,22 +61,26 @@ export default function SectionsScreen() {
   }
 
   return (
-    <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+    <View className="flex-1" style={{ backgroundColor: theme.bg }}>
       <SafeAreaView className="flex-1" edges={['top']}>
         <ScrollView
           className="flex-1 px-5"
           contentContainerStyle={{ paddingTop: 8, paddingBottom: 118 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text className="text-infiro-navy font-manrope-extrabold text-[27px] leading-[31px]">Działy tematyczne</Text>
-          <Text style={{ color: '#6b74a8' }} className="font-manrope-medium text-[14px] leading-[20px] mt-1 mb-[22px]">
+          <Text
+            className="text-[27px] leading-[31px]"
+            style={{ color: theme.textPrimary, fontFamily: theme.headingFontFamily }}
+          >
+            Działy tematyczne
+          </Text>
+          <Text style={{ color: theme.textSecondary }} className="font-manrope-medium text-[14px] leading-[20px] mt-1 mb-[22px]">
             Wybierz dział, który chcesz dziś poćwiczyć.
           </Text>
 
           <View style={{ gap: 14 }}>
             {sections.map((section) => {
-              const accent = getAccent(section.index);
-              const accentHex = ACCENT_HEX[section.index % ACCENT_HEX.length];
+              const color = topicColor(theme, section.index);
               const totalTasks = section.subsections.reduce((sum, s) => sum + s.totalTasks, 0);
               const solvedTasks = section.subsections.reduce((sum, s) => sum + s.solvedTasks, 0);
               const pct = totalTasks > 0 ? Math.round((solvedTasks / totalTasks) * 100) : 0;
@@ -86,8 +89,7 @@ export default function SectionsScreen() {
               return (
                 <View
                   key={section.id}
-                  className={accent.bgSoft}
-                  style={{ borderRadius: 20, overflow: 'hidden' }}
+                  style={{ borderRadius: 20, overflow: 'hidden', backgroundColor: withAlpha(color, 0.12) }}
                 >
                   <View style={{ padding: 18 }}>
                     <View className="flex-row items-center" style={{ gap: 10 }}>
@@ -97,21 +99,28 @@ export default function SectionsScreen() {
                         style={{ gap: 14 }}
                       >
                         <View
-                          className={`items-center justify-center ${accent.bg}`}
-                          style={{ width: 40, height: 40, borderRadius: 10 }}
+                          className="items-center justify-center"
+                          style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: color }}
                         >
-                          <Text className="text-infiro-white font-manrope-extrabold text-[17px]">{section.index + 1}</Text>
+                          <Text className="font-manrope-extrabold text-[17px]" style={{ color: theme.accentInk }}>
+                            {section.index + 1}
+                          </Text>
                         </View>
                         <View className="flex-1">
-                          <Text className="text-infiro-navy font-manrope-extrabold text-[17px] leading-[21px]">
+                          <Text
+                            className="font-manrope-extrabold text-[17px] leading-[21px]"
+                            style={{ color: theme.textPrimary }}
+                          >
                             {section.title}
                           </Text>
-                          <Text style={{ color: '#4a5488' }} className="font-manrope-medium text-xs mt-1">
+                          <Text style={{ color: theme.textSecondary }} className="font-manrope-medium text-xs mt-1">
                             {pluralize(section.subsections.length, 'podsekcja', 'podsekcje', 'podsekcji')} ·{' '}
                             {pluralize(totalTasks, 'zadanie', 'zadania', 'zadań')}
                           </Text>
                         </View>
-                        <Text className="text-infiro-navy font-manrope-extrabold text-[17px]">{pct}%</Text>
+                        <Text className="font-manrope-extrabold text-[17px]" style={{ color: theme.textPrimary }}>
+                          {pct}%
+                        </Text>
                       </Pressable>
                       <Pressable
                         onPress={() => setExpandedId((prev) => (prev === section.id ? null : section.id))}
@@ -119,7 +128,11 @@ export default function SectionsScreen() {
                         accessibilityLabel={expanded ? 'Zwiń podsekcje' : 'Rozwiń podsekcje'}
                         style={{ padding: 2 }}
                       >
-                        <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color="#8b93bd" />
+                        <Ionicons
+                          name={expanded ? 'chevron-up' : 'chevron-down'}
+                          size={18}
+                          color={theme.textSecondary}
+                        />
                       </Pressable>
                     </View>
 
@@ -127,16 +140,19 @@ export default function SectionsScreen() {
                       style={{
                         height: 8,
                         borderRadius: 100,
-                        backgroundColor: 'rgba(20,34,132,0.09)',
+                        backgroundColor: withAlpha(theme.textPrimary, 0.09),
                         overflow: 'hidden',
                         marginTop: 14,
                       }}
                     >
-                      <View className={accent.bg} style={{ height: 8, borderRadius: 100, width: `${pct}%` }} />
+                      <View style={{ height: 8, borderRadius: 100, width: `${pct}%`, backgroundColor: color }} />
                     </View>
 
                     {expanded && section.description && (
-                      <Text style={{ color: '#6b74a8' }} className="font-manrope-medium text-[14px] leading-[20px] mt-3.5">
+                      <Text
+                        style={{ color: theme.textSecondary }}
+                        className="font-manrope-medium text-[14px] leading-[20px] mt-3.5"
+                      >
                         {section.description}
                       </Text>
                     )}
@@ -161,9 +177,9 @@ export default function SectionsScreen() {
                           }}
                           className="flex-row items-center"
                           style={{
-                            backgroundColor: 'rgba(255,255,255,0.6)',
+                            backgroundColor: withAlpha(theme.surface, 0.6),
                             borderTopWidth: 1,
-                            borderTopColor: 'rgba(20,34,132,0.07)',
+                            borderTopColor: theme.surfaceBorder,
                             paddingHorizontal: 18,
                             paddingVertical: 15,
                             gap: 13,
@@ -176,24 +192,36 @@ export default function SectionsScreen() {
                               borderRadius: 100,
                               alignItems: 'center',
                               justifyContent: 'center',
-                              backgroundColor: full ? accentHex : 'rgba(20,34,132,0.06)',
+                              backgroundColor: full ? color : withAlpha(theme.textPrimary, 0.06),
                             }}
                           >
                             {full ? (
-                              <Ionicons name="checkmark" size={15} color="#fefefe" />
+                              <Ionicons name="checkmark" size={15} color={theme.accentInk} />
                             ) : started ? (
-                              <Ionicons name="play" size={11} color="#8b93bd" />
+                              <Ionicons name="play" size={11} color={theme.textSecondary} />
                             ) : (
-                              <View style={{ width: 5, height: 5, borderRadius: 100, backgroundColor: '#a7aecd' }} />
+                              <View
+                                style={{
+                                  width: 5,
+                                  height: 5,
+                                  borderRadius: 100,
+                                  backgroundColor: theme.textSecondary,
+                                }}
+                              />
                             )}
                           </View>
                           <View className="flex-1">
-                            <Text className="text-infiro-navy font-manrope-bold text-[13px] leading-[17px]">{sub.title}</Text>
-                            <Text style={{ color: '#8b93bd' }} className="font-manrope-medium text-xs mt-0.5">
+                            <Text
+                              className="font-manrope-bold text-[13px] leading-[17px]"
+                              style={{ color: theme.textPrimary }}
+                            >
+                              {sub.title}
+                            </Text>
+                            <Text style={{ color: theme.textSecondary }} className="font-manrope-medium text-xs mt-0.5">
                               {meta}
                             </Text>
                           </View>
-                          <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
+                          <Ionicons name="chevron-forward" size={16} color={theme.textSecondary} />
                         </Pressable>
                       );
                     })}

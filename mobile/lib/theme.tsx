@@ -15,9 +15,11 @@ export type ThemeTokens = {
   accentInk: string;
   topicColors: [string, string, string, string];
   headingFontFamily: string;
+  isDark: boolean;
 };
 
 export const NEUTRAL_THEME: ThemeTokens = {
+  isDark: false,
   bg: '#f4f5fb',
   textPrimary: '#142284',
   textSecondary: '#8b93bd',
@@ -34,6 +36,7 @@ export const NEUTRAL_THEME: ThemeTokens = {
 
 export const THEMES: Record<InterestId, ThemeTokens> = {
   sport: {
+    isDark: false,
     bg: '#F2F7FC',
     textPrimary: '#0B2545',
     textSecondary: '#5A7290',
@@ -48,6 +51,7 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     headingFontFamily: 'Oswald_700Bold',
   },
   gry: {
+    isDark: true,
     bg: '#0E0E1A',
     textPrimary: '#F1F2FF',
     textSecondary: '#8B90C9',
@@ -62,6 +66,7 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     headingFontFamily: 'Rajdhani_700Bold',
   },
   lego: {
+    isDark: false,
     bg: '#FFF7E8',
     textPrimary: '#1C2B6B',
     textSecondary: '#6B7290',
@@ -76,6 +81,7 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     headingFontFamily: 'TitanOne_400Regular',
   },
   zwierzeta: {
+    isDark: false,
     bg: '#F5EFDD',
     textPrimary: '#3B2A1A',
     textSecondary: '#8A7859',
@@ -90,6 +96,7 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     headingFontFamily: 'Baloo2_700Bold',
   },
   rysowanie: {
+    isDark: false,
     bg: '#FFFBF2',
     textPrimary: '#2B2440',
     textSecondary: '#8C84A8',
@@ -104,6 +111,7 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     headingFontFamily: 'BodoniModa_700Bold',
   },
   muzyka: {
+    isDark: false,
     bg: '#F7F3FF',
     textPrimary: '#2D1B4E',
     textSecondary: '#8A7AAE',
@@ -118,6 +126,7 @@ export const THEMES: Record<InterestId, ThemeTokens> = {
     headingFontFamily: 'PlayfairDisplay_700Bold_Italic',
   },
   jedzenie: {
+    isDark: false,
     bg: '#FFF6EC',
     textPrimary: '#5C2E1A',
     textSecondary: '#9C7A63',
@@ -140,6 +149,16 @@ export function themeFor(interest: string | null | undefined): ThemeTokens {
 
 export function topicColor(theme: ThemeTokens, index: number): string {
   return theme.topicColors[((index % 4) + 4) % 4];
+}
+
+export function isLightHex(hex: string): boolean {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  const value = parseInt(full, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6;
 }
 
 export function withAlpha(hex: string, alpha: number): string {

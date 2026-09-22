@@ -7,11 +7,9 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { ErrorState } from '../../../components/student/ErrorState';
 import { getEbook } from '../../../lib/ebook';
-import { getAccent } from '../../../lib/levelingTest';
 import { pluralize } from '../../../lib/pluralize';
 import { SubsectionDetail, SubsectionTaskStatus, getSubsectionTasks } from '../../../lib/student';
-
-const ACCENT_HEX = ['#ff5f55', '#c873d9', '#f0b67e', '#142284'];
+import { topicColor, useTheme, withAlpha } from '../../../lib/theme';
 
 const DIFFICULTY_LABEL: Record<1 | 2 | 3, string> = { 1: 'Łatwe', 2: 'Średnie', 3: 'Trudne' };
 const STATUS_LABEL: Record<SubsectionTaskStatus, string> = {
@@ -29,6 +27,7 @@ function StatusGlyph({ status, color }: { status: SubsectionTaskStatus; color: s
 }
 
 export default function SubsectionTasksScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const [detail, setDetail] = useState<SubsectionDetail | null>(null);
@@ -68,8 +67,7 @@ export default function SubsectionTasksScreen() {
     }, [id, attempt])
   );
 
-  const accent = detail ? getAccent(detail.sectionIndex) : null;
-  const accentHex = detail ? ACCENT_HEX[detail.sectionIndex % ACCENT_HEX.length] : '#142284';
+  const color = detail ? topicColor(theme, detail.sectionIndex) : theme.accent;
   const tasks = detail?.tasks ?? [];
   const total = tasks.length;
   const solved = tasks.filter((t) => t.status === 'done').length;
@@ -112,7 +110,7 @@ export default function SubsectionTasksScreen() {
 
   if (error) {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb', paddingTop: insets.top }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg, paddingTop: insets.top }}>
         <ErrorState onRetry={() => setAttempt((a) => a + 1)} />
       </View>
     );
@@ -122,23 +120,23 @@ export default function SubsectionTasksScreen() {
     return (
       <View
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: '#f4f5fb', paddingTop: insets.top }}
+        style={{ backgroundColor: theme.bg, paddingTop: insets.top }}
       >
-        <ActivityIndicator color="#142284" />
+        <ActivityIndicator color={theme.textPrimary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+    <View className="flex-1" style={{ backgroundColor: theme.bg }}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 132 }}
         showsVerticalScrollIndicator={false}
       >
         <View
-          className={accent?.bgSoft}
           style={{
+            backgroundColor: withAlpha(color, 0.12),
             paddingTop: insets.top + 8,
             paddingHorizontal: 20,
             paddingBottom: 22,
@@ -147,16 +145,22 @@ export default function SubsectionTasksScreen() {
           }}
         >
           <Pressable onPress={goToSection} hitSlop={8} className="mb-3.5">
-            <Text style={{ color: '#6b74a8' }} className="font-manrope-semibold text-[14px]" numberOfLines={1}>
+            <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-[14px]" numberOfLines={1}>
               ‹ {detail?.sectionTitle ?? 'Wróć'}
             </Text>
           </Pressable>
 
-          <Text className="text-infiro-navy font-manrope-extrabold text-[24px] leading-[28px]">
+          <Text
+            className="text-[24px] leading-[28px]"
+            style={{ color: theme.textPrimary, fontFamily: theme.headingFontFamily }}
+          >
             {detail?.title ?? ''}
           </Text>
           {detail?.description && (
-            <Text style={{ color: '#5a6392' }} className="font-manrope-medium text-[14px] leading-[20px] mt-2.5">
+            <Text
+              style={{ color: theme.textSecondary }}
+              className="font-manrope-medium text-[14px] leading-[20px] mt-2.5"
+            >
               {detail.description}
             </Text>
           )}
@@ -165,18 +169,18 @@ export default function SubsectionTasksScreen() {
             style={{
               height: 8,
               borderRadius: 100,
-              backgroundColor: 'rgba(20,34,132,0.1)',
+              backgroundColor: withAlpha(theme.textPrimary, 0.1),
               overflow: 'hidden',
               marginTop: 18,
             }}
           >
-            <View className={accent?.bg} style={{ height: 8, borderRadius: 100, width: `${pct}%` }} />
+            <View style={{ height: 8, borderRadius: 100, width: `${pct}%`, backgroundColor: color }} />
           </View>
           <View className="flex-row items-center justify-between" style={{ marginTop: 9 }}>
-            <Text style={{ color: '#5a6392' }} className="font-manrope-semibold text-xs">
+            <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs">
               {pluralize(total, 'zadanie', 'zadania', 'zadań')}
             </Text>
-            <Text className="text-infiro-navy font-manrope-extrabold text-[13px]">
+            <Text className="font-manrope-extrabold text-[13px]" style={{ color: theme.textPrimary }}>
               {solved} / {total}
             </Text>
           </View>
@@ -187,12 +191,15 @@ export default function SubsectionTasksScreen() {
             {hasEbook && (
               <Pressable
                 onPress={() => router.push(`/(student)/ebooks/${detail.id}`)}
-                className="flex-row items-center bg-infiro-white"
+                className="flex-row items-center"
                 style={{
                   borderRadius: 16,
                   padding: 14,
                   gap: 12,
-                  shadowColor: '#142284',
+                  backgroundColor: theme.surface,
+                  borderWidth: 1,
+                  borderColor: theme.surfaceBorder,
+                  shadowColor: theme.textPrimary,
                   shadowOpacity: 0.06,
                   shadowRadius: 12,
                   shadowOffset: { width: 0, height: 3 },
@@ -201,29 +208,34 @@ export default function SubsectionTasksScreen() {
               >
                 <View
                   className="items-center justify-center"
-                  style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: 'rgba(20,34,132,0.06)' }}
+                  style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: withAlpha(theme.textPrimary, 0.06) }}
                 >
-                  <Ionicons name="book-outline" size={18} color={accentHex} />
+                  <Ionicons name="book-outline" size={18} color={color} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-infiro-navy font-manrope-extrabold text-[14px]">Teoria</Text>
-                  <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
+                  <Text className="font-manrope-extrabold text-[14px]" style={{ color: theme.textPrimary }}>
+                    Teoria
+                  </Text>
+                  <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs mt-0.5">
                     Przeczytaj przed ćwiczeniem
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
+                <Ionicons name="chevron-forward" size={16} color={theme.textSecondary} />
               </Pressable>
             )}
 
             {tasks.length > 0 && (
               <Pressable
                 onPress={() => router.push(`/(student)/timed/${detail.id}`)}
-                className="flex-row items-center bg-infiro-white"
+                className="flex-row items-center"
                 style={{
                   borderRadius: 16,
                   padding: 14,
                   gap: 12,
-                  shadowColor: '#142284',
+                  backgroundColor: theme.surface,
+                  borderWidth: 1,
+                  borderColor: theme.surfaceBorder,
+                  shadowColor: theme.textPrimary,
                   shadowOpacity: 0.06,
                   shadowRadius: 12,
                   shadowOffset: { width: 0, height: 3 },
@@ -232,17 +244,19 @@ export default function SubsectionTasksScreen() {
               >
                 <View
                   className="items-center justify-center"
-                  style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: 'rgba(20,34,132,0.06)' }}
+                  style={{ width: 34, height: 34, borderRadius: 100, backgroundColor: withAlpha(theme.textPrimary, 0.06) }}
                 >
-                  <Ionicons name="timer-outline" size={18} color={accentHex} />
+                  <Ionicons name="timer-outline" size={18} color={color} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-infiro-navy font-manrope-extrabold text-[14px]">Ćwicz na czas</Text>
-                  <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-0.5">
+                  <Text className="font-manrope-extrabold text-[14px]" style={{ color: theme.textPrimary }}>
+                    Ćwicz na czas
+                  </Text>
+                  <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs mt-0.5">
                     60 sekund, zadania ABC z tej podsekcji
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={16} color="#c3c8de" />
+                <Ionicons name="chevron-forward" size={16} color={theme.textSecondary} />
               </Pressable>
             )}
           </View>
@@ -250,7 +264,7 @@ export default function SubsectionTasksScreen() {
 
         <View className="px-5" style={{ marginTop: 22 }}>
           <Text
-            style={{ color: '#8b93bd', letterSpacing: 1.4 }}
+            style={{ color: theme.textSecondary, letterSpacing: 1.4 }}
             className="font-manrope-bold text-[12px] uppercase mb-3.5"
           >
             Zadania
@@ -262,27 +276,28 @@ export default function SubsectionTasksScreen() {
               const isCurrent = task.status === 'current';
               const isLocked = task.status === 'locked';
 
-              const circleBg = isDone || isCurrent ? accentHex : isLocked ? 'rgba(20,34,132,0.05)' : 'rgba(20,34,132,0.06)';
-              const glyphColor = isDone || isCurrent ? '#fefefe' : isLocked ? '#b3b9d6' : '#a7aecd';
+              const circleBg = isDone || isCurrent ? color : withAlpha(theme.textPrimary, isLocked ? 0.05 : 0.06);
+              const glyphColor = isDone || isCurrent ? theme.accentInk : theme.textSecondary;
 
-              const pillBg = isCurrent ? accentHex : isLocked ? 'rgba(20,34,132,0.04)' : 'rgba(20,34,132,0.06)';
-              const pillFg = isCurrent ? '#fefefe' : isDone ? '#6b74a8' : isLocked ? '#b3b9d6' : '#8b93bd';
+              const pillBg = isCurrent ? color : withAlpha(theme.textPrimary, isLocked ? 0.04 : 0.06);
+              const pillFg = isCurrent ? theme.accentInk : theme.textSecondary;
 
               return (
                 <Pressable
                   key={task.id}
                   disabled={isLocked}
                   onPress={() => openTask(task)}
-                  className="flex-row items-center bg-infiro-white"
+                  className="flex-row items-center"
                   style={{
                     borderRadius: 16,
                     paddingVertical: 14,
                     paddingHorizontal: 15,
                     gap: 13,
                     opacity: isLocked ? 0.6 : 1,
-                    borderWidth: isCurrent ? 1.5 : 0,
-                    borderColor: isCurrent ? accentHex : 'transparent',
-                    shadowColor: '#142284',
+                    backgroundColor: theme.surface,
+                    borderWidth: isCurrent ? 1.5 : 1,
+                    borderColor: isCurrent ? color : theme.surfaceBorder,
+                    shadowColor: theme.textPrimary,
                     shadowOpacity: 0.06,
                     shadowRadius: 12,
                     shadowOffset: { width: 0, height: 3 },
@@ -303,10 +318,13 @@ export default function SubsectionTasksScreen() {
                   </View>
 
                   <View className="flex-1">
-                    <Text className="text-infiro-navy font-manrope-extrabold text-[14px] leading-[18px]">
+                    <Text
+                      className="font-manrope-extrabold text-[14px] leading-[18px]"
+                      style={{ color: theme.textPrimary }}
+                    >
                       Zadanie {task.position}
                     </Text>
-                    <Text style={{ color: '#8b93bd' }} className="font-manrope-semibold text-xs mt-1">
+                    <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs mt-1">
                       {task.difficulty ? DIFFICULTY_LABEL[task.difficulty] : 'Ćwiczenie pamięciowe'}
                     </Text>
                   </View>
@@ -328,7 +346,7 @@ export default function SubsectionTasksScreen() {
             })}
 
             {detail && tasks.length === 0 && (
-              <Text style={{ color: '#8b93bd' }} className="font-manrope-medium text-[13px] text-center mt-6">
+              <Text style={{ color: theme.textSecondary }} className="font-manrope-medium text-[13px] text-center mt-6">
                 Brak zadań w tej podsekcji.
               </Text>
             )}
@@ -343,9 +361,9 @@ export default function SubsectionTasksScreen() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(244,245,251,0.96)',
+            backgroundColor: withAlpha(theme.bg, 0.96),
             borderTopWidth: 1,
-            borderTopColor: '#e8eaf4',
+            borderTopColor: theme.surfaceBorder,
           }}
         >
           <SafeAreaView edges={['bottom']}>
@@ -357,16 +375,18 @@ export default function SubsectionTasksScreen() {
                   height: 54,
                   borderRadius: 100,
                   gap: 8,
-                  backgroundColor: accentHex,
-                  shadowColor: accentHex,
+                  backgroundColor: color,
+                  shadowColor: color,
                   shadowOpacity: 0.35,
                   shadowRadius: 16,
                   shadowOffset: { width: 0, height: 8 },
                   elevation: 6,
                 }}
               >
-                <Text className="text-infiro-white font-manrope-extrabold text-base">{cta.label}</Text>
-                <Ionicons name="arrow-forward" size={18} color="#fefefe" />
+                <Text className="font-manrope-extrabold text-base" style={{ color: theme.accentInk }}>
+                  {cta.label}
+                </Text>
+                <Ionicons name="arrow-forward" size={18} color={theme.accentInk} />
               </Pressable>
             </View>
           </SafeAreaView>

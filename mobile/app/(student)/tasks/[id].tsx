@@ -20,14 +20,11 @@ import { ErrorState } from '../../../components/student/ErrorState';
 import { MemoryBoard } from '../../../components/student/MemoryBoard';
 import { TaskCta } from '../../../components/student/TaskCta';
 import { TaskHeader } from '../../../components/student/TaskHeader';
-import { getAccent } from '../../../lib/levelingTest';
 import { Task, TaskAnswerInput, TaskAnswerResult, getTask, submitTaskAnswer } from '../../../lib/tasks';
+import { isLightHex, topicColor, useTheme, withAlpha } from '../../../lib/theme';
 
-const NAVY = '#142284';
 const CORAL = '#ff5f55';
 const GREEN = '#1f9d63';
-const SCREEN_BG = '#f4f5fb';
-const ACCENT_HEX = ['#ff5f55', '#c873d9', '#f0b67e', '#142284'];
 const NEUTRAL_ACCENT_INDEX = 3;
 const LETTERS = ['A', 'B', 'C'];
 const DIFFICULTY_LABEL: Record<1 | 2 | 3, string> = { 1: 'Łatwe', 2: 'Średnie', 3: 'Trudne' };
@@ -38,20 +35,22 @@ function AttemptDots({
   used,
   max,
   phase,
-  accentHex,
+  accentColor,
+  neutralColor,
 }: {
   used: number;
   max: number;
   phase: Phase;
-  accentHex: string;
+  accentColor: string;
+  neutralColor: string;
 }) {
   return (
     <View className="flex-row" style={{ gap: 6 }}>
       {Array.from({ length: max }).map((_, i) => {
-        let color = 'rgba(20,34,132,0.15)';
+        let color = neutralColor;
         if (phase === 'answering') {
           if (i < used) color = CORAL;
-          else if (i === used) color = accentHex;
+          else if (i === used) color = accentColor;
         } else if (i < used) {
           color = i === used - 1 && phase === 'correct' ? GREEN : CORAL;
         }
@@ -62,6 +61,8 @@ function AttemptDots({
 }
 
 export default function TaskScreen() {
+  const theme = useTheme();
+  const textClass = theme.isDark ? 'text-infiro-white' : 'text-infiro-navy';
   const params = useLocalSearchParams<{
     id: string;
     position?: string;
@@ -74,8 +75,7 @@ export default function TaskScreen() {
   const position = Number(params.position) || 0;
   const total = Number(params.total) || 0;
   const accentIndex = params.sectionIndex != null ? Number(params.sectionIndex) || 0 : NEUTRAL_ACCENT_INDEX;
-  const accent = getAccent(accentIndex);
-  const accentHex = ACCENT_HEX[accentIndex % ACCENT_HEX.length];
+  const color = topicColor(theme, accentIndex);
   const sectionTitle = params.sectionTitle;
 
   const [task, setTask] = useState<Task | null>(null);
@@ -174,7 +174,7 @@ export default function TaskScreen() {
 
   if (error) {
     return (
-      <View className="flex-1" style={{ backgroundColor: SCREEN_BG }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1">
           <ErrorState onRetry={() => setReload((n) => n + 1)} />
         </SafeAreaView>
@@ -184,8 +184,8 @@ export default function TaskScreen() {
 
   if (!task) {
     return (
-      <View className="flex-1 items-center justify-center" style={{ backgroundColor: SCREEN_BG }}>
-        <ActivityIndicator color={NAVY} />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <ActivityIndicator color={theme.textPrimary} />
       </View>
     );
   }
@@ -195,13 +195,17 @@ export default function TaskScreen() {
 
   if (task.type === 'memory') {
     return (
-      <View className="flex-1" style={{ backgroundColor: SCREEN_BG }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
           <TaskHeader
             title={headerTitle}
             onClose={() => router.back()}
             progress={headerProgress}
-            accentClassName={accent.bg}
+            accentColor={color}
+            trackColor={withAlpha(theme.textPrimary, 0.1)}
+            closeButtonColor={withAlpha(theme.textPrimary, 0.06)}
+            closeIconColor={theme.textPrimary}
+            titleColor={theme.textSecondary}
           />
 
           <ScrollView
@@ -211,13 +215,17 @@ export default function TaskScreen() {
           >
             {sectionTitle ? (
               <Text
-                className={`${accent.text} text-xs font-manrope-bold uppercase tracking-wide mb-2`}
+                className="text-xs font-manrope-bold uppercase tracking-wide mb-2"
+                style={{ color }}
                 numberOfLines={1}
               >
                 {sectionTitle}
               </Text>
             ) : null}
-            <MathText className="text-infiro-navy text-2xl font-manrope-extrabold leading-snug" color={NAVY}>
+            <MathText
+              className={`${textClass} text-2xl font-manrope-extrabold leading-snug`}
+              color={theme.textPrimary}
+            >
               {task.prompt}
             </MathText>
             <View style={{ marginTop: 24 }}>
@@ -249,34 +257,44 @@ export default function TaskScreen() {
   if (phase === 'unlocked' && result?.unlockedDifficulty) {
     const unlockedLabel = DIFFICULTY_LABEL[result.unlockedDifficulty as 1 | 2 | 3];
     return (
-      <View className="flex-1 bg-infiro-navy">
+      <View className="flex-1" style={{ backgroundColor: theme.heroTo }}>
         <SafeAreaView className="flex-1 px-6 pb-6">
           <View className="flex-1 items-center justify-center">
             <View
-              className="w-24 h-24 rounded-full bg-infiro-purple/15 items-center justify-center mb-7"
+              className="w-24 h-24 rounded-full items-center justify-center mb-7"
               style={{
-                shadowColor: '#c873d9',
+                backgroundColor: withAlpha(theme.accent, 0.18),
+                shadowColor: theme.accent,
                 shadowOpacity: 0.4,
                 shadowRadius: 22,
                 shadowOffset: { width: 0, height: 0 },
                 elevation: 6,
               }}
             >
-              <Ionicons name="trending-up-outline" size={42} color="#c873d9" />
+              <Ionicons name="trending-up-outline" size={42} color={theme.accent} />
             </View>
 
-            <Text className="text-infiro-white/60 text-sm uppercase tracking-wide text-center mb-2">
+            <Text style={{ color: 'rgba(255,255,255,0.65)' }} className="text-sm uppercase tracking-wide text-center mb-2">
               Awans
             </Text>
-            <Text className="text-infiro-white font-manrope-extrabold text-4xl leading-tight text-center mb-4">
+            <Text
+              className="text-4xl leading-tight text-center mb-4"
+              style={{ color: '#fefefe', fontFamily: theme.headingFontFamily }}
+            >
               Odblokowano poziom: {unlockedLabel}
             </Text>
-            <Text className="text-infiro-white/80 text-base leading-relaxed text-center">
+            <Text style={{ color: 'rgba(255,255,255,0.8)' }} className="text-base leading-relaxed text-center">
               Wszystkie łatwiejsze zadania w tej podsekcji są zrobione — czas na trudniejsze.
             </Text>
           </View>
 
-          <TaskCta label="Super, dalej!" onPress={() => router.back()} tone="warning" showArrow />
+          <TaskCta
+            label="Super, dalej!"
+            onPress={() => router.back()}
+            tone="accent"
+            accentHex={theme.accent}
+            showArrow
+          />
         </SafeAreaView>
       </View>
     );
@@ -307,24 +325,36 @@ export default function TaskScreen() {
       : phase === 'revealed' || phase === 'retry'
         ? CORAL
         : inputFocused
-          ? accentHex
-          : 'rgba(20,34,132,0.12)';
+          ? color
+          : withAlpha(theme.textPrimary, 0.12);
   const inputBg =
     phase === 'correct'
       ? 'rgba(31,157,99,0.08)'
       : phase === 'revealed' || phase === 'retry'
         ? 'rgba(255,95,85,0.06)'
-        : '#fefefe';
+        : theme.surface;
 
   return (
-    <View className="flex-1" style={{ backgroundColor: SCREEN_BG }}>
+    <View className="flex-1" style={{ backgroundColor: theme.bg }}>
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
         <TaskHeader
           title={headerTitle}
           onClose={() => router.back()}
-          right={<AttemptDots used={attemptsUsed} max={task.maxAttempts} phase={phase} accentHex={accentHex} />}
+          right={
+            <AttemptDots
+              used={attemptsUsed}
+              max={task.maxAttempts}
+              phase={phase}
+              accentColor={color}
+              neutralColor={withAlpha(theme.textPrimary, 0.15)}
+            />
+          }
           progress={headerProgress}
-          accentClassName={accent.bg}
+          accentColor={color}
+          trackColor={withAlpha(theme.textPrimary, 0.1)}
+          closeButtonColor={withAlpha(theme.textPrimary, 0.06)}
+          closeIconColor={theme.textPrimary}
+          titleColor={theme.textSecondary}
         />
 
         <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -337,7 +367,8 @@ export default function TaskScreen() {
             <View className="flex-row items-center justify-between" style={{ marginBottom: 10 }}>
               {sectionTitle ? (
                 <Text
-                  className={`${accent.text} text-xs font-manrope-bold uppercase tracking-wide flex-1 mr-3`}
+                  className="text-xs font-manrope-bold uppercase tracking-wide flex-1 mr-3"
+                  style={{ color }}
                   numberOfLines={1}
                 >
                   {sectionTitle}
@@ -345,14 +376,17 @@ export default function TaskScreen() {
               ) : (
                 <View className="flex-1" />
               )}
-              <View className={`${accent.bgSoft} rounded-full px-3 py-1`}>
-                <Text className={`${accent.text} text-xs font-manrope-bold`}>
+              <View className="rounded-full px-3 py-1" style={{ backgroundColor: withAlpha(color, 0.14) }}>
+                <Text className="text-xs font-manrope-bold" style={{ color }}>
                   {DIFFICULTY_LABEL[task.difficulty]}
                 </Text>
               </View>
             </View>
 
-            <MathText className="text-infiro-navy text-2xl font-manrope-extrabold leading-snug" color={NAVY}>
+            <MathText
+              className={`${textClass} text-2xl font-manrope-extrabold leading-snug`}
+              color={theme.textPrimary}
+            >
               {task.prompt}
             </MathText>
 
@@ -371,16 +405,16 @@ export default function TaskScreen() {
                     : pickedWrong
                       ? CORAL
                       : active
-                        ? NAVY
-                        : 'rgba(20,34,132,0.12)';
+                        ? theme.accent
+                        : withAlpha(theme.textPrimary, 0.12);
                   const bg = good
                     ? 'rgba(31,157,99,0.08)'
                     : pickedWrong
                       ? 'rgba(255,95,85,0.06)'
                       : active
-                        ? NAVY
-                        : '#fefefe';
-                  const fg = active ? '#fefefe' : NAVY;
+                        ? theme.accent
+                        : theme.surface;
+                  const fg = active ? theme.accentInk : theme.textPrimary;
 
                   return (
                     <Pressable
@@ -399,19 +433,16 @@ export default function TaskScreen() {
                       }}
                     >
                       <View
-                        className={`w-8 h-8 rounded-full items-center justify-center ${
-                          active ? 'bg-infiro-white/20' : accent.bgSoft
-                        }`}
+                        className="w-8 h-8 rounded-full items-center justify-center"
+                        style={{ backgroundColor: active ? withAlpha(theme.accentInk, 0.2) : withAlpha(color, 0.14) }}
                       >
-                        <Text
-                          className={`font-manrope-bold text-sm ${active ? 'text-infiro-white' : accent.text}`}
-                        >
+                        <Text className="font-manrope-bold text-sm" style={{ color: active ? theme.accentInk : color }}>
                           {LETTERS[i]}
                         </Text>
                       </View>
                       <MathText
                         className={`font-manrope-semibold text-base flex-1 ${
-                          active ? 'text-infiro-white' : 'text-infiro-navy'
+                          active ? (isLightHex(theme.accentInk) ? 'text-infiro-white' : 'text-infiro-navy') : textClass
                         }`}
                         color={fg}
                       >
@@ -431,17 +462,18 @@ export default function TaskScreen() {
                   editable={!locked}
                   keyboardType="decimal-pad"
                   placeholder="Wpisz odpowiedź"
-                  placeholderTextColor="rgba(20,34,132,0.35)"
+                  placeholderTextColor={withAlpha(theme.textPrimary, 0.35)}
                   onSubmitEditing={check}
                   onFocus={() => setInputFocused(true)}
                   onBlur={() => setInputFocused(false)}
-                  className="font-manrope-bold text-xl text-infiro-navy"
+                  className="font-manrope-bold text-xl"
                   style={{
                     height: 56,
                     borderRadius: 16,
                     borderWidth: 1.5,
                     borderColor: inputBorder,
                     backgroundColor: inputBg,
+                    color: theme.textPrimary,
                     paddingLeft: 18,
                     paddingRight: 48,
                     paddingVertical: 0,
@@ -480,7 +512,7 @@ export default function TaskScreen() {
               disabled={phase === 'answering' && answerEmpty}
               loading={submitting}
               tone={phase === 'correct' ? 'success' : phase === 'retry' ? 'warning' : 'accent'}
-              accentHex={accentHex}
+              accentHex={color}
               showArrow={phase === 'correct' || phase === 'revealed'}
             />
           </View>
