@@ -142,9 +142,6 @@ export default function ProfileScreen() {
               <Text className="font-manrope-extrabold text-xl" style={{ color: theme.textPrimary }}>
                 {name ?? 'Uczeń'}
               </Text>
-              <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-[13px] mt-1">
-                klasa 5
-              </Text>
             </View>
           </View>
 
@@ -152,7 +149,7 @@ export default function ProfileScreen() {
             style={{ color: theme.textSecondary, letterSpacing: 1.4 }}
             className="font-manrope-bold text-[12px] uppercase mb-3"
           >
-            Zainteresowania
+            Motyw aplikacji
           </Text>
           {pickedInterest ? (
             <View
