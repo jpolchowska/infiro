@@ -87,24 +87,7 @@ export type LevelingResult = {
   total: number;
   maxTotal: number;
   perSection: LevelingSectionResult[];
-  levelLabel: string;
-  encouragement: string;
 };
-
-const LEVEL_ENCOURAGEMENT: Record<string, string> = {
-  Podstawy: 'Dobry początek — zaczynamy od podstaw.',
-  'Dobry start': 'Świetnie Ci poszło! Czas na nieco trudniejsze zadania.',
-  'Pewny start': 'Mocny wynik! Czas na prawdziwe wyzwania.',
-  'Mistrzowski start': 'Bezbłędnie! Czas na największe wyzwania.',
-};
-
-function levelLabelFor(score: number, maxScore: number): string {
-  const ratio = maxScore > 0 ? score / maxScore : 0;
-  if (ratio >= 1) return 'Mistrzowski start';
-  if (ratio >= 0.7) return 'Pewny start';
-  if (ratio >= 0.4) return 'Dobry start';
-  return 'Podstawy';
-}
 
 type RawSubmitResponse = {
   score: number;
@@ -124,7 +107,6 @@ export async function submitLevelingTest(answers: LevelingAnswer[]): Promise<Lev
     },
   });
 
-  const levelLabel = levelLabelFor(raw.score, raw.max_score);
   return {
     total: raw.score,
     maxTotal: raw.max_score,
@@ -134,7 +116,5 @@ export async function submitLevelingTest(answers: LevelingAnswer[]): Promise<Lev
       score: s.score,
       total: s.total,
     })),
-    levelLabel,
-    encouragement: LEVEL_ENCOURAGEMENT[levelLabel],
   };
 }

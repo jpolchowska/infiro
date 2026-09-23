@@ -17,10 +17,10 @@ export function AnswerFeedback(props: AnswerFeedbackProps) {
     return (
       <View
         className="flex-row items-center"
-        style={{ gap: 10, padding: 14, borderRadius: 16, backgroundColor: 'rgba(31,157,99,0.12)' }}
+        style={{ gap: 12, padding: 16, borderRadius: 16, backgroundColor: 'rgba(31,157,99,0.1)' }}
       >
-        <Ionicons name="checkmark-circle" size={22} color={GREEN} />
-        <Text className="font-manrope-extrabold text-[15px]" style={{ color: GREEN }}>
+        <Ionicons name="checkmark-circle" size={26} color={GREEN} />
+        <Text className="font-manrope-extrabold text-[16px]" style={{ color: GREEN }}>
           Dobrze!
         </Text>
       </View>
@@ -29,28 +29,33 @@ export function AnswerFeedback(props: AnswerFeedbackProps) {
 
   if (props.kind === 'retry') {
     return (
-      <View style={{ padding: 14, borderRadius: 16, backgroundColor: 'rgba(255,95,85,0.1)' }}>
-        <Text className="font-manrope-extrabold text-[15px]" style={{ color: CORAL }}>
-          Spróbuj jeszcze raz
-        </Text>
-        <Text className="font-manrope-semibold text-xs mt-1" style={{ color: '#8b93bd' }}>
-          {props.attemptsLeft === 1 ? 'Została ostatnia próba' : `Zostały ${props.attemptsLeft} próby`}
-        </Text>
+      <View
+        className="flex-row items-center"
+        style={{ gap: 12, padding: 16, borderRadius: 16, backgroundColor: 'rgba(255,95,85,0.1)' }}
+      >
+        <Ionicons name="refresh-circle" size={26} color={CORAL} />
+        <View className="flex-1">
+          <Text className="font-manrope-extrabold text-[16px]" style={{ color: CORAL }}>
+            Spróbuj jeszcze raz
+          </Text>
+          <Text className="font-manrope-semibold text-[13px] mt-0.5" style={{ color: '#8b93bd' }}>
+            {props.attemptsLeft === 1 ? 'Została ostatnia próba' : `Zostały ${props.attemptsLeft} próby`}
+          </Text>
+        </View>
       </View>
     );
   }
 
   return (
-    <View style={{ padding: 14, borderRadius: 16, backgroundColor: 'rgba(20,34,132,0.06)' }}>
-      <Text
-        className="font-manrope-bold text-xs uppercase"
-        style={{ color: '#8b93bd', letterSpacing: 1 }}
-      >
+    <View style={{ padding: 16, borderRadius: 16, backgroundColor: 'rgba(20,34,132,0.06)' }}>
+      <Text className="font-manrope-bold text-xs uppercase" style={{ color: '#8b93bd', letterSpacing: 1 }}>
         Poprawna odpowiedź
       </Text>
-      <MathText className="font-manrope-extrabold text-[16px]" color={NAVY}>
-        {props.solution}
-      </MathText>
+      <View style={{ marginTop: 6 }}>
+        <MathText className="font-manrope-extrabold text-[18px] text-infiro-navy" color={NAVY}>
+          {props.solution}
+        </MathText>
+      </View>
     </View>
   );
 }

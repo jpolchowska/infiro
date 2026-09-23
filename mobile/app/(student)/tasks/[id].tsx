@@ -1,32 +1,90 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FadeIn } from '../../../components/leveling-test/FadeIn';
 import { MathText } from '../../../components/MathText';
 import { Text } from '../../../components/Text';
 import { AnswerFeedback } from '../../../components/student/AnswerFeedback';
 import { ErrorState } from '../../../components/student/ErrorState';
 import { MemoryBoard } from '../../../components/student/MemoryBoard';
+import { TaskCta } from '../../../components/student/TaskCta';
+import { TaskHeader } from '../../../components/student/TaskHeader';
 import { Task, TaskAnswerInput, TaskAnswerResult, getTask, submitTaskAnswer } from '../../../lib/tasks';
+import { isLightHex, topicColor, useTheme, withAlpha } from '../../../lib/theme';
 
-const NAVY = '#142284';
 const CORAL = '#ff5f55';
 const GREEN = '#1f9d63';
+const NEUTRAL_ACCENT_INDEX = 3;
 const LETTERS = ['A', 'B', 'C'];
 const DIFFICULTY_LABEL: Record<1 | 2 | 3, string> = { 1: 'Łatwe', 2: 'Średnie', 3: 'Trudne' };
 
 type Phase = 'answering' | 'correct' | 'retry' | 'revealed' | 'unlocked';
 
+function AttemptDots({
+  used,
+  max,
+  phase,
+  accentColor,
+  neutralColor,
+}: {
+  used: number;
+  max: number;
+  phase: Phase;
+  accentColor: string;
+  neutralColor: string;
+}) {
+  return (
+    <View className="flex-row" style={{ gap: 6 }}>
+      {Array.from({ length: max }).map((_, i) => {
+        let color = neutralColor;
+        if (phase === 'answering') {
+          if (i < used) color = CORAL;
+          else if (i === used) color = accentColor;
+        } else if (i < used) {
+          color = i === used - 1 && phase === 'correct' ? GREEN : CORAL;
+        }
+        return <View key={i} style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }} />;
+      })}
+    </View>
+  );
+}
+
 export default function TaskScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const theme = useTheme();
+  const textClass = theme.isDark ? 'text-infiro-white' : 'text-infiro-navy';
+  const params = useLocalSearchParams<{
+    id: string;
+    position?: string;
+    total?: string;
+    sectionTitle?: string;
+    sectionIndex?: string;
+  }>();
+  const { id } = params;
+
+  const position = Number(params.position) || 0;
+  const total = Number(params.total) || 0;
+  const accentIndex = params.sectionIndex != null ? Number(params.sectionIndex) || 0 : NEUTRAL_ACCENT_INDEX;
+  const color = topicColor(theme, accentIndex);
+  const sectionTitle = params.sectionTitle;
+
   const [task, setTask] = useState<Task | null>(null);
   const [error, setError] = useState(false);
   const [reload, setReload] = useState(0);
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [answerText, setAnswerText] = useState('');
+  const [inputFocused, setInputFocused] = useState(false);
   const [result, setResult] = useState<TaskAnswerResult | null>(null);
   const [attemptsUsed, setAttemptsUsed] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -116,7 +174,7 @@ export default function TaskScreen() {
 
   if (error) {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1">
           <ErrorState onRetry={() => setReload((n) => n + 1)} />
         </SafeAreaView>
@@ -126,42 +184,47 @@ export default function TaskScreen() {
 
   if (!task) {
     return (
-      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#f4f5fb' }}>
-        <ActivityIndicator color={NAVY} />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <ActivityIndicator color={theme.textPrimary} />
       </View>
     );
   }
 
+  const headerTitle = position > 0 ? `Zadanie ${position}${total > 0 ? ` z ${total}` : ''}` : 'Zadanie';
+  const headerProgress = position > 0 && total > 0 ? { current: position, total } : undefined;
+
   if (task.type === 'memory') {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
-        <SafeAreaView className="flex-1" edges={['top']}>
-          <View
-            className="flex-row items-center justify-between px-5"
-            style={{ paddingTop: 4, paddingBottom: 8 }}
-          >
-            <Pressable
-              onPress={() => router.back()}
-              hitSlop={12}
-              className="w-9 h-9 rounded-full items-center justify-center"
-              style={{ backgroundColor: 'rgba(20,34,132,0.06)' }}
-            >
-              <Ionicons name="close" size={18} color={NAVY} />
-            </Pressable>
-            <Text className="font-manrope-semibold text-[13px]" style={{ color: '#8b93bd' }}>
-              Połącz pary
-            </Text>
-            <View className="w-9" />
-          </View>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
+        <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
+          <TaskHeader
+            title={headerTitle}
+            onClose={() => router.back()}
+            progress={headerProgress}
+            accentColor={color}
+            trackColor={withAlpha(theme.textPrimary, 0.1)}
+            closeButtonColor={withAlpha(theme.textPrimary, 0.06)}
+            closeIconColor={theme.textPrimary}
+            titleColor={theme.textSecondary}
+          />
 
           <ScrollView
             className="flex-1"
-            contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 24 }}
+            contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 }}
             showsVerticalScrollIndicator={false}
           >
+            {sectionTitle ? (
+              <Text
+                className="text-xs font-manrope-bold uppercase tracking-wide mb-2"
+                style={{ color }}
+                numberOfLines={1}
+              >
+                {sectionTitle}
+              </Text>
+            ) : null}
             <MathText
-              className="text-infiro-navy font-manrope-extrabold text-[22px] leading-[28px]"
-              color={NAVY}
+              className={`${textClass} text-2xl font-manrope-extrabold leading-snug`}
+              color={theme.textPrimary}
             >
               {task.prompt}
             </MathText>
@@ -169,37 +232,22 @@ export default function TaskScreen() {
               <MemoryBoard pairs={task.pairs} onSolved={handleMemorySolved} />
             </View>
             {memorySolved && (
-              <View style={{ marginTop: 18 }}>
-                <AnswerFeedback kind="correct" />
-              </View>
+              <FadeIn>
+                <View style={{ marginTop: 20 }}>
+                  <AnswerFeedback kind="correct" />
+                </View>
+              </FadeIn>
             )}
           </ScrollView>
 
-          <View
-            className="px-5"
-            style={{
-              paddingTop: 12,
-              paddingBottom: 10,
-              borderTopWidth: 1,
-              borderTopColor: '#e8eaf4',
-              backgroundColor: 'rgba(244,245,251,0.96)',
-            }}
-          >
-            <Pressable
+          <View className="px-5" style={{ paddingTop: 8, paddingBottom: 12 }}>
+            <TaskCta
+              label="Dalej"
               onPress={() => router.back()}
               disabled={!memorySolved}
-              className="flex-row items-center justify-center"
-              style={{
-                height: 54,
-                borderRadius: 100,
-                gap: 8,
-                backgroundColor: GREEN,
-                opacity: memorySolved ? 1 : 0.4,
-              }}
-            >
-              <Text className="text-infiro-white font-manrope-extrabold text-base">Dalej</Text>
-              <Ionicons name="arrow-forward" size={18} color="#fefefe" />
-            </Pressable>
+              tone="success"
+              showArrow
+            />
           </View>
         </SafeAreaView>
       </View>
@@ -209,29 +257,44 @@ export default function TaskScreen() {
   if (phase === 'unlocked' && result?.unlockedDifficulty) {
     const unlockedLabel = DIFFICULTY_LABEL[result.unlockedDifficulty as 1 | 2 | 3];
     return (
-      <View className="flex-1 bg-infiro-navy">
-        <SafeAreaView className="flex-1 justify-center px-6">
-          <Text className="text-infiro-white/60 text-sm uppercase tracking-wide mb-2">Awans</Text>
-          <Text className="text-infiro-white font-manrope-extrabold text-4xl leading-tight mb-3">
-            🎉 Odblokowano poziom: {unlockedLabel}
-          </Text>
-          <Text className="text-infiro-white/80 text-base mb-10">
-            Wszystkie łatwiejsze zadania w tej podsekcji są zrobione — czas na trudniejsze.
-          </Text>
-          <Pressable
+      <View className="flex-1" style={{ backgroundColor: theme.heroTo }}>
+        <SafeAreaView className="flex-1 px-6 pb-6">
+          <View className="flex-1 items-center justify-center">
+            <View
+              className="w-24 h-24 rounded-full items-center justify-center mb-7"
+              style={{
+                backgroundColor: withAlpha(theme.accent, 0.18),
+                shadowColor: theme.accent,
+                shadowOpacity: 0.4,
+                shadowRadius: 22,
+                shadowOffset: { width: 0, height: 0 },
+                elevation: 6,
+              }}
+            >
+              <Ionicons name="trending-up-outline" size={42} color={theme.accent} />
+            </View>
+
+            <Text style={{ color: 'rgba(255,255,255,0.65)' }} className="text-sm uppercase tracking-wide text-center mb-2">
+              Awans
+            </Text>
+            <Text
+              className="text-4xl leading-tight text-center mb-4"
+              style={{ color: '#fefefe', fontFamily: theme.headingFontFamily }}
+            >
+              Odblokowano poziom: {unlockedLabel}
+            </Text>
+            <Text style={{ color: 'rgba(255,255,255,0.8)' }} className="text-base leading-relaxed text-center">
+              Wszystkie łatwiejsze zadania w tej podsekcji są zrobione — czas na trudniejsze.
+            </Text>
+          </View>
+
+          <TaskCta
+            label="Super, dalej!"
             onPress={() => router.back()}
-            className="rounded-full py-4 items-center"
-            style={{
-              backgroundColor: CORAL,
-              shadowColor: CORAL,
-              shadowOpacity: 0.5,
-              shadowRadius: 16,
-              shadowOffset: { width: 0, height: 8 },
-              elevation: 8,
-            }}
-          >
-            <Text className="text-infiro-white font-manrope-extrabold text-base">Super, dalej!</Text>
-          </Pressable>
+            tone="accent"
+            accentHex={theme.accent}
+            showArrow
+          />
         </SafeAreaView>
       </View>
     );
@@ -249,182 +312,211 @@ export default function TaskScreen() {
   const locked = phase !== 'answering';
   const answerEmpty = task.type === 'single_choice' ? selectedId == null : answerText.trim() === '';
 
-  const cta: { label: string; onPress: () => void; disabled?: boolean } =
+  const cta: { label: string; onPress: () => void } =
     phase === 'answering'
-      ? { label: 'Sprawdź', onPress: check, disabled: answerEmpty || submitting }
+      ? { label: 'Sprawdź', onPress: check }
       : phase === 'retry'
         ? { label: 'Spróbuj jeszcze raz', onPress: retry }
         : { label: 'Dalej', onPress: () => router.back() };
 
+  const inputBorder =
+    phase === 'correct'
+      ? GREEN
+      : phase === 'revealed' || phase === 'retry'
+        ? CORAL
+        : inputFocused
+          ? color
+          : withAlpha(theme.textPrimary, 0.12);
+  const inputBg =
+    phase === 'correct'
+      ? 'rgba(31,157,99,0.08)'
+      : phase === 'revealed' || phase === 'retry'
+        ? 'rgba(255,95,85,0.06)'
+        : theme.surface;
+
   return (
-    <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
-      <SafeAreaView className="flex-1" edges={['top']}>
-        <View
-          className="flex-row items-center justify-between px-5"
-          style={{ paddingTop: 4, paddingBottom: 8 }}
-        >
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={12}
-            className="w-9 h-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: 'rgba(20,34,132,0.06)' }}
+    <View className="flex-1" style={{ backgroundColor: theme.bg }}>
+      <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
+        <TaskHeader
+          title={headerTitle}
+          onClose={() => router.back()}
+          right={
+            <AttemptDots
+              used={attemptsUsed}
+              max={task.maxAttempts}
+              phase={phase}
+              accentColor={color}
+              neutralColor={withAlpha(theme.textPrimary, 0.15)}
+            />
+          }
+          progress={headerProgress}
+          accentColor={color}
+          trackColor={withAlpha(theme.textPrimary, 0.1)}
+          closeButtonColor={withAlpha(theme.textPrimary, 0.06)}
+          closeIconColor={theme.textPrimary}
+          titleColor={theme.textSecondary}
+        />
+
+        <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 24 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            <Ionicons name="close" size={18} color={NAVY} />
-          </Pressable>
-          <Text className="font-manrope-semibold text-[13px]" style={{ color: '#8b93bd' }}>
-            {phase === 'answering'
-              ? `Próba ${attemptsUsed + 1} z ${task.maxAttempts}`
-              : DIFFICULTY_LABEL[task.difficulty]}
-          </Text>
-          <View className="w-9" />
-        </View>
+            <View className="flex-row items-center justify-between" style={{ marginBottom: 10 }}>
+              {sectionTitle ? (
+                <Text
+                  className="text-xs font-manrope-bold uppercase tracking-wide flex-1 mr-3"
+                  style={{ color }}
+                  numberOfLines={1}
+                >
+                  {sectionTitle}
+                </Text>
+              ) : (
+                <View className="flex-1" />
+              )}
+              <View className="rounded-full px-3 py-1" style={{ backgroundColor: withAlpha(color, 0.14) }}>
+                <Text className="text-xs font-manrope-bold" style={{ color }}>
+                  {DIFFICULTY_LABEL[task.difficulty]}
+                </Text>
+              </View>
+            </View>
 
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 24 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <MathText
-            className="text-infiro-navy font-manrope-extrabold text-[22px] leading-[28px]"
-            color={NAVY}
-          >
-            {task.prompt}
-          </MathText>
+            <MathText
+              className={`${textClass} text-2xl font-manrope-extrabold leading-snug`}
+              color={theme.textPrimary}
+            >
+              {task.prompt}
+            </MathText>
 
-          {task.type === 'single_choice' ? (
-            <View style={{ gap: 10, marginTop: 24 }}>
-              {task.options.map((opt, i) => {
-                const selected = selectedId === opt.id;
-                const isCorrectOne = phase === 'revealed' && opt.id === correctOptionId;
-                const isWrongPick = phase === 'revealed' && selected && !isCorrectOne;
+            {task.type === 'single_choice' ? (
+              <View style={{ gap: 12, marginTop: 24 }}>
+                {task.options.map((opt, i) => {
+                  const selected = selectedId === opt.id;
+                  const active = selected && phase === 'answering';
+                  const isCorrectOne = phase === 'revealed' && opt.id === correctOptionId;
+                  const pickedCorrect = phase === 'correct' && selected;
+                  const good = isCorrectOne || pickedCorrect;
+                  const pickedWrong = (phase === 'retry' || phase === 'revealed') && selected && !isCorrectOne;
 
-                const borderColor = isCorrectOne
-                  ? GREEN
-                  : isWrongPick
-                    ? CORAL
-                    : selected
-                      ? NAVY
-                      : 'rgba(20,34,132,0.12)';
-                const bg = selected && phase === 'answering' ? NAVY : '#fefefe';
-                const fg = selected && phase === 'answering' ? '#fefefe' : NAVY;
+                  const borderColor = good
+                    ? GREEN
+                    : pickedWrong
+                      ? CORAL
+                      : active
+                        ? theme.accent
+                        : withAlpha(theme.textPrimary, 0.12);
+                  const bg = good
+                    ? 'rgba(31,157,99,0.08)'
+                    : pickedWrong
+                      ? 'rgba(255,95,85,0.06)'
+                      : active
+                        ? theme.accent
+                        : theme.surface;
+                  const fg = active ? theme.accentInk : theme.textPrimary;
 
-                return (
-                  <Pressable
-                    key={opt.id}
-                    disabled={locked}
-                    onPress={() => setSelectedId(opt.id)}
-                    className="flex-row items-center"
-                    style={{
-                      borderRadius: 16,
-                      borderWidth: 1.5,
-                      borderColor,
-                      backgroundColor: bg,
-                      paddingVertical: 15,
-                      paddingHorizontal: 15,
-                      gap: 13,
-                    }}
-                  >
-                    <View
-                      className="items-center justify-center"
+                  return (
+                    <Pressable
+                      key={opt.id}
+                      disabled={locked}
+                      onPress={() => setSelectedId(opt.id)}
+                      className="flex-row items-center"
                       style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 100,
-                        backgroundColor:
-                          selected && phase === 'answering'
-                            ? 'rgba(254,254,254,0.2)'
-                            : 'rgba(20,34,132,0.06)',
+                        borderRadius: 16,
+                        borderWidth: 1.5,
+                        borderColor,
+                        backgroundColor: bg,
+                        paddingVertical: 16,
+                        paddingHorizontal: 16,
+                        gap: 12,
                       }}
                     >
-                      <Text className="font-manrope-bold text-[13px]" style={{ color: fg }}>
-                        {LETTERS[i]}
-                      </Text>
-                    </View>
-                    <MathText className="font-manrope-semibold text-[15px] flex-1" color={fg}>
-                      {opt.text}
-                    </MathText>
-                    {isCorrectOne && <Ionicons name="checkmark" size={18} color={GREEN} />}
-                    {isWrongPick && <Ionicons name="close" size={18} color={CORAL} />}
-                  </Pressable>
-                );
-              })}
-            </View>
-          ) : (
-            <View style={{ marginTop: 24 }}>
-              <TextInput
-                value={answerText}
-                onChangeText={setAnswerText}
-                editable={!locked}
-                keyboardType="decimal-pad"
-                placeholder="Wpisz odpowiedź"
-                placeholderTextColor="rgba(20,34,132,0.35)"
-                onSubmitEditing={check}
-                className="font-manrope-extrabold text-[20px] text-infiro-navy"
-                style={{
-                  height: 58,
-                  borderRadius: 16,
-                  borderWidth: 1.5,
-                  borderColor:
-                    phase === 'correct' ? GREEN : phase === 'revealed' ? CORAL : 'rgba(20,34,132,0.12)',
-                  backgroundColor: '#fefefe',
-                  paddingHorizontal: 16,
-                }}
-              />
-            </View>
-          )}
-
-          {phase === 'correct' && (
-            <View style={{ marginTop: 18 }}>
-              <AnswerFeedback kind="correct" />
-            </View>
-          )}
-          {phase === 'retry' && (
-            <View style={{ marginTop: 18 }}>
-              <AnswerFeedback kind="retry" attemptsLeft={result?.attemptsLeft ?? 0} />
-            </View>
-          )}
-          {phase === 'revealed' && (
-            <View style={{ marginTop: 18 }}>
-              <AnswerFeedback kind="revealed" solution={revealedText} />
-            </View>
-          )}
-        </ScrollView>
-
-        <View
-          className="px-5"
-          style={{
-            paddingTop: 12,
-            paddingBottom: 10,
-            borderTopWidth: 1,
-            borderTopColor: '#e8eaf4',
-            backgroundColor: 'rgba(244,245,251,0.96)',
-          }}
-        >
-          <Pressable
-            onPress={cta.onPress}
-            disabled={cta.disabled}
-            className="flex-row items-center justify-center"
-            style={{
-              height: 54,
-              borderRadius: 100,
-              gap: 8,
-              backgroundColor: phase === 'correct' ? GREEN : phase === 'retry' ? CORAL : NAVY,
-              opacity: cta.disabled ? 0.4 : 1,
-            }}
-          >
-            {submitting ? (
-              <ActivityIndicator color="#fefefe" />
+                      <View
+                        className="w-8 h-8 rounded-full items-center justify-center"
+                        style={{ backgroundColor: active ? withAlpha(theme.accentInk, 0.2) : withAlpha(color, 0.14) }}
+                      >
+                        <Text className="font-manrope-bold text-sm" style={{ color: active ? theme.accentInk : color }}>
+                          {LETTERS[i]}
+                        </Text>
+                      </View>
+                      <MathText
+                        className={`font-manrope-semibold text-base flex-1 ${
+                          active ? (isLightHex(theme.accentInk) ? 'text-infiro-white' : 'text-infiro-navy') : textClass
+                        }`}
+                        color={fg}
+                      >
+                        {opt.text}
+                      </MathText>
+                      {good && <Ionicons name="checkmark-circle" size={22} color={GREEN} />}
+                      {pickedWrong && <Ionicons name="close-circle" size={22} color={CORAL} />}
+                    </Pressable>
+                  );
+                })}
+              </View>
             ) : (
-              <>
-                <Text className="text-infiro-white font-manrope-extrabold text-base">{cta.label}</Text>
-                {(phase === 'correct' || phase === 'revealed') && (
-                  <Ionicons name="arrow-forward" size={18} color="#fefefe" />
+              <View style={{ marginTop: 24, justifyContent: 'center' }}>
+                <TextInput
+                  value={answerText}
+                  onChangeText={setAnswerText}
+                  editable={!locked}
+                  keyboardType="decimal-pad"
+                  placeholder="Wpisz odpowiedź"
+                  placeholderTextColor={withAlpha(theme.textPrimary, 0.35)}
+                  onSubmitEditing={check}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                  className="font-manrope-bold text-xl"
+                  style={{
+                    height: 56,
+                    borderRadius: 16,
+                    borderWidth: 1.5,
+                    borderColor: inputBorder,
+                    backgroundColor: inputBg,
+                    color: theme.textPrimary,
+                    paddingLeft: 18,
+                    paddingRight: 48,
+                    paddingVertical: 0,
+                  }}
+                />
+                {phase === 'correct' && (
+                  <View style={{ position: 'absolute', right: 16 }}>
+                    <Ionicons name="checkmark-circle" size={24} color={GREEN} />
+                  </View>
                 )}
-              </>
+                {(phase === 'retry' || phase === 'revealed') && (
+                  <View style={{ position: 'absolute', right: 16 }}>
+                    <Ionicons name="close-circle" size={24} color={CORAL} />
+                  </View>
+                )}
+              </View>
             )}
-          </Pressable>
-        </View>
+
+            {phase !== 'answering' && (
+              <FadeIn key={phase}>
+                <View style={{ marginTop: 20 }}>
+                  {phase === 'correct' && <AnswerFeedback kind="correct" />}
+                  {phase === 'retry' && (
+                    <AnswerFeedback kind="retry" attemptsLeft={result?.attemptsLeft ?? 0} />
+                  )}
+                  {phase === 'revealed' && <AnswerFeedback kind="revealed" solution={revealedText} />}
+                </View>
+              </FadeIn>
+            )}
+          </ScrollView>
+
+          <View className="px-5" style={{ paddingTop: 8, paddingBottom: 12 }}>
+            <TaskCta
+              label={cta.label}
+              onPress={cta.onPress}
+              disabled={phase === 'answering' && answerEmpty}
+              loading={submitting}
+              tone={phase === 'correct' ? 'success' : phase === 'retry' ? 'warning' : 'accent'}
+              accentHex={color}
+              showArrow={phase === 'correct' || phase === 'revealed'}
+            />
+          </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   );
