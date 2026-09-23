@@ -52,7 +52,6 @@ export default function HomeScreen() {
   const loading = !me || !stats;
 
   const name = me?.name ?? null;
-  const initial = name ? name.slice(0, 1).toUpperCase() : null;
   const current = stats?.current ?? null;
   const currentColor = current ? topicColor(theme, current.sectionIndex) : theme.accent;
   const currentPct =
@@ -75,33 +74,13 @@ export default function HomeScreen() {
             contentContainerStyle={{ paddingTop: 8, paddingBottom: 118 }}
             showsVerticalScrollIndicator={false}
           >
-            <View className="flex-row items-center justify-between mb-[22px]">
+            <View className="mb-[22px]">
               <Text
                 className="text-[27px] leading-[31px]"
                 style={{ color: theme.textPrimary, fontFamily: theme.headingFontFamily }}
               >
                 {name ? `Cześć, ${name}!` : 'Cześć!'}
               </Text>
-              <Pressable
-                onPress={() => router.replace('/(student)/profile')}
-                className="items-center justify-center"
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 100,
-                  backgroundColor: withAlpha(theme.textPrimary, 0.08),
-                  borderWidth: 1,
-                  borderColor: withAlpha(theme.textPrimary, 0.15),
-                }}
-              >
-                {initial ? (
-                  <Text className="font-manrope-bold text-[15px]" style={{ color: theme.textPrimary }}>
-                    {initial}
-                  </Text>
-                ) : (
-                  <Ionicons name="person" size={18} color={theme.textPrimary} />
-                )}
-              </Pressable>
             </View>
 
             {current && (
