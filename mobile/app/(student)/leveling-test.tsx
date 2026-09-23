@@ -133,7 +133,7 @@ export default function LevelingTestScreen() {
               <Ionicons name="speedometer-outline" size={42} color="#c873d9" />
             </View>
 
-            <Text className="text-infiro-white text-3xl font-manrope-extrabold leading-tight text-center mb-3">
+            <Text className="w-full text-infiro-white text-3xl font-manrope-extrabold leading-tight text-center mb-3">
               Test poziomujący
             </Text>
             <Text className="text-infiro-white/70 text-base leading-relaxed text-center mb-8">
@@ -295,7 +295,7 @@ export default function LevelingTestScreen() {
                 <Ionicons name="trophy-outline" size={42} color="#c873d9" />
               </View>
 
-              <Text className="text-infiro-white/60 text-sm uppercase tracking-wide text-center mb-1">
+              <Text className="w-full text-infiro-white/60 text-sm uppercase tracking-wide text-center mb-1">
                 Twój wynik
               </Text>
               <Text className="text-infiro-white text-5xl font-manrope-extrabold leading-tight text-center mb-2">
