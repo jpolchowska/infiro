@@ -8,10 +8,10 @@ import { EbookRenderer } from '../../../components/ebook/EbookRenderer';
 import { Text } from '../../../components/Text';
 import { ErrorState } from '../../../components/student/ErrorState';
 import { Ebook, getEbook } from '../../../lib/ebook';
-
-const NAVY = '#142284';
+import { useTheme, withAlpha } from '../../../lib/theme';
 
 export default function EbookScreen() {
+  const theme = useTheme();
   const { subsectionId } = useLocalSearchParams<{ subsectionId: string }>();
   const [ebook, setEbook] = useState<Ebook | null | undefined>(undefined);
   const [error, setError] = useState(false);
@@ -36,7 +36,7 @@ export default function EbookScreen() {
 
   if (error) {
     return (
-      <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+      <View className="flex-1" style={{ backgroundColor: theme.bg }}>
         <SafeAreaView className="flex-1">
           <ErrorState onRetry={() => setReload((n) => n + 1)} />
         </SafeAreaView>
@@ -46,14 +46,14 @@ export default function EbookScreen() {
 
   if (ebook === undefined) {
     return (
-      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#f4f5fb' }}>
-        <ActivityIndicator color={NAVY} />
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: theme.bg }}>
+        <ActivityIndicator color={theme.textPrimary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1" style={{ backgroundColor: '#f4f5fb' }}>
+    <View className="flex-1" style={{ backgroundColor: theme.bg }}>
       <SafeAreaView className="flex-1" edges={['top']}>
         <View
           className="flex-row items-center justify-between px-5"
@@ -63,11 +63,11 @@ export default function EbookScreen() {
             onPress={() => router.back()}
             hitSlop={12}
             className="w-9 h-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: 'rgba(20,34,132,0.06)' }}
+            style={{ backgroundColor: withAlpha(theme.textPrimary, 0.06) }}
           >
-            <Ionicons name="close" size={18} color={NAVY} />
+            <Ionicons name="close" size={18} color={theme.textPrimary} />
           </Pressable>
-          <Text className="font-manrope-semibold text-[13px]" style={{ color: '#8b93bd' }}>
+          <Text className="font-manrope-semibold text-[13px]" style={{ color: theme.textSecondary }}>
             Teoria
           </Text>
           <View className="w-9" />
@@ -75,10 +75,13 @@ export default function EbookScreen() {
 
         {ebook === null ? (
           <View className="flex-1 items-center justify-center px-8">
-            <Text className="text-infiro-navy font-manrope-extrabold text-lg text-center">
+            <Text
+              className="font-manrope-extrabold text-lg text-center"
+              style={{ color: theme.textPrimary }}
+            >
               Teoria jeszcze niedostępna
             </Text>
-            <Text style={{ color: '#8b93bd' }} className="font-manrope-medium text-[13px] text-center mt-2">
+            <Text style={{ color: theme.textSecondary }} className="font-manrope-medium text-[13px] text-center mt-2">
               Wróć tu później — nauczyciel jeszcze nie dodał treści do tej podsekcji.
             </Text>
           </View>
@@ -88,12 +91,15 @@ export default function EbookScreen() {
             contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 40 }}
             showsVerticalScrollIndicator={false}
           >
-            <Text className="text-infiro-navy font-manrope-extrabold text-[26px] leading-[30px]">
+            <Text
+              className="text-[26px] leading-[30px]"
+              style={{ color: theme.textPrimary, fontFamily: theme.headingFontFamily }}
+            >
               {ebook.title}
             </Text>
             {ebook.intro && (
               <Text
-                style={{ color: '#5a6392' }}
+                style={{ color: theme.textSecondary }}
                 className="font-manrope-medium text-[14px] leading-[20px] mt-2.5"
               >
                 {ebook.intro}

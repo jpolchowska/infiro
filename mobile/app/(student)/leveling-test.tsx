@@ -283,7 +283,7 @@ export default function LevelingTestScreen() {
           >
             <View className="items-center">
               <View
-                className="w-24 h-24 rounded-full bg-infiro-purple/15 items-center justify-center mb-6"
+                className="w-24 h-24 rounded-full bg-infiro-purple/15 items-center justify-center mb-8"
                 style={{
                   shadowColor: '#c873d9',
                   shadowOpacity: 0.4,
@@ -298,24 +298,19 @@ export default function LevelingTestScreen() {
               <Text className="text-infiro-white/60 text-sm uppercase tracking-wide text-center mb-1">
                 Twój wynik
               </Text>
-              <Text className="text-infiro-white text-5xl font-manrope-extrabold leading-tight text-center mb-4">
+              <Text className="text-infiro-white text-5xl font-manrope-extrabold leading-tight text-center mb-2">
                 {result.total}/{result.maxTotal}
               </Text>
 
-              <View className="bg-infiro-purple/20 rounded-full px-4 py-1.5 mb-4">
-                <Text className="text-infiro-white font-manrope-bold text-sm">Poziom: {result.levelLabel}</Text>
-              </View>
-
-              <Text className="text-infiro-white/80 text-base leading-relaxed text-center mb-8">
-                {result.encouragement}
-              </Text>
-
-              <View className="w-full bg-infiro-white/10 rounded-2xl p-5 gap-6">
+              <View
+                className="w-full bg-infiro-white/10 rounded-2xl p-5 gap-7"
+                style={{ marginTop: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}
+              >
                 {result.perSection.map((section) => {
                   const percent = section.total > 0 ? Math.min(100, Math.round((section.score / section.total) * 100)) : 0;
                   return (
                     <View key={section.sectionId}>
-                      <View className="flex-row items-center justify-between mb-2">
+                      <View className="flex-row items-center justify-between mb-2.5">
                         <Text className="text-infiro-white text-sm font-manrope-semibold flex-1 mr-2">
                           {section.sectionTitle}
                         </Text>
@@ -323,8 +318,8 @@ export default function LevelingTestScreen() {
                           {section.score}/{section.total}
                         </Text>
                       </View>
-                      <View className="w-full h-2 bg-infiro-white/15 rounded-full overflow-hidden">
-                        <View className="h-2 bg-infiro-coral rounded-full" style={{ width: `${percent}%` }} />
+                      <View className="w-full h-2.5 bg-infiro-white/15 rounded-full overflow-hidden">
+                        <View className="h-2.5 bg-infiro-coral rounded-full" style={{ width: `${percent}%` }} />
                       </View>
                     </View>
                   );

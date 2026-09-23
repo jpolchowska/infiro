@@ -8,6 +8,13 @@ import {
   Manrope_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/manrope';
+import { Baloo2_700Bold } from '@expo-google-fonts/baloo-2';
+import { BodoniModa_700Bold } from '@expo-google-fonts/bodoni-moda';
+import { Fraunces_700Bold } from '@expo-google-fonts/fraunces';
+import { Oswald_700Bold } from '@expo-google-fonts/oswald';
+import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
+import { Rajdhani_700Bold } from '@expo-google-fonts/rajdhani';
+import { TitanOne_400Regular } from '@expo-google-fonts/titan-one';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -23,6 +30,13 @@ export default function RootLayout() {
     Manrope_600SemiBold,
     Manrope_700Bold,
     Manrope_800ExtraBold,
+    Oswald_700Bold,
+    Rajdhani_700Bold,
+    TitanOne_400Regular,
+    Baloo2_700Bold,
+    BodoniModa_700Bold,
+    PlayfairDisplay_700Bold_Italic,
+    Fraunces_700Bold,
   });
 
   useEffect(() => {
