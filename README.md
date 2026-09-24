@@ -56,6 +56,7 @@ The project organizes course content into sections → subsections → tasks, wi
 - Leveling (diagnostic) test with per-section results and attempt history
 - Theory e-book reader
 - Fractions rendered in stacked notation
+- Per-interest visual theme — background, accent colors, and heading font adapt to the chosen interest across the panel
 - Personal stats, interests, and profile
 
 **Teachers & Admins**
