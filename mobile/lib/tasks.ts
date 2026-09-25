@@ -108,7 +108,6 @@ export type TaskAnswerResult = {
   attemptNumber: number;
   attemptsLeft: number | null;
   solution: TaskSolution;
-  // Poziom trudności odblokowany tą odpowiedzią (null poza tym jednym momentem przejścia).
   unlockedDifficulty: number | null;
 };
 

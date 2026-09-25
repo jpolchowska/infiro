@@ -56,14 +56,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // --- 🔄 ODŚWIEŻANIE TOKENA (Token Refresh) ---
   useEffect(() => {
     if (!authenticated) return;
 
-    // 1. Reaguj na zdarzenia Keycloaka (gdy biblioteka sama odświeży token)
     keycloak.onTokenExpired = () => {
       keycloak
-        .updateToken(30) // odśwież, jeśli token wygasa w ciągu 30s
+        .updateToken(30)
         .then((refreshed) => {
           if (refreshed) {
             setToken(keycloak.token);
@@ -75,10 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
-    // 2. Cykliczny interwał sprawdzający co 20 sekund, czy token nie wygasa
     const interval = setInterval(() => {
       keycloak
-        .updateToken(70) // odśwież, jeśli wygasa w ciągu najbliższych 70s
+        .updateToken(70)
         .then((refreshed) => {
           if (refreshed) {
             setToken(keycloak.token);
@@ -95,11 +92,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [authenticated]);
 
-  // Pomocnicza funkcja do pobierania ZAWSZE ważnego tokena przed wywołaniem API
   const getToken = async (): Promise<string | undefined> => {
     if (!keycloak.authenticated) return undefined;
     try {
-      // Wymuś odświeżenie, jeśli token jest bliski wygaśnięcia (min. 30s ważności)
       await keycloak.updateToken(30);
       setToken(keycloak.token);
       return keycloak.token;
@@ -129,7 +124,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Hook do łatwego używania w komponentach potomnych
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

@@ -26,7 +26,7 @@ export default function TestTokenPage() {
       <h2 className="text-xl font-bold">Test getToken()</h2>
       
       <p className="text-sm text-gray-600">
-        Status zalogowania: <strong>{authenticated ? "Zalogowany ✅" : "Niezalogowany ❌"}</strong>
+        Status zalogowania: <strong>{authenticated ? "Zalogowany" : "Niezalogowany"}</strong>
       </p>
 
       <button

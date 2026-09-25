@@ -49,8 +49,6 @@ export default function RootLayout() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }}>
-        {/* Logowanie -> apka i apka -> logowanie to reset sesji, nie nawigacja
-            "w głąb" -- przenikanie zamiast przewracania kartki. */}
         <Stack.Screen name="index" options={{ animation: 'fade', animationDuration: 220 }} />
         <Stack.Screen name="(student)" options={{ animation: 'fade', animationDuration: 220 }} />
         <Stack.Screen name="(teacher)" options={{ animation: 'fade', animationDuration: 220 }} />

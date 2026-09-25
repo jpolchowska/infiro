@@ -80,8 +80,6 @@ useEffect(() => {
 
   return (
     <View className="flex-1 bg-infiro-navy" style={{ overflow: 'hidden' }}>
-      {/* --- Dekoracja ekranu logowania (placeholder, bez grafik) ---
-          Do usunięcia w całości, jeśli powstanie prawdziwy design / logo. */}
       <View
         pointerEvents="none"
         style={{
@@ -108,7 +106,6 @@ useEffect(() => {
           opacity: 0.12,
         }}
       />
-      {/* --- koniec dekoracji --- */}
 
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
         <View className="flex-1 px-6" style={{ paddingTop: 12, paddingBottom: 20 }}>

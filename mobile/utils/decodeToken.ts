@@ -1,4 +1,3 @@
-// utils/decodeToken.ts
 import { jwtDecode } from "jwt-decode";
 
 interface KeycloakTokenPayload {
@@ -12,7 +11,6 @@ interface KeycloakTokenPayload {
 export function getAccountType(token: string): "Nauczyciel" | "Uczeń" | null {
   const decoded = jwtDecode<KeycloakTokenPayload>(token);
 
-  // Wariant A: masz custom claim (zalecane, patrz punkt 2)
   if (decoded.realm_access?.roles?.includes("ROLE_TEACHER")) {
     return "Nauczyciel";
   }
@@ -22,7 +20,6 @@ export function getAccountType(token: string): "Nauczyciel" | "Uczeń" | null {
 
 }
 
-/** Imię wprost z tokena Keycloaka -- nie wymaga żadnego zapytania do backendu. */
 export function getGivenName(token: string): string | null {
   const decoded = jwtDecode<KeycloakTokenPayload>(token);
   return decoded.given_name ?? null;
