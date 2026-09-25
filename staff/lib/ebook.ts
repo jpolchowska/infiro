@@ -44,7 +44,6 @@ function mapBlock(raw: RawBlock): EbookBlock {
   return raw;
 }
 
-// null = podsekcja nie ma jeszcze e-booka (backend zwraca 404).
 export async function getEbook(token: string, subsectionId: number): Promise<Ebook | null> {
   try {
     const raw = await apiFetch<RawEbook>(`/api/student/subsections/${subsectionId}/ebook`, { token });

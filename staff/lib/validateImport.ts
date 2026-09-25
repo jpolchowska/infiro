@@ -4,7 +4,6 @@ function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
 }
 
-// Mirrors backend/app/routes/admin_import.py's validate_import_payload — keep in sync with it.
 export function validateImportPayload(data: unknown): string[] {
   const errors: string[] = [];
 

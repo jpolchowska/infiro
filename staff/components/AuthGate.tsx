@@ -11,7 +11,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Sprawdzamy role realmowe -- panel obsługuje zarówno admina, jak i nauczyciela.
   const isAdmin = authenticated && keycloak?.hasRealmRole("admin");
   const isTeacher = authenticated && keycloak?.hasRealmRole("ROLE_TEACHER");
   const role: "admin" | "teacher" | null = isAdmin ? "admin" : isTeacher ? "teacher" : null;
@@ -48,7 +47,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // Zalogowany, ale bez roli admina ani nauczyciela -> Blokada 403
   if (authenticated && role === null) {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center">
@@ -66,7 +64,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Zalogowany administrator lub nauczyciel -> Pełny panel
   return (
     <>
       <header className="border-b border-gray-200 bg-white">
