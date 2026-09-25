@@ -21,7 +21,6 @@ type RawMe = {
 export async function getMe(): Promise<StudentMe> {
   const raw = await apiFetch<RawMe>("/api/student/me");
   const token = await SecureStore.getItemAsync("access_token");
-  // Imię bierzemy wprost z tokena Keycloaka -- backend go nie zwraca.
   const name = token ? getGivenName(token) : null;
 
   return {
@@ -33,7 +32,6 @@ export async function getMe(): Promise<StudentMe> {
   };
 }
 
-// interest === null czyści wybór.
 export async function saveInterest(interest: string | null): Promise<void> {
   await apiFetch<void>("/api/student/interest", {
     method: "PATCH",
@@ -192,7 +190,6 @@ export type SubsectionTaskSummary = {
   id: number;
   position: number;
   type: TaskType;
-  // null dla memory -- o trudności decyduje liczba par.
   difficulty: 1 | 2 | 3 | null;
   status: SubsectionTaskStatus;
 };
@@ -204,8 +201,6 @@ export type SubsectionDetail = {
   sectionId: number;
   sectionTitle: string;
   sectionIndex: number;
-  // Kolejna podsekcja w tym samym dziale (null = ostatnia) -- pod przycisk
-  // "Dalej" po ukończeniu wszystkich zadań.
   nextSubsectionId: number | null;
   tasks: SubsectionTaskSummary[];
 };
@@ -252,7 +247,6 @@ export async function getSubsectionTasks(subsectionId: number): Promise<Subsecti
   };
 }
 
-// Backend zwraca tu już camelCase (`completedAt`) -- bez mapowania.
 export async function getLevelingTestHistory(): Promise<LastLevelingTest[]> {
   return apiFetch<LastLevelingTest[]>("/api/student/leveling-test/history");
 }

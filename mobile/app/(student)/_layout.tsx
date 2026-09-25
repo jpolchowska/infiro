@@ -1,4 +1,3 @@
-// app/(student)/_layout.tsx
 import { Stack } from 'expo-router';
 import { ThemeProvider } from '../../lib/theme';
 
