@@ -30,7 +30,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/infiro_logo_pozytyw_bez_tla.png",
+          "image": "./assets/infiro-logo.png",
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
