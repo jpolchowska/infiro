@@ -224,7 +224,7 @@ docker compose exec backend python -m pytest tests -q
    docker compose -f compose.yaml -f compose.prod.yaml ps
 ```
 
-5. Log into Keycloak as admin (`https://mathiro.test/admin/` or through link), switch to the `matematyka-app` realm, open the `nextjs-staff` client, and add the tunnel URL from step 2 to both **Valid Redirect URIs** and **Web Origins** — add it alongside the existing `mathiro.test` entries, don't replace them. Keep in mind that during adding link from step 2, you have to add /* in the bacl for expample https://broader-teaches-pitch-hurricane.trycloudflare.com/* .
+5. Log into Keycloak as admin (`https://mathiro.test/admin/` or through link), switch to the `matematyka-app` realm, open the `nextjs-app` client, and add the tunnel URL from step 2 to both **Valid Redirect URIs** and **Web Origins** — add it alongside the existing `mathiro.test` entries, don't replace them. Keep in mind that during adding link from step 2, you have to add /* in the bacl for expample https://broader-teaches-pitch-hurricane.trycloudflare.com/* .
 
 6. Open the app:
    - Browser, this machine: `https://mathiro.test`
