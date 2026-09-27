@@ -1,0 +1,70 @@
+# Użycie:
+#   docker compose -f compose.yaml -f docker-compose.prod.yml up --build -d
+
+services:
+  keycloak:
+    command: start --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: $KC_ADMIN_PASSWORD
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: $KC_DB_PASSWORD
+
+      KC_HOSTNAME: $DOMAIN
+      KC_HOSTNAME_STRICT: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+
+      KC_HEALTH_ENABLED: "true"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    environment:
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: null
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: $DB_NAME
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres-init:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend/
+      target: prod
+    environment:
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      FLASK_APP: run.py
+    restart: unless-stopped
+
+  staff:
+    build:
+      context: ./staff/
+      target: prod
+      args:
+        NEXT_PUBLIC_KEYCLOAK_URL: $DOMAIN
+        NEXT_PUBLIC_KEYCLOAK_REALM: $NEXT_PUBLIC_KEYCLOAK_REALM
+        NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: $NEXT_PUBLIC_KEYCLOAK_CLIENT_ID
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infrastructure/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/certs:/etc/nginx/certs:ro
+    restart: unless-stopped
