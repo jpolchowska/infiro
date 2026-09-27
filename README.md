@@ -132,13 +132,14 @@ cd infiro
 ### Environment Variables
 
 ```bash
-cp .env.example .env
+cp .env.dev.example .env
 # fill in .env with your values
 ```
 
-Create the database password secret:
+Create the database password secret (it must match `DB_PASSWORD` in `.env`):
 
 ```bash
+mkdir -p infrastructure/secrets
 echo "mysecretpassword" > infrastructure/secrets/db_password.txt
 ```
 
@@ -163,8 +164,8 @@ Database migrations are applied automatically when the backend starts. A fresh d
 ### Run the Mobile App
 
 ```bash
-cp mobile/.env.example mobile/.env
-# fill in mobile/.env — see the comments in mobile/.env.example for
+cp mobile/.env.dev.example mobile/.env
+# fill in mobile/.env — see the comments in mobile/.env.dev.example for
 # Android Studio vs. Expo Go configuration
 ```
 
@@ -191,7 +192,7 @@ docker compose exec backend python -m pytest tests -q
 - Install `mkcert` and run `mkcert -install`
 - Generate a certificate:
 ```bash
-  cd infrastructure/certs && mkcert mathiro.test "*.mathiro.test"
+  mkdir -p infrastructure/certs && cd infrastructure/certs && mkcert mathiro.test "*.mathiro.test"
 ```
 - Add `mathiro.test` to your hosts file:
 ```bash
@@ -207,6 +208,7 @@ docker compose exec backend python -m pytest tests -q
      -c "CREATE USER keycloak WITH PASSWORD 'your_password';" \
      -c "CREATE DATABASE keycloak OWNER keycloak;"
 ```
+   Whichever way you create it, `KC_DB_PASSWORD` in `.env` must match the Keycloak database password — the init script hardcodes it as `silne_losowe_haslo_2`.
 
 2. Create the tunnel (leave this terminal open for the whole testing session):
 ```bash
@@ -225,7 +227,7 @@ docker compose exec backend python -m pytest tests -q
    docker compose -f compose.yaml -f compose.prod.yaml ps
 ```
 
-5. Log into Keycloak as admin (`https://mathiro.test/admin/` or through link), switch to the `matematyka-app` realm, open the `nextjs-app` client, and add the tunnel URL from step 2 to both **Valid Redirect URIs** and **Web Origins** — add it alongside the existing `mathiro.test` entries, don't replace them. Keep in mind that during adding link from step 2, you have to add /* in the bacl for expample https://broader-teaches-pitch-hurricane.trycloudflare.com/* .
+5. Log into Keycloak as admin (`https://mathiro.test/admin/` or the tunnel address), switch to the `matematyka-app` realm, open the `nextjs-app` client, and add the tunnel URL from step 2 with `/*` appended to **Valid Redirect URIs** (e.g. `https://xxxx.trycloudflare.com/*`). Add it alongside the existing entries — don't replace them.
 
 6. Open the app:
    - Browser, this machine: `https://mathiro.test`
@@ -370,10 +372,15 @@ infiro/
 ├── infrastructure/
 │   ├── realm-export.json          # Keycloak realm — auto-imported on startup
 │   ├── nginx.conf                 # single entrypoint / reverse proxy config
-│   └── secrets/db_password.txt
+│   ├── nginx.prod.conf            # production nginx config (HTTPS)
+│   ├── postgres-init/             # creates the Keycloak database on first Postgres start
+│   ├── certs/                     # local mkcert certificates (not committed)
+│   └── secrets/db_password.txt    # not committed
 ├── docs/                          # task and e-book JSON format specs
 ├── compose.yaml
-└── .env.example
+├── compose.prod.yaml              # production overrides
+├── .env.dev.example
+└── .env.prod.example
 ```
 
 ## Documentation
