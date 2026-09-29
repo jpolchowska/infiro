@@ -252,6 +252,63 @@ export default function SectionDetailScreen() {
                 );
               })}
             </View>
+
+            {pct === 100 && (
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: '/(student)/final-test/[sectionId]',
+                    params: { sectionId: String(section.id), sectionIndex: String(section.index) },
+                  })
+                }
+                className="flex-row items-center"
+                style={{
+                  marginTop: 18,
+                  borderRadius: 20,
+                  padding: 16,
+                  gap: 14,
+                  backgroundColor: theme.surface,
+                  borderWidth: 1.5,
+                  borderColor: withAlpha(color, 0.4),
+                  shadowColor: color,
+                  shadowOpacity: 0.18,
+                  shadowRadius: 16,
+                  shadowOffset: { width: 0, height: 6 },
+                  elevation: 4,
+                }}
+              >
+                <View
+                  className="items-center justify-center"
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 100,
+                    backgroundColor: withAlpha(color, 0.15),
+                    shadowColor: color,
+                    shadowOpacity: 0.35,
+                    shadowRadius: 10,
+                    shadowOffset: { width: 0, height: 0 },
+                    elevation: 3,
+                  }}
+                >
+                  <Ionicons name="trophy-outline" size={24} color={color} />
+                </View>
+                <View className="flex-1">
+                  <Text style={{ color, letterSpacing: 1 }} className="font-manrope-bold text-[11px] uppercase">
+                    Finał działu
+                  </Text>
+                  <Text className="font-manrope-extrabold text-[16px] mt-0.5" style={{ color: theme.textPrimary }}>
+                    Test końcowy
+                  </Text>
+                  <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs mt-0.5">
+                    {section.lastFinalTestScore != null
+                      ? `Ostatni wynik: ${section.lastFinalTestScore}/${section.lastFinalTestMaxScore}`
+                      : 'Sprawdź, co zapamiętałeś/aś'}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
+              </Pressable>
+            )}
           </View>
         )}
       </ScrollView>

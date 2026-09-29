@@ -148,6 +148,8 @@ export type SectionSummary = {
   description: string | null;
   index: number;
   subsections: SectionSubsectionSummary[];
+  lastFinalTestScore: number | null;
+  lastFinalTestMaxScore: number | null;
 };
 
 type RawSectionSubsection = {
@@ -164,6 +166,8 @@ type RawSection = {
   description: string | null;
   index: number;
   subsections: RawSectionSubsection[];
+  last_final_test_score: number | null;
+  last_final_test_max_score: number | null;
 };
 
 export async function getSections(): Promise<SectionSummary[]> {
@@ -181,6 +185,8 @@ export async function getSections(): Promise<SectionSummary[]> {
       solvedTasks: sub.solved_tasks,
       totalTasks: sub.total_tasks,
     })),
+    lastFinalTestScore: s.last_final_test_score,
+    lastFinalTestMaxScore: s.last_final_test_max_score,
   }));
 }
 
