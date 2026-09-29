@@ -18,6 +18,7 @@ def create_app(config=None):
     from app.routes.public import public_bp
     from app.routes.student import student_bp
     from app.routes.leveling_test import leveling_test_bp
+    from app.routes.section_test import section_test_bp
     from app.routes.tasks import tasks_bp
     from app.routes.admin_sections import admin_sections_bp
     from app.routes.admin_materials import admin_materials_bp
@@ -29,6 +30,7 @@ def create_app(config=None):
 
     app.register_blueprint(student_bp)
     app.register_blueprint(leveling_test_bp)
+    app.register_blueprint(section_test_bp)
     app.register_blueprint(public_bp)
     app.register_blueprint(tasks_bp)
     app.register_blueprint(admin_sections_bp)

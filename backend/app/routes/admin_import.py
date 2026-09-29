@@ -17,6 +17,8 @@ from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.ebooks import ebooks
+from app.models.section_test_questions import SectionTestQuestion
+from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.services.uploads import extract_image_zip
 
 admin_import_bp = Blueprint("admin_import", __name__)
@@ -130,6 +132,104 @@ def validate_import_payload(data):
     except jsonschema.exceptions.ValidationError as err:
         print(f"Błąd walidacji: {err.message}")
         return False
+
+ALLOWED_SECTION_TEST_TYPES = {"single_choice", "short_answer"}
+
+
+def validate_section_test_payload(data):
+    """Waliduje sparsowany JSON z importem testu końcowego działu (format:
+    sekcje -> pytania, bez podsekcji i bez difficulty -- to nie jest zadanie
+    ćwiczeniowe). Zwraca listę błędów jako tekst; pusta lista oznacza
+    poprawny plik. Odzwierciedla logikę
+    staff/lib/validateImport.ts's validateSectionTestPayload -- trzymać oba
+    pliki w zgodzie.
+    """
+    schema = {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["section", "questions"],
+            "properties": {
+                "section": {"type": "string"},
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["type", "themes"],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": list(ALLOWED_SECTION_TEST_TYPES),
+                            },
+                            "content_key": {"type": "string"},
+                            "themes": {
+                                "type": "object",
+                                "required": ["default"],
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "required": ["prompt"],
+                                    "properties": {
+                                        "prompt": {"type": "string"},
+                                        "options": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "required": ["text"],
+                                                "properties": {
+                                                    "text": {"type": "string"},
+                                                    "correct": {"type": "boolean"}
+                                                }
+                                            }
+                                        },
+                                        "answers": {
+                                            "type": "array",
+                                            "items": {"type": "string"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    try:
+        validate(instance=data, schema=schema)
+        return True
+    except jsonschema.exceptions.ValidationError as err:
+        print(f"Błąd walidacji: {err.message}")
+        return False
+
+
+def _replace_section_test_options(question, options):
+    existing = SectionTestAnswerOption.query.filter_by(
+        section_test_question_id=question.id
+    ).order_by(SectionTestAnswerOption.order_index).all()
+    for index, option_data in enumerate(options, start=1):
+        if index <= len(existing):
+            option = existing[index - 1]
+            option.option_text = option_data["text"].strip()
+            option.is_correct = option_data.get("correct") is True
+            option.order_index = index
+        else:
+            db.session.add(SectionTestAnswerOption(
+                section_test_question_id=question.id,
+                option_text=option_data["text"].strip(),
+                is_correct=option_data.get("correct") is True,
+                order_index=index,
+            ))
+
+
+def _section_test_question_output(question):
+    return {
+        "id": question.id,
+        "content_key": question.content_key,
+        "type": question.type,
+        "themes": question.themes,
+    }
+
 
 MEMORY_DIFFICULTY_BY_PAIRS = {3: 2, 6: 3}
 
@@ -475,5 +575,79 @@ def upload_ebooks():
         "title": ebook.title,
         "intro": ebook.intro,
         "blocks": ebook.content,
+    }), 201
+
+
+@admin_import_bp.route("/api/admin/sections/<int:section_id>/final-test/import", methods=["POST"])
+@authenticate_token
+@require_realm_role("admin")
+def import_section_test(section_id):
+    section = db.session.get(Section, section_id)
+    if section is None:
+        return jsonify({"errors": [f"Section does not exist: {section_id}"]}), 404
+
+    data = request.get_json()
+    if data is None:
+        return jsonify({"error": "JSON body is required"}), 400
+
+    isOk = validate_section_test_payload(data)
+    if isOk == False:
+        return jsonify({"errors": ["Invalid JSON format"]}), 400
+
+    section_entry = next(
+        (entry for entry in data if entry["section"].strip() == section.title), None
+    )
+    if section_entry is None:
+        return jsonify({"errors": [
+            f"payload does not contain a 'section' matching '{section.title}'"
+        ]}), 400
+
+    content_keys = set()
+    imported_questions = []
+    question_count = 0
+
+    for question_order, question_data in enumerate(section_entry["questions"], start=1):
+        themes = _resolved_themes(question_data["themes"])
+        content_key = question_data.get("content_key") or str(uuid4())
+        if content_key in content_keys:
+            return jsonify({"errors": [
+                f"duplicate content_key: '{content_key}'"
+            ]}), 400
+        content_keys.add(content_key)
+
+        question = SectionTestQuestion.query.filter_by(content_key=content_key).first()
+        if question is None:
+            question = SectionTestQuestion(
+                section_id=section.id,
+                prompt="",
+                type=question_data["type"],
+                order_index=question_order,
+                content_key=content_key,
+            )
+            db.session.add(question)
+            db.session.flush()
+
+        default = themes["default"]
+        question.section_id = section.id
+        question.type = question_data["type"]
+        question.order_index = question_order
+        question.prompt = default["prompt"].strip()
+        question.accepted_answers = default.get("answers")
+        question.themes = themes
+        question.content_key = content_key
+        question_data["id"] = question.id
+        question_data["content_key"] = content_key
+
+        if question.type == "single_choice":
+            _replace_section_test_options(question, default["options"])
+        question_count += 1
+        imported_questions.append(_section_test_question_output(question))
+
+    db.session.commit()
+
+    return jsonify({
+        "question_count": question_count,
+        "questions": imported_questions,
+        "data": data,
     }), 201
 
