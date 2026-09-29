@@ -7,3 +7,6 @@ from app.models.users import User
 from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.ebooks import ebooks
+from app.models.section_test_questions import SectionTestQuestion
+from app.models.section_test_answer_options import SectionTestAnswerOption
+from app.models.section_test_attempts import SectionTestAttempt
