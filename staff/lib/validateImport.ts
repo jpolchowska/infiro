@@ -96,3 +96,68 @@ function validatePairs(value: unknown, label: string, errors: string[]) {
   if (!Array.isArray(value) || ![3, 6].includes(value.length)) { errors.push(`${label}: 'pairs' musi być listą długości 3 albo 6.`); return; }
   value.forEach((pair, i) => { if (typeof pair !== "object" || pair === null || Array.isArray(pair) || !isNonEmptyString((pair as Unknown).a) || !isNonEmptyString((pair as Unknown).b)) errors.push(`${label} para #${i + 1}: 'a' i 'b' muszą być niepustymi tekstami.`); });
 }
+
+// Odzwierciedla logikę backend/app/routes/admin_import.py's
+// validate_section_test_payload -- trzymać oba pliki w zgodzie.
+const ALLOWED_SECTION_TEST_TYPES = new Set(["single_choice", "short_answer"]);
+
+export function validateSectionTestPayload(data: unknown): string[] {
+  const errors: string[] = [];
+
+  if (!Array.isArray(data)) {
+    return ["Plik musi zawierać tablicę JSON sekcji."];
+  }
+  if (data.length === 0) {
+    return ["Plik nie zawiera żadnych sekcji."];
+  }
+
+  data.forEach((rawItem, i) => {
+    if (typeof rawItem !== "object" || rawItem === null || Array.isArray(rawItem)) {
+      errors.push(`sekcja #${i + 1}: musi być obiektem.`);
+      return;
+    }
+    const section = rawItem as Unknown;
+    const sectionLabel = `sekcja #${i + 1}`;
+    if (!isNonEmptyString(section.section)) errors.push(`${sectionLabel}: 'section' musi być niepustym tekstem.`);
+    if (!Array.isArray(section.questions)) {
+      errors.push(`${sectionLabel}: 'questions' musi być listą.`);
+      return;
+    }
+    section.questions.forEach((rawQuestion, k) =>
+      validateSectionTestQuestion(rawQuestion, `${sectionLabel} / pytanie #${k + 1}`, errors)
+    );
+  });
+
+  return errors;
+}
+
+function validateSectionTestQuestion(rawQuestion: unknown, label: string, errors: string[]) {
+  if (typeof rawQuestion !== "object" || rawQuestion === null || Array.isArray(rawQuestion)) {
+    errors.push(`${label}: musi być obiektem.`);
+    return;
+  }
+  const question = rawQuestion as Unknown;
+  if (typeof question.content_key !== "undefined" && !isNonEmptyString(question.content_key)) errors.push(`${label}: 'content_key' musi być niepustym tekstem.`);
+  const type = question.type;
+  if (typeof type !== "string" || !ALLOWED_SECTION_TEST_TYPES.has(type)) {
+    errors.push(`${label}: 'type' musi być jednym z: single_choice, short_answer.`);
+    return;
+  }
+  if (typeof question.themes !== "object" || question.themes === null || Array.isArray(question.themes)) {
+    errors.push(`${label}: 'themes' musi być obiektem.`);
+    return;
+  }
+  const themes = question.themes as Unknown;
+  if (!("default" in themes)) errors.push(`${label}: themes musi zawierać 'default'.`);
+  for (const [key, rawVariant] of Object.entries(themes)) {
+    if (!ALLOWED_THEMES.has(key)) errors.push(`${label}: nieznany klucz motywu '${key}'.`);
+    if (typeof rawVariant !== "object" || rawVariant === null || Array.isArray(rawVariant)) {
+      errors.push(`${label} motyw '${key}': musi być obiektem.`);
+      continue;
+    }
+    const variant = rawVariant as Unknown;
+    if (!isNonEmptyString(variant.prompt)) errors.push(`${label} motyw '${key}': 'prompt' musi być niepustym tekstem.`);
+    if (type === "single_choice" && (key === "default" || "options" in variant)) validateOptions(variant.options, `${label} motyw '${key}'`, errors);
+    if (type === "short_answer" && (key === "default" || "answers" in variant)) validateAnswers(variant.answers, `${label} motyw '${key}'`, errors);
+  }
+}

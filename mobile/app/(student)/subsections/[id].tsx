@@ -100,7 +100,16 @@ export default function SubsectionTasksScreen() {
           label: 'Dalej',
           onPress: () => router.replace(`/(student)/subsections/${detail.nextSubsectionId}`),
         }
-      : { label: 'Wróć do działu', onPress: goToSection }
+      : {
+          label: 'Test końcowy działu',
+          onPress: () => {
+            if (detail)
+              router.push({
+                pathname: '/(student)/final-test/[sectionId]',
+                params: { sectionId: String(detail.sectionId), sectionIndex: String(detail.sectionIndex) },
+              });
+          },
+        }
     : {
         label: solved === 0 ? 'Zacznij ćwiczyć' : 'Ćwicz dalej',
         onPress: () => {

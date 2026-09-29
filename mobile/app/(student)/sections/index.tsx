@@ -148,6 +148,34 @@ export default function SectionsScreen() {
                       <View style={{ height: 8, borderRadius: 100, width: `${pct}%`, backgroundColor: color }} />
                     </View>
 
+                    {pct === 100 && (
+                      <Pressable
+                        onPress={() =>
+                          router.push({
+                            pathname: '/(student)/final-test/[sectionId]',
+                            params: { sectionId: String(section.id), sectionIndex: String(section.index) },
+                          })
+                        }
+                        className="flex-row items-center"
+                        style={{
+                          marginTop: 12,
+                          gap: 8,
+                          paddingVertical: 8,
+                          paddingHorizontal: 12,
+                          borderRadius: 100,
+                          alignSelf: 'flex-start',
+                          backgroundColor: withAlpha(theme.surface, 0.6),
+                        }}
+                      >
+                        <Ionicons name="school-outline" size={14} color={color} />
+                        <Text className="font-manrope-bold text-xs" style={{ color: theme.textPrimary }}>
+                          {section.lastFinalTestScore != null
+                            ? `Test końcowy: ${section.lastFinalTestScore}/${section.lastFinalTestMaxScore}`
+                            : 'Test końcowy działu'}
+                        </Text>
+                      </Pressable>
+                    )}
+
                     {expanded && section.description && (
                       <Text
                         style={{ color: theme.textSecondary }}

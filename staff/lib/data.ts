@@ -335,6 +335,17 @@ export async function importEbook(
   );
 }
 
+export async function importSectionTest(
+  token: string,
+  sectionId: number,
+  payload: unknown
+): Promise<{ question_count: number; questions: unknown[]; data: unknown[] }> {
+  return apiFetch<{ question_count: number; questions: unknown[]; data: unknown[] }>(
+    `/api/admin/sections/${sectionId}/final-test/import`,
+    { token, method: "POST", json: payload }
+  );
+}
+
 type RawStudent = {
   id: number;
   name: string | null;

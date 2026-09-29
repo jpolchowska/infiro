@@ -13,6 +13,7 @@ from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
+from app.models.section_test_attempts import SectionTestAttempt
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.ebooks import ebooks
 from app.utills import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options, determine_student_difficulty_level_, _student_subsection_json
@@ -50,11 +51,20 @@ def get_student_sections():
                     student_id, 
                     subsection )
              )
-        result.append({ 
-            "id": section.id, 
-            "title": section.title, 
-            "description": section.description, 
+        last_final_test = (
+            SectionTestAttempt.query
+            .filter_by(student_id=student_id, section_id=section.id)
+            .order_by(SectionTestAttempt.completed_at.desc())
+            .first()
+        )
+
+        result.append({
+            "id": section.id,
+            "title": section.title,
+            "description": section.description,
             "index": index, "subsections": subsection_data,
+            "last_final_test_score": last_final_test.score if last_final_test else None,
+            "last_final_test_max_score": last_final_test.max_score if last_final_test else None,
             })
     return jsonify(result), 200
 

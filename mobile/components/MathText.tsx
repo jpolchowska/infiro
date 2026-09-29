@@ -40,14 +40,14 @@ function Fraction({
     <View style={{ alignItems: 'center', marginHorizontal: 2, flexShrink: 0 }}>
       <Text
         className={className}
-        style={{ includeFontPadding: false, margin: 0, marginBottom: 0, marginTop: 0, ...style }}
+        style={{ includeFontPadding: false, margin: 0, marginBottom: 0, marginTop: 0, color, ...style }}
       >
         {n}
       </Text>
       <View style={{ alignSelf: 'stretch', height: 1.5, marginVertical: 0.5, backgroundColor: color }} />
       <Text
         className={className}
-        style={{ includeFontPadding: false, margin: 0, marginBottom: 0, marginTop: 0, ...style }}
+        style={{ includeFontPadding: false, margin: 0, marginBottom: 0, marginTop: 0, color, ...style }}
       >
         {d}
       </Text>
@@ -62,11 +62,12 @@ function renderWords(
   color: string,
   style: TextStyle | undefined
 ) {
+  const textStyle = { color, ...style };
   const words = text.split(/\s+/).filter(Boolean);
   if (words.length === 0) {
     return /\s/.test(text)
       ? [
-          <Text key={`${key}-space`} className={className} style={style}>
+          <Text key={`${key}-space`} className={className} style={textStyle}>
             {' '}
           </Text>,
         ]
@@ -83,7 +84,7 @@ function renderWords(
     const match = word.match(FRACTION_WORD);
     if (!match) {
       return (
-        <Text key={`${key}-${i}`} className={className} style={style}>
+        <Text key={`${key}-${i}`} className={className} style={textStyle}>
           {prefix + word + space}
         </Text>
       );
@@ -95,13 +96,13 @@ function renderWords(
     return (
       <View key={`${key}-${i}`} style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 0 }}>
         {before ? (
-          <Text className={className} style={style}>
+          <Text className={className} style={textStyle}>
             {before}
           </Text>
         ) : null}
         <Fraction n={n} d={d} className={className} color={color} style={style} />
         {after ? (
-          <Text className={className} style={style}>
+          <Text className={className} style={textStyle}>
             {after}
           </Text>
         ) : null}
@@ -113,7 +114,7 @@ function renderWords(
 export function MathText({ children, className, color = '#142284', style }: MathTextProps) {
   if (!HAS_MARKUP.test(children)) {
     return (
-      <Text className={className} style={style}>
+      <Text className={className} style={{ color, ...style }}>
         {children}
       </Text>
     );
