@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, type SubmitEvent } from "react";
-import { validateImportPayload } from "@/lib/validateImport";
-import { importEbook, importTasks, uploadImagesZip } from "@/lib/data";
+import { useEffect, useState, type SubmitEvent } from "react";
+import { validateImportPayload, validateSectionTestPayload } from "@/lib/validateImport";
+import { getSections, importEbook, importSectionTest, importTasks, uploadImagesZip } from "@/lib/data";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/components/AuthContext";
+import type { Section } from "@/lib/types";
 
 const MAX_ERRORS_SHOWN = 20;
 
@@ -56,6 +57,22 @@ export default function ImportPage() {
   const [uploadResult, setUploadResult] = useState<number | null>(null);
   const [ebookFile, setEbookFile] = useState<File | null>(null);
   const [ebookResult, setEbookResult] = useState<{ title: string } | null>(null);
+  const [sections, setSections] = useState<Section[]>([]);
+  const [finalTestSectionId, setFinalTestSectionId] = useState<number | null>(null);
+  const [finalTestFile, setFinalTestFile] = useState<File | null>(null);
+  const [finalTestCount, setFinalTestCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getToken();
+        const result = await getSections(token ?? "");
+        setSections(result);
+        setFinalTestSectionId((current) => current ?? result[0]?.id ?? null);
+      } catch {}
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleJsonSubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -142,6 +159,49 @@ export default function ImportPage() {
         setErrors([err.message]);
       } else {
         setErrors(["Import e-booka się nie powiódł. Spróbuj ponownie."]);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleFinalTestSubmit(e: SubmitEvent) {
+    e.preventDefault();
+    setFinalTestCount(null);
+    if (!finalTestSectionId) {
+      setErrors(["Wybierz dział."]);
+      return;
+    }
+    if (!finalTestFile) {
+      setErrors(["Wybierz plik .json."]);
+      return;
+    }
+
+    let data: unknown;
+    try {
+      data = JSON.parse(await finalTestFile.text());
+    } catch {
+      setErrors(["Nie udało się sparsować pliku jako JSON."]);
+      return;
+    }
+
+    const validationErrors = validateSectionTestPayload(data);
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors(null);
+    setSubmitting(true);
+    try {
+      const token = await getToken();
+      const result = await importSectionTest(token ?? "", finalTestSectionId, data);
+      setFinalTestCount(result.question_count);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setErrors([err.message]);
+      } else {
+        setErrors(["Import testu końcowego się nie powiódł. Spróbuj ponownie."]);
       }
     } finally {
       setSubmitting(false);
@@ -262,6 +322,49 @@ export default function ImportPage() {
             className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
           >
             {submitting ? "Importowanie…" : "Importuj e-book"}
+          </button>
+        </div>
+      </form>
+
+      {finalTestCount !== null && (
+        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+          Zaimportowano {finalTestCount} pytań testu końcowego.
+        </div>
+      )}
+
+      <form onSubmit={handleFinalTestSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
+        <h2 className="text-sm font-semibold text-infiro-navy">Test końcowy działu (JSON)</h2>
+        <p className="mt-1 text-xs text-gray-500">
+          Osobna pula pytań na koniec działu, niezależna od zwykłych zadań. Format:
+          docs/format-testu-koncowego.md. Dział musi już istnieć.
+        </p>
+        <div className="mt-4">
+          <label className="block text-sm text-gray-600">
+            Dział
+            <select
+              className="mt-1 block w-full rounded-sm border border-gray-300 px-3 py-2 text-sm"
+              value={finalTestSectionId ?? ""}
+              onChange={(e) => setFinalTestSectionId(Number(e.target.value) || null)}
+            >
+              {sections.length === 0 && <option value="">Brak działów</option>}
+              {sections.map((section) => (
+                <option key={section.id} value={section.id}>
+                  {section.title}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="mt-4">
+          <UploadField accept=".json" hint=".json" onFileSelected={setFinalTestFile} />
+        </div>
+        <div className="mt-4 flex justify-center">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+          >
+            {submitting ? "Importowanie…" : "Importuj test końcowy"}
           </button>
         </div>
       </form>
