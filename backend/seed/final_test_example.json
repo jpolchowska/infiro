@@ -1,0 +1,152 @@
+[
+  {
+    "section": "Tabliczka mnożenia i dzielenia",
+    "questions": [
+      {
+        "type": "single_choice",
+        "content_key": "final-mnozenie-1",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 6 × 7?",
+            "options": [
+              { "text": "40" },
+              { "text": "42", "correct": true },
+              { "text": "48" }
+            ]
+          },
+          "sport": {
+            "prompt": "Na turniej zgłosiło się 6 drużyn, każda po 7 zawodników. Ilu zawodników jest łącznie?"
+          },
+          "gry": {
+            "prompt": "Masz 6 skrzyń, a w każdej po 7 kryształów. Ile kryształów masz łącznie?"
+          }
+        }
+      },
+      {
+        "type": "single_choice",
+        "content_key": "final-mnozenie-2",
+        "themes": {
+          "default": {
+            "prompt": "Które dodawanie jest tym samym co 4 × 5?",
+            "options": [
+              { "text": "4 + 5" },
+              { "text": "5 + 5 + 5 + 5", "correct": true },
+              { "text": "4 + 4 + 4" }
+            ]
+          }
+        }
+      },
+      {
+        "type": "single_choice",
+        "content_key": "final-mnozenie-3",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 9 × 8?",
+            "options": [
+              { "text": "63" },
+              { "text": "72", "correct": true },
+              { "text": "81" }
+            ]
+          },
+          "lego": {
+            "prompt": "Budujesz 9 wieżyczek, każda z 8 klocków. Ile klocków zużyjesz łącznie?"
+          }
+        }
+      },
+      {
+        "type": "single_choice",
+        "content_key": "final-mnozenie-4",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 7 × 7?",
+            "options": [
+              { "text": "42" },
+              { "text": "49", "correct": true },
+              { "text": "56" }
+            ]
+          }
+        }
+      },
+      {
+        "type": "single_choice",
+        "content_key": "final-dzielenie-1",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 36 : 6?",
+            "options": [
+              { "text": "5" },
+              { "text": "6", "correct": true },
+              { "text": "7" }
+            ]
+          },
+          "jedzenie": {
+            "prompt": "36 pierogów rozkładasz równo na 6 talerzy. Ile pierogów trafia na jeden talerz?"
+          },
+          "zwierzeta": {
+            "prompt": "36 marchewek dzielisz równo między 6 króliki. Ile marchewek dostaje jeden królik?"
+          }
+        }
+      },
+      {
+        "type": "single_choice",
+        "content_key": "final-dzielenie-2",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 45 : 5?",
+            "options": [
+              { "text": "8" },
+              { "text": "9", "correct": true },
+              { "text": "10" }
+            ]
+          },
+          "rysowanie": {
+            "prompt": "45 kredek rozkładasz równo do 5 piórników. Ile kredek trafia do jednego piórnika?"
+          }
+        }
+      },
+      {
+        "type": "short_answer",
+        "content_key": "final-mnozenie-5",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 8 × 9? Wpisz wynik.",
+            "answers": ["72"]
+          }
+        }
+      },
+      {
+        "type": "short_answer",
+        "content_key": "final-mnozenie-6",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 3 × 8? Wpisz wynik.",
+            "answers": ["24"]
+          }
+        }
+      },
+      {
+        "type": "short_answer",
+        "content_key": "final-dzielenie-3",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 54 : 9? Wpisz wynik.",
+            "answers": ["6"]
+          },
+          "muzyka": {
+            "prompt": "54 nuty rozkładasz równo na 9 taktów. Ile nut jest w jednym takcie? Wpisz wynik."
+          }
+        }
+      },
+      {
+        "type": "short_answer",
+        "content_key": "final-dzielenie-4",
+        "themes": {
+          "default": {
+            "prompt": "Ile to 63 : 7? Wpisz wynik.",
+            "answers": ["9"]
+          }
+        }
+      }
+    ]
+  }
+]
