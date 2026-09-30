@@ -15,7 +15,7 @@ from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.ebooks import ebooks
-from app.utils import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options, determine_student_difficulty_level_, _attempts_used_in_current_cycle, _task_solution
+from app.utils import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options, determine_student_difficulty_level, _attempts_used_in_current_cycle, _task_solution
 import random
 import re
 
@@ -110,7 +110,7 @@ def submit_student_answer(task_id):
         }), 400
 
     # difficulty level of exercise
-    getStudentLevel = determine_student_difficulty_level_(student.id, task.subsection_id)
+    previous_difficulty_level = determine_student_difficulty_level(student.id, task.subsection_id)
 
     # ---------------------------------------------------------
     # MEMORY
@@ -248,15 +248,15 @@ def submit_student_answer(task_id):
         elif task.type == "short_answer":
             solution = _task_solution(task, student.interest)
 
-    newDifficultyLevel = determine_student_difficulty_level_(student.id, task.subsection_id)
+    new_difficulty_level = determine_student_difficulty_level(student.id, task.subsection_id)
 
-    if newDifficultyLevel != getStudentLevel:
+    if new_difficulty_level != previous_difficulty_level:
         return jsonify({
             "is_correct": is_correct,
             "attempt_number": attempt_number,
             "attempts_left": attempts_left,
             "solution": solution,
-            "unlocked_difficulty": newDifficultyLevel
+            "unlocked_difficulty": new_difficulty_level
         }), 200
 
     return jsonify({

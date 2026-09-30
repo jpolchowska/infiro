@@ -254,8 +254,8 @@ def _task_solution(task, interest=None):
 
     return None
 
-def determine_student_difficulty_level_(student_id, subsection_id):
-    tasksDoneByStudent = (
+def determine_student_difficulty_level(student_id, subsection_id):
+    tasks_done_by_student = (
         db.session.query(
             StudentAnswer.task_id,
             Task.difficulty_level,
@@ -271,33 +271,31 @@ def determine_student_difficulty_level_(student_id, subsection_id):
         .all()
     )
 
-    AllExercisesInSubsection = (
+    all_tasks_in_subsection = (
         db.session.query(Task.id, Task.difficulty_level, Task.subsection_id)
         .filter(Task.subsection_id == subsection_id)
         .all()
     )
 
     for i in range(1, 4, 1):
-        countDifficultySub = 0
+        remaining_tasks = 0
 
-        for task in AllExercisesInSubsection:
+        for task in all_tasks_in_subsection:
             if task.difficulty_level == i:
-                countDifficultySub += 1
+                remaining_tasks += 1
 
-        for task in tasksDoneByStudent:
+        for task in tasks_done_by_student:
             if (
                 task.subsection_id == subsection_id
                 and task.difficulty_level == i
             ):
-                countDifficultySub -= 1
+                remaining_tasks -= 1
 
-        if countDifficultySub > 0:
+        if remaining_tasks > 0:
             return i
 
-    # here we return exercise of maximum difficulty from a subsection
-    maxDifficulty = (
-        db.
-        session.query(Task.difficulty_level)
+    max_difficulty = (
+        db.session.query(Task.difficulty_level)
         .filter(
             Task.subsection_id == subsection_id,
             Task.difficulty_level.isnot(None),
@@ -305,7 +303,7 @@ def determine_student_difficulty_level_(student_id, subsection_id):
         .order_by(Task.difficulty_level.desc())
         .first()
     )
-    return maxDifficulty.difficulty_level if maxDifficulty else 3
+    return max_difficulty.difficulty_level if max_difficulty else 3
 
 def _student_subsection_json(student_id, subsection):
     progress = _subsection_progress(student_id, subsection)
