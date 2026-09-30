@@ -15,7 +15,7 @@ from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.ebooks import ebooks
 from app.middleware.auth import _current_user
-from app.utills import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options
+from app.utils import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options
 import random
 
 student_bp = Blueprint("student", __name__)
