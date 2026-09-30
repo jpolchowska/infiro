@@ -357,7 +357,7 @@ infiro/
 │   │   │   └── public.py          # status check
 │   │   ├── services/              # user handling, image upload/ZIP extraction
 │   │   ├── static/uploads/        # uploaded task and e-book images (bind-mounted)
-│   │   └── utills.py              # task themes, attempts, difficulty unlocking helpers
+│   │   └── utils.py               # task themes, attempts, difficulty unlocking helpers
 │   ├── migrations/                # Flask-Migrate migrations, applied on startup
 │   ├── seed/                      # sample task import file (tasks_example.json)
 │   └── tests/                     # pytest suite, including e-book ZIP fixtures
