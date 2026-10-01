@@ -212,6 +212,9 @@ export default function ImportPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">Import treści</h1>
+      <p className="mt-2 max-w-2xl text-sm text-gray-600">
+        Dodawaj treści do aplikacji z plików JSON i ZIP.
+      </p>
 
       {errors && errors.length > 0 && (
         <div className="mt-6 max-w-xl rounded-sm border border-red-300 bg-red-50 p-5">

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   {
     href: "/",
-    label: "Sekcje",
+    label: "Kurs",
     isActive: (path: string) => path === "/" || path.startsWith("/sections"),
     roles: ["admin", "teacher"] as const,
   },

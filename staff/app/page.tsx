@@ -48,8 +48,8 @@ export default function Home() {
       <h1 className="text-2xl font-semibold text-infiro-navy">Witaj!</h1>
       <p className="mt-1 max-w-2xl text-sm text-gray-500">
         {isTeacher
-          ? "Przeglądaj sekcje, materiały i zadania kursu."
-          : "Zarządzaj sekcjami, materiałami i zadaniami. Zmiany są widoczne w aplikacji mobilnej po opublikowaniu."}
+          ? "Przeglądaj treść kursu: sekcje, podsekcje i zadania."
+          : "Zarządzaj treścią kursu: sekcjami, podsekcjami i zadaniami."}
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
