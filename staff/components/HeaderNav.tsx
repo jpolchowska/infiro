@@ -28,12 +28,6 @@ const NAV_ITEMS = [
     isActive: (path: string) => path.startsWith("/import"),
     roles: ["admin"] as const,
   },
-  {
-    href: "/settings",
-    label: "Ustawienia",
-    isActive: (path: string) => path.startsWith("/settings"),
-    roles: ["admin", "teacher"] as const,
-  },
 ];
 
 export function HeaderNav({ role }: { role: "admin" | "teacher" }) {

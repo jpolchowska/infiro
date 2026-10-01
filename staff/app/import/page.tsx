@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthContext";
 import type { Section } from "@/lib/types";
 
 const MAX_ERRORS_SHOWN = 20;
+const SHOW_IMAGES_ZIP_IMPORT = false;
 
 function UploadField({
   accept,
@@ -21,7 +22,7 @@ function UploadField({
   const [fileName, setFileName] = useState<string | null>(null);
 
   return (
-    <label className="block cursor-pointer rounded-sm border border-dashed border-gray-300 px-6 py-8 text-center hover:border-infiro-navy">
+    <label className="flex flex-1 cursor-pointer items-center justify-center rounded-sm border border-dashed border-gray-300 px-6 py-8 text-center hover:border-infiro-navy">
       <input
         type="file"
         accept={accept}
@@ -211,11 +212,6 @@ export default function ImportPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">Import treści</h1>
-      <p className="mt-2 max-w-2xl text-sm text-gray-600">
-        Sekcje i podsekcje dopasowywane są po dokładnym tytule i tworzone,
-        jeśli nie istnieją. Zadania z `content_key` są aktualizowane,
-        a nowe zadania otrzymują identyfikator do kolejnego importu.
-      </p>
 
       {errors && errors.length > 0 && (
         <div className="mt-6 max-w-xl rounded-sm border border-red-300 bg-red-50 p-5">
@@ -253,121 +249,126 @@ export default function ImportPage() {
         </button>
       )}
 
-      {taskCount !== null && (
-        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          Zaimportowano {taskCount} zadań.
-        </div>
-      )}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-6">
+          {taskCount !== null && (
+            <div className="rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+              Zaimportowano {taskCount} zadań.
+            </div>
+          )}
 
-      <form onSubmit={handleJsonSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
-        <h2 className="text-sm font-semibold text-infiro-navy">Plik z zadaniami (JSON)</h2>
-        <div className="mt-4">
-          <UploadField accept=".json" hint=".json" onFileSelected={setJsonFile} />
+          <form onSubmit={handleJsonSubmit} className="rounded-sm border border-gray-200 bg-white p-6">
+            <h2 className="text-sm font-semibold text-infiro-navy">Plik z zadaniami (JSON)</h2>
+            <div className="mt-4">
+              <UploadField accept=".json" hint=".json" onFileSelected={setJsonFile} />
+            </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {submitting ? "Importowanie…" : "Importuj zadania"}
+              </button>
+            </div>
+          </form>
+
+          {SHOW_IMAGES_ZIP_IMPORT && (
+            <>
+              {uploadResult !== null && (
+                <div className="rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+                  Rozpakowano {uploadResult} zdjęć.
+                </div>
+              )}
+
+              <form onSubmit={handleZipSubmit} className="rounded-sm border border-gray-200 bg-white p-6">
+                <h2 className="text-sm font-semibold text-infiro-navy">Zdjęcia (ZIP)</h2>
+                <p className="mt-1 text-xs text-gray-500">
+                  Rozpakowywane do static/uploads i dowiązywane do zadań po nazwie pliku.
+                </p>
+                <div className="mt-4">
+                  <UploadField accept=".zip" hint=".zip" onFileSelected={setZipFile} />
+                </div>
+                <div className="mt-4 flex justify-center">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+                  >
+                    {submitting ? "Rozpakowywanie…" : "Rozpakuj i zaimportuj"}
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
+
+          {ebookResult && (
+            <div className="rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+              Zaimportowano e-book &quot;{ebookResult.title}&quot;.
+            </div>
+          )}
+
+          <form onSubmit={handleEbookSubmit} className="rounded-sm border border-gray-200 bg-white p-6">
+            <h2 className="text-sm font-semibold text-infiro-navy">E-book (ZIP)</h2>
+            <div className="mt-4">
+              <UploadField accept=".zip" hint=".zip" onFileSelected={setEbookFile} />
+            </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {submitting ? "Importowanie…" : "Importuj e-book"}
+              </button>
+            </div>
+          </form>
         </div>
-        <div className="mt-4 flex justify-center">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+
+        <div className="flex flex-col gap-6">
+          {finalTestCount !== null && (
+            <div className="rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
+              Zaimportowano {finalTestCount} pytań testu końcowego.
+            </div>
+          )}
+
+          <form
+            onSubmit={handleFinalTestSubmit}
+            className="flex flex-1 flex-col rounded-sm border border-gray-200 bg-white p-6"
           >
-            {submitting ? "Importowanie…" : "Importuj zadania"}
-          </button>
+            <h2 className="text-sm font-semibold text-infiro-navy">Test końcowy działu (JSON)</h2>
+            <div className="mt-4">
+              <label className="block text-sm text-gray-600">
+                Dział
+                <select
+                  className="mt-1 block w-full rounded-sm border border-gray-300 px-3 py-2 text-sm"
+                  value={finalTestSectionId ?? ""}
+                  onChange={(e) => setFinalTestSectionId(Number(e.target.value) || null)}
+                >
+                  {sections.length === 0 && <option value="">Brak działów</option>}
+                  {sections.map((section) => (
+                    <option key={section.id} value={section.id}>
+                      {section.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="mt-4 flex flex-1 flex-col">
+              <UploadField accept=".json" hint=".json" onFileSelected={setFinalTestFile} />
+            </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {submitting ? "Importowanie…" : "Importuj test końcowy"}
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
-
-      {uploadResult !== null && (
-        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          Rozpakowano {uploadResult} zdjęć.
-        </div>
-      )}
-
-      <form onSubmit={handleZipSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
-        <h2 className="text-sm font-semibold text-infiro-navy">Zdjęcia (ZIP)</h2>
-        <p className="mt-1 text-xs text-gray-500">
-          Rozpakowywane do static/uploads i dowiązywane do zadań po nazwie pliku.
-        </p>
-        <div className="mt-4">
-          <UploadField accept=".zip" hint=".zip" onFileSelected={setZipFile} />
-        </div>
-        <div className="mt-4 flex justify-center">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
-          >
-            {submitting ? "Rozpakowywanie…" : "Rozpakuj i zaimportuj"}
-          </button>
-        </div>
-      </form>
-
-      {ebookResult && (
-        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          Zaimportowano e-book &quot;{ebookResult.title}&quot;.
-        </div>
-      )}
-
-      <form onSubmit={handleEbookSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
-        <h2 className="text-sm font-semibold text-infiro-navy">E-book (ZIP)</h2>
-        <p className="mt-1 text-xs text-gray-500">
-          Folder z <code>ebook.json</code> i podfolderem <code>images/</code>, spakowany w .zip. Format:
-          docs/format-ebookow.md. Sekcja i podsekcja muszą już istnieć.
-        </p>
-        <div className="mt-4">
-          <UploadField accept=".zip" hint=".zip" onFileSelected={setEbookFile} />
-        </div>
-        <div className="mt-4 flex justify-center">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
-          >
-            {submitting ? "Importowanie…" : "Importuj e-book"}
-          </button>
-        </div>
-      </form>
-
-      {finalTestCount !== null && (
-        <div className="mt-6 max-w-xl rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          Zaimportowano {finalTestCount} pytań testu końcowego.
-        </div>
-      )}
-
-      <form onSubmit={handleFinalTestSubmit} className="mt-6 max-w-xl rounded-sm border border-gray-200 bg-white p-6">
-        <h2 className="text-sm font-semibold text-infiro-navy">Test końcowy działu (JSON)</h2>
-        <p className="mt-1 text-xs text-gray-500">
-          Osobna pula pytań na koniec działu, niezależna od zwykłych zadań. Format:
-          docs/format-testu-koncowego.md. Dział musi już istnieć.
-        </p>
-        <div className="mt-4">
-          <label className="block text-sm text-gray-600">
-            Dział
-            <select
-              className="mt-1 block w-full rounded-sm border border-gray-300 px-3 py-2 text-sm"
-              value={finalTestSectionId ?? ""}
-              onChange={(e) => setFinalTestSectionId(Number(e.target.value) || null)}
-            >
-              {sections.length === 0 && <option value="">Brak działów</option>}
-              {sections.map((section) => (
-                <option key={section.id} value={section.id}>
-                  {section.title}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div className="mt-4">
-          <UploadField accept=".json" hint=".json" onFileSelected={setFinalTestFile} />
-        </div>
-        <div className="mt-4 flex justify-center">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
-          >
-            {submitting ? "Importowanie…" : "Importuj test końcowy"}
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 }
