@@ -66,7 +66,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-[#dfe2ee] bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <span className="text-lg font-semibold text-infiro-navy">
             {role === "admin" ? "Panel administratora" : "Panel nauczyciela"}

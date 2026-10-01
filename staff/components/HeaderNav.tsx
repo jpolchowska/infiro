@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   {
     href: "/",
-    label: "Sekcje",
+    label: "Kurs",
     isActive: (path: string) => path === "/" || path.startsWith("/sections"),
     roles: ["admin", "teacher"] as const,
   },
@@ -27,12 +27,6 @@ const NAV_ITEMS = [
     label: "Import treści",
     isActive: (path: string) => path.startsWith("/import"),
     roles: ["admin"] as const,
-  },
-  {
-    href: "/settings",
-    label: "Ustawienia",
-    isActive: (path: string) => path.startsWith("/settings"),
-    roles: ["admin", "teacher"] as const,
   },
 ];
 
