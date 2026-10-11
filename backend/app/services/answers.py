@@ -89,7 +89,7 @@ def grade_answer(item, answer, interest, noun, load_options):
             None,
         )
         if selected is None:
-            return None, f"option {selected_option_id} does not belong to {label}"
+            return None, f"Option {selected_option_id} does not belong to {label}"
         return GradedAnswer(item, selected["is_correct"], selected["id"], None), None
 
     if item.type == TaskType.SHORT_ANSWER:
@@ -98,4 +98,4 @@ def grade_answer(item, answer, interest, noun, load_options):
         is_correct = is_accepted_answer(answer_text, accepted_answers(item, interest))
         return GradedAnswer(item, is_correct, None, answer_text), None
 
-    return None, f"unsupported {noun} type for {label}"
+    return None, f"Unsupported {noun} type for {label}"

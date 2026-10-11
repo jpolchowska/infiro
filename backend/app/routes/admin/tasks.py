@@ -21,14 +21,14 @@ def _validate_options(options):
     correct_count = 0
     for opt in options:
         if not isinstance(opt, dict) or not isinstance(opt.get("text"), str) or not opt["text"].strip():
-            return "each option needs a non-empty 'text'"
+            return "Each option needs a non-empty 'text'"
         if not isinstance(opt.get("correct"), bool):
-            return "each option needs a boolean 'correct'"
+            return "Each option needs a boolean 'correct'"
         if opt["correct"]:
             correct_count += 1
 
     if correct_count != 1:
-        return "exactly one option must be correct"
+        return "Exactly one option must be correct"
     return None
 
 
@@ -38,7 +38,7 @@ def _validate_options(options):
 def create_task(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
-        return jsonify({"error": "subsection not found"}), 404
+        return jsonify({"error": "Subsection not found"}), 404
 
     data = json_object()
     if data is None:
@@ -88,7 +88,7 @@ def create_task(subsection_id):
 def update_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:
-        return jsonify({"error": "task not found"}), 404
+        return jsonify({"error": "Task not found"}), 404
 
     data = json_object()
     if data is None:
@@ -135,7 +135,7 @@ def update_task(task_id):
 def delete_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:
-        return jsonify({"error": "task not found"}), 404
+        return jsonify({"error": "Task not found"}), 404
 
     content_deletion.delete_task(task)
     db.session.commit()

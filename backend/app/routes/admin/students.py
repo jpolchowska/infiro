@@ -60,10 +60,10 @@ def get_student(student_id):
 
     student = User.query.filter_by(id=student_id, role=UserRole.STUDENT).first()
     if student is None:
-        return jsonify({"error": "student not found"}), 404
+        return jsonify({"error": "Student not found"}), 404
 
     if role == RealmRole.TEACHER and student.teacher_id != teacher.id:
-        return jsonify({"error": "student not found"}), 404
+        return jsonify({"error": "Student not found"}), 404
 
     return jsonify(student_report(student)), 200
 
@@ -74,7 +74,7 @@ def get_student(student_id):
 def update_student(student_id):
     student = User.query.filter_by(id=student_id, role=UserRole.STUDENT).first()
     if student is None:
-        return jsonify({"error": "student not found"}), 404
+        return jsonify({"error": "Student not found"}), 404
 
     data = json_object()
     if data is None:
@@ -89,7 +89,7 @@ def update_student(student_id):
 
             teacher = User.query.filter_by(id=teacher_id, role=UserRole.TEACHER).first()
             if teacher is None:
-                return jsonify({"error": "teacher not found"}), 404
+                return jsonify({"error": "Teacher not found"}), 404
 
         student.teacher_id = teacher_id
 

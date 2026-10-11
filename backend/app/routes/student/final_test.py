@@ -14,7 +14,7 @@ bp = Blueprint("student_final_test", __name__, url_prefix="/api/student")
 def get_final_test(student, section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     return jsonify(build_final_test(section, student.interest)), 200
 
@@ -24,7 +24,7 @@ def get_final_test(student, section_id):
 def submit_final_test_answers(student, section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     data = json_object()
     if data is None:

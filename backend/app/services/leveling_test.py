@@ -57,12 +57,12 @@ def _grade(answers, interest):
     graded = []
     for answer in answers:
         if not isinstance(answer, dict):
-            return None, "each answer must be an object"
+            return None, "Each answer must be an object"
 
         task_id = answer.get("task_id")
         task = db.session.get(Task, task_id)
         if task is None:
-            return None, f"task {task_id} not found"
+            return None, f"Task {task_id} not found"
 
         result, error = grade_answer(task, answer, interest, "task", task_options)
         if error:

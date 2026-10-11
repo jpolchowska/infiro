@@ -37,14 +37,14 @@ def submit_final_test(student, section, answers):
     graded = []
     for answer in answers:
         if not isinstance(answer, dict):
-            return None, "each answer must be an object"
+            return None, "Each answer must be an object"
 
         question_id = answer.get("question_id")
         question = SectionTestQuestion.query.filter_by(
             id=question_id, section_id=section.id
         ).first()
         if question is None:
-            return None, f"question {question_id} not found in this section"
+            return None, f"Question {question_id} not found in this section"
 
         result, error = grade_answer(question, answer, student.interest, "question", question_options)
         if error:

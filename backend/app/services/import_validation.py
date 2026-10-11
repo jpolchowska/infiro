@@ -160,9 +160,9 @@ def _validate_subsection(subsection, label, content_keys, errors):
 
 def _validate_sections(data, children_field, validate_child, child_name):
     if not isinstance(data, list):
-        return ["payload must be a JSON array of sections"]
+        return ["Payload must be a JSON array of sections"]
     if not data:
-        return ["payload does not contain any sections"]
+        return ["Payload does not contain any sections"]
 
     errors = []
     content_keys = set()

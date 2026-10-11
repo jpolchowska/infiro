@@ -49,7 +49,7 @@ def create_section():
 def get_section(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     subsections = Subsection.query.filter_by(section_id=section_id).order_by(
         Subsection.order_index
@@ -67,7 +67,7 @@ def get_section(section_id):
 def update_section(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     data = json_object()
     if data is None:
@@ -91,7 +91,7 @@ def update_section(section_id):
 def delete_section(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     content_deletion.delete_section(section)
     db.session.commit()

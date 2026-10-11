@@ -61,7 +61,7 @@ def import_final_test(section, data):
         (entry for entry in data if entry["section"].strip() == section.title), None
     )
     if section_entry is None:
-        return None, [f"payload does not contain a 'section' matching '{section.title}'"]
+        return None, [f"Payload does not contain a 'section' matching '{section.title}'"]
 
     imported_questions = []
 

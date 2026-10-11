@@ -20,7 +20,7 @@ bp = Blueprint("admin_subsections", __name__, url_prefix="/api/admin")
 def create_subsection(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     data = json_object()
     if data is None:
@@ -54,7 +54,7 @@ def create_subsection(section_id):
 def get_subsection(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
-        return jsonify({"error": "subsection not found"}), 404
+        return jsonify({"error": "Subsection not found"}), 404
 
     tasks = Task.query.filter_by(subsection_id=subsection_id).order_by(
         Task.order_index, Task.id
@@ -74,7 +74,7 @@ def get_subsection(subsection_id):
 def update_subsection(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
-        return jsonify({"error": "subsection not found"}), 404
+        return jsonify({"error": "Subsection not found"}), 404
 
     data = json_object()
     if data is None:
@@ -98,7 +98,7 @@ def update_subsection(subsection_id):
 def delete_subsection(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
-        return jsonify({"error": "subsection not found"}), 404
+        return jsonify({"error": "Subsection not found"}), 404
 
     content_deletion.delete_subsection(subsection)
     db.session.commit()
