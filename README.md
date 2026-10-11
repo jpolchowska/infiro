@@ -102,7 +102,7 @@ graph LR
 | Layer | Technology |
 |---|---|
 | Authorization Server | Keycloak 26 |
-| Backend | Python 3.12, Flask, Flask-SQLAlchemy, Flask-Migrate (applied on startup), PyJWT, jsonschema, Pillow |
+| Backend | Python 3.12, Flask, Flask-SQLAlchemy, Flask-Migrate (applied on startup), PyJWT, Pillow |
 | Web panel (staff) | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4, keycloak-js |
 | Mobile app | Expo SDK 57, React Native 0.86, React 19, TypeScript, Expo Router, expo-auth-session, NativeWind |
 | Database | PostgreSQL 16 |
@@ -352,12 +352,12 @@ infiro/
 │   │   ├── routes/
 │   │   │   ├── student*.py        # profile, sections/subsections, tasks, timed practice, stats
 │   │   │   ├── leveling_test.py   # leveling test, submit, history
-│   │   │   ├── admin_*.py         # sections, materials, students, task/e-book import
+│   │   │   ├── section_test.py    # section final test, submit, history
+│   │   │   ├── admin_*.py         # sections, subsections, tasks, materials, students, imports
 │   │   │   ├── tasks.py           # legacy task endpoints
 │   │   │   └── public.py          # status check
-│   │   ├── services/              # user handling, image upload/ZIP extraction
-│   │   ├── static/uploads/        # uploaded task and e-book images (bind-mounted)
-│   │   └── utils.py               # task themes, attempts, difficulty unlocking helpers
+│   │   ├── services/              # import and validation, themes, answers, progress, uploads, users
+│   │   └── static/uploads/        # uploaded task and e-book images (bind-mounted)
 │   ├── migrations/                # Flask-Migrate migrations, applied on startup
 │   ├── seed/                      # sample task import file (tasks_example.json)
 │   └── tests/                     # pytest suite, including e-book ZIP fixtures
