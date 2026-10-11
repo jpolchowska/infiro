@@ -46,7 +46,7 @@ def create_section():
 @authenticate_token
 @require_any_realm_role("admin", "ROLE_TEACHER")
 def get_section(section_id):
-    section = Section.query.get(section_id)
+    section = db.session.get(Section, section_id)
     if section is None:
         return jsonify({"error": "section not found"}), 404
 
@@ -67,7 +67,7 @@ def get_section(section_id):
 @authenticate_token
 @require_realm_role("admin")
 def update_section(section_id):
-    section = Section.query.get(section_id)
+    section = db.session.get(Section, section_id)
     if section is None:
         return jsonify({"error": "section not found"}), 404
 
@@ -91,7 +91,7 @@ def update_section(section_id):
 @authenticate_token
 @require_realm_role("admin")
 def delete_section(section_id):
-    section = Section.query.get(section_id)
+    section = db.session.get(Section, section_id)
     if section is None:
         return jsonify({"error": "section not found"}), 404
 

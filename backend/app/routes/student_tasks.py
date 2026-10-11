@@ -1,8 +1,8 @@
 import random
-from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
+from app.clock import utc_now
 from app.extensions import db
 from app.middleware.auth import authenticate_token, current_user
 from app.models.student_answers import StudentAnswer
@@ -109,7 +109,7 @@ def submit_student_answer(task_id):
             student_id=student.id,
             is_correct=True,
             attempt_number=1,
-            submitted_at=datetime.utcnow(),
+            submitted_at=utc_now(),
         )
 
         db.session.add(answer)
@@ -165,7 +165,7 @@ def submit_student_answer(task_id):
             selected_option_id=selected_option_id,
             is_correct=is_correct,
             attempt_number=attempt_number,
-            submitted_at=datetime.utcnow(),
+            submitted_at=utc_now(),
         )
 
     else:
@@ -188,7 +188,7 @@ def submit_student_answer(task_id):
             answer_text=answer_text,
             is_correct=is_correct,
             attempt_number=attempt_number,
-            submitted_at=datetime.utcnow(),
+            submitted_at=utc_now(),
         )
 
     db.session.add(answer)

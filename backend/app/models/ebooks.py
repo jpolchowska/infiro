@@ -1,5 +1,4 @@
-from datetime import datetime
-
+from app.clock import utc_now
 from app.extensions import db
 
 
@@ -14,4 +13,4 @@ class Ebook(db.Model):
     title = db.Column(db.Text, nullable=False)
     intro = db.Column(db.Text, nullable=True)
     content = db.Column(db.JSON, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=utc_now)

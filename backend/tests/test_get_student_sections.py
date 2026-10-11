@@ -1,5 +1,4 @@
-from datetime import datetime
-
+from app.clock import utc_now
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
@@ -64,7 +63,7 @@ def test_get_student_sections(client, login):
         student_id=student.id,
         is_correct=True,
         attempt_number=1,
-        submitted_at=datetime.utcnow(),
+        submitted_at=utc_now(),
     )
 
     answer2 = StudentAnswer(
@@ -72,7 +71,7 @@ def test_get_student_sections(client, login):
         student_id=student.id,
         is_correct=True,
         attempt_number=1,
-        submitted_at=datetime.utcnow(),
+        submitted_at=utc_now(),
     )
 
     answer3 = StudentAnswer(
@@ -80,7 +79,7 @@ def test_get_student_sections(client, login):
         student_id=student.id,
         is_correct=False,
         attempt_number=1,
-        submitted_at=datetime.utcnow(),
+        submitted_at=utc_now(),
     )
 
     db.session.add_all([answer1, answer2, answer3])

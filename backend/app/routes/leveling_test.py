@@ -1,8 +1,8 @@
 import random
-from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
+from app.clock import utc_now
 from app.extensions import db
 from app.middleware.auth import authenticate_token, current_user
 from app.models.leveling_test_attempts import LevelingTestAttempt
@@ -98,7 +98,7 @@ def submit_leveling_test():
 
         task_id = answer.get("task_id")
 
-        task = Task.query.get(task_id)
+        task = db.session.get(Task, task_id)
         if task is None:
             return jsonify({"error": f"task {task_id} not found"}), 400
 
@@ -142,7 +142,7 @@ def submit_leveling_test():
 
     score = sum(1 for _, is_correct, _, _ in validated if is_correct)
     max_score = len(validated)
-    now = datetime.utcnow()
+    now = utc_now()
 
     section_stats = {}
     for task, is_correct, _, _ in validated:

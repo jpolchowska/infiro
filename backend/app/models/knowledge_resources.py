@@ -1,5 +1,4 @@
-from datetime import datetime
-
+from app.clock import utc_now
 from app.extensions import db
 
 
@@ -32,4 +31,4 @@ class KnowledgeResource(db.Model):
     content_text = db.Column(db.Text, nullable=True)
     file_url = db.Column(db.Text, nullable=True)
     order_index = db.Column(db.Integer, nullable=False, default=0)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=utc_now)

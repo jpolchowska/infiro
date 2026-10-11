@@ -1,5 +1,4 @@
-from datetime import datetime
-
+from app.clock import utc_now
 from app.extensions import db
 
 
@@ -13,5 +12,5 @@ class LevelingTestAttempt(db.Model):
     score = db.Column(db.Integer, nullable=False)
     max_score = db.Column(db.Integer, nullable=False)
     completed_at = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False
+        db.DateTime, default=utc_now, nullable=False
     )

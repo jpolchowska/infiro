@@ -34,7 +34,7 @@ def _validate_options(options):
 @authenticate_token
 @require_realm_role("admin")
 def create_task(subsection_id):
-    subsection = Subsection.query.get(subsection_id)
+    subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
         return jsonify({"error": "subsection not found"}), 404
 
@@ -84,7 +84,7 @@ def create_task(subsection_id):
 @authenticate_token
 @require_realm_role("admin")
 def update_task(task_id):
-    task = Task.query.get(task_id)
+    task = db.session.get(Task, task_id)
     if task is None:
         return jsonify({"error": "task not found"}), 404
 
@@ -131,7 +131,7 @@ def update_task(task_id):
 @authenticate_token
 @require_realm_role("admin")
 def delete_task(task_id):
-    task = Task.query.get(task_id)
+    task = db.session.get(Task, task_id)
     if task is None:
         return jsonify({"error": "task not found"}), 404
 

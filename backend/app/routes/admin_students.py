@@ -94,10 +94,10 @@ def _needs_practice(student):
     for task_id, answer in latest_by_task.items():
         if answer.is_correct:
             continue
-        task = Task.query.get(task_id)
+        task = db.session.get(Task, task_id)
         if task is None:
             continue
-        subsection = Subsection.query.get(task.subsection_id)
+        subsection = db.session.get(Subsection, task.subsection_id)
         items.append({
             "task_title": task.title,
             "subsection_title": subsection.title if subsection else None,
@@ -113,8 +113,8 @@ def _recent_activity(student, limit=10):
 
     items = []
     for answer in answers:
-        task = Task.query.get(answer.task_id)
-        subsection = Subsection.query.get(task.subsection_id) if task else None
+        task = db.session.get(Task, answer.task_id)
+        subsection = db.session.get(Subsection, task.subsection_id) if task else None
         items.append({
             "task_title": task.title if task else None,
             "subsection_title": subsection.title if subsection else None,

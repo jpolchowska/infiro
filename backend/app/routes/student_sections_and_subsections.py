@@ -21,6 +21,9 @@ student_sections_and_subsections_bp = Blueprint("student_sections_and_subsection
 @authenticate_token
 def get_student_sections():
     student = current_user()
+    if student is None:
+        return jsonify({"error": "User not found"}), 404
+
     student_id = student.id
     sections = (
         Section.query
@@ -67,6 +70,9 @@ def get_student_sections():
 @authenticate_token
 def get_student_subsection_tasks(subsection_id):
     student = current_user()
+    if student is None:
+        return jsonify({"error": "User not found"}), 404
+
     student_id = student.id
 
     subsection = db.session.get(Subsection, subsection_id)

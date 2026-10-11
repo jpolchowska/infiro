@@ -1,8 +1,8 @@
 import random
-from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
+from app.clock import utc_now
 from app.extensions import db
 from app.middleware.auth import authenticate_token, current_user
 from app.models.section_test_answer_options import SectionTestAnswerOption
@@ -138,7 +138,7 @@ def submit_section_final_test(section_id):
 
     score = sum(1 for _, is_correct in validated if is_correct)
     max_score = len(validated)
-    now = datetime.utcnow()
+    now = utc_now()
 
     attempt = SectionTestAttempt(
         student_id=user.id,

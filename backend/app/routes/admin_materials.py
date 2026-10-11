@@ -59,7 +59,7 @@ def _create_material(*, section_id=None, subsection_id=None):
 @authenticate_token
 @require_realm_role("admin")
 def create_section_material(section_id):
-    if Section.query.get(section_id) is None:
+    if db.session.get(Section, section_id) is None:
         return jsonify({"error": "section not found"}), 404
     return _create_material(section_id=section_id)
 
@@ -68,7 +68,7 @@ def create_section_material(section_id):
 @authenticate_token
 @require_realm_role("admin")
 def create_subsection_material(subsection_id):
-    if Subsection.query.get(subsection_id) is None:
+    if db.session.get(Subsection, subsection_id) is None:
         return jsonify({"error": "subsection not found"}), 404
     return _create_material(subsection_id=subsection_id)
 
@@ -77,7 +77,7 @@ def create_subsection_material(subsection_id):
 @authenticate_token
 @require_realm_role("admin")
 def update_material(material_id):
-    resource = KnowledgeResource.query.get(material_id)
+    resource = db.session.get(KnowledgeResource, material_id)
     if resource is None:
         return jsonify({"error": "material not found"}), 404
 
@@ -107,7 +107,7 @@ def update_material(material_id):
 @authenticate_token
 @require_realm_role("admin")
 def delete_material(material_id):
-    resource = KnowledgeResource.query.get(material_id)
+    resource = db.session.get(KnowledgeResource, material_id)
     if resource is None:
         return jsonify({"error": "material not found"}), 404
 

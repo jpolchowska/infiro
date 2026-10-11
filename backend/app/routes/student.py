@@ -27,6 +27,9 @@ student_bp = Blueprint("student", __name__)
 @authenticate_token
 def get_student_stats():
     student = current_user()
+    if student is None:
+        return jsonify({"error": "User not found"}), 404
+
     student_id = student.id
 
     total_tasks = Task.query.count()
