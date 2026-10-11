@@ -1,9 +1,5 @@
 from datetime import datetime
-from types import SimpleNamespace
 
-import pytest
-
-from app import create_app
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
@@ -13,34 +9,8 @@ from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
 
 
-@pytest.fixture
-def client():
-    app = create_app({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite://",
-    })
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
-
-
-def test_get_student_stats(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "student-sub",
-            "realm_access": {"roles": ["student"]},
-        },
-    )
+def test_get_student_stats(client, login):
+    login("student-sub", ["student"])
 
     student = User(
         keycloak_sub="student-sub",

@@ -1,40 +1,16 @@
 import copy
-from types import SimpleNamespace
 
 import pytest
 
-from app import create_app
-from app.extensions import db
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
 
 
-@pytest.fixture
-def client(monkeypatch):
-    app = create_app({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite://",
-    })
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin"]},
-        },
-    )
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
+@pytest.fixture(autouse=True)
+def admin(login):
+    login("admin-sub", ["admin"])
 
 
 def _payload():

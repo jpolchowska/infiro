@@ -1,5 +1,3 @@
-from types import SimpleNamespace
-
 import pytest
 from sqlalchemy import event
 
@@ -33,21 +31,6 @@ def client():
         db.drop_all()
 
 
-def _mock_auth(monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin"]},
-        },
-    )
-
-
 def _create_section_with_ebook_and_final_test():
     student = User(keycloak_sub="student-sub", role="student")
     section = Section(title="Tabliczka mnożenia", order_index=0)
@@ -79,8 +62,8 @@ def _create_section_with_ebook_and_final_test():
     return section, subsection
 
 
-def test_delete_section_removes_ebooks_and_final_test(client, monkeypatch):
-    _mock_auth(monkeypatch)
+def test_delete_section_removes_ebooks_and_final_test(client, login):
+    login("admin-sub", ["admin"])
     section, _ = _create_section_with_ebook_and_final_test()
 
     response = client.delete(
@@ -97,8 +80,8 @@ def test_delete_section_removes_ebooks_and_final_test(client, monkeypatch):
     assert SectionTestAttempt.query.count() == 0
 
 
-def test_delete_subsection_removes_its_ebook(client, monkeypatch):
-    _mock_auth(monkeypatch)
+def test_delete_subsection_removes_its_ebook(client, login):
+    login("admin-sub", ["admin"])
     section, subsection = _create_section_with_ebook_and_final_test()
 
     response = client.delete(

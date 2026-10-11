@@ -1,43 +1,13 @@
-from types import SimpleNamespace
 from pathlib import Path
 
-import pytest
-
-from app import create_app
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
 from app.models.subsections import Subsection
 
 
-@pytest.fixture
-def client():
-    app = create_app({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite://",
-    })
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
-
-
-def test_post_correct_zip(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin"]},
-        },
-    )
+def test_post_correct_zip(client, login):
+    login("admin-sub", ["admin"])
 
     admin = User(
         keycloak_sub="admin-sub",
@@ -78,20 +48,8 @@ def test_post_correct_zip(client, monkeypatch):
     assert response.json["subsection_id"] == subsection.id
 
 
-def test_post_bad_zip(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin"]},
-        },
-    )
+def test_post_bad_zip(client, login):
+    login("admin-sub", ["admin"])
 
     admin = User(
         keycloak_sub="admin-sub",
@@ -130,20 +88,8 @@ def test_post_bad_zip(client, monkeypatch):
     assert response.status_code == 400
 
 
-def test_post_zip_without_subsection(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin"]},
-        },
-    )
+def test_post_zip_without_subsection(client, login):
+    login("admin-sub", ["admin"])
 
     admin = User(
         keycloak_sub="admin-sub",

@@ -1,43 +1,13 @@
-from types import SimpleNamespace
 from pathlib import Path
 
-import pytest
-
-from app import create_app
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
 from app.models.subsections import Subsection
 
 
-@pytest.fixture
-def client():
-    app = create_app({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite://",
-    })
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
-
-
-def test_get_student_ebooks_existing_ebook(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin", "student"]},
-        },
-    )
+def test_get_student_ebooks_existing_ebook(client, login):
+    login("admin-sub", ["admin", "student"])
 
     admin = User(
         keycloak_sub="admin-sub",
@@ -96,20 +66,8 @@ def test_get_student_ebooks_existing_ebook(client, monkeypatch):
     assert response.json["title"] == "Kawałki całości"
 
 
-def test_get_student_ebooks_nonexisting_ebook(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin", "student"]},
-        },
-    )
+def test_get_student_ebooks_nonexisting_ebook(client, login):
+    login("admin-sub", ["admin", "student"])
 
     section = Section(
         title="Ułamki proste",
