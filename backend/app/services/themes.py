@@ -1,9 +1,10 @@
+from app.constants import DEFAULT_THEME
 from app.models.task_answer_options import TaskAnswerOption
 
 
 def resolve_theme(item, interest):
     themes = item.themes if isinstance(item.themes, dict) else {}
-    default = themes.get("default", {})
+    default = themes.get(DEFAULT_THEME, {})
     selected = themes.get(interest, {}) if interest else {}
 
     if not isinstance(default, dict):
@@ -45,7 +46,7 @@ def task_options(task, interest):
 
 
 def merge_theme_variants(themes):
-    default = themes["default"]
+    default = themes[DEFAULT_THEME]
     return {
         key: {**default, **variant}
         for key, variant in themes.items()

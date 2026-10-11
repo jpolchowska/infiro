@@ -1,9 +1,10 @@
 from uuid import uuid4
 
+from app.constants import DEFAULT_THEME, TaskType
 from app.extensions import db
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_questions import SectionTestQuestion
-from app.services.import_helpers import sync_answer_options
+from app.services.answer_options import sync_answer_options
 from app.services.import_validation import validate_section_test_import
 from app.services.themes import merge_theme_variants
 
@@ -31,7 +32,7 @@ def _upsert_question(section, question_data, content_key, order_index):
         db.session.add(question)
         db.session.flush()
 
-    default = themes["default"]
+    default = themes[DEFAULT_THEME]
     question.section_id = section.id
     question.type = question_data["type"]
     question.order_index = order_index
@@ -42,7 +43,7 @@ def _upsert_question(section, question_data, content_key, order_index):
     question_data["id"] = question.id
     question_data["content_key"] = content_key
 
-    if question.type == "single_choice":
+    if question.type == TaskType.SINGLE_CHOICE:
         sync_answer_options(
             SectionTestAnswerOption,
             {"section_test_question_id": question.id},

@@ -1,16 +1,15 @@
-from flask import request
-
+from app.constants import INTERESTS
 from app.extensions import db
 from app.models.users import User
 
 
-def get_or_create_user(role):
-    sub = request.user.get("sub")
+def get_or_create_user(claims, role):
+    sub = claims.get("sub")
     user = User.query.filter_by(keycloak_sub=sub).first()
 
-    first_name = request.user.get("given_name")
-    last_name = request.user.get("family_name")
-    email = request.user.get("email")
+    first_name = claims.get("given_name")
+    last_name = claims.get("family_name")
+    email = claims.get("email")
 
     if user is None:
         user = User(
@@ -31,16 +30,9 @@ def get_or_create_user(role):
     return user
 
 
-def update_interest():
-    sub = request.user.get("sub")
-    user = User.query.filter_by(keycloak_sub=sub).first()
-    interest = (request.get_json(silent=True) or {}).get("interest")
-
-    available_interests = ["sport", "zwierzeta", "lego", "gry", "rysowanie", "muzyka", "jedzenie"]
-
-    if interest is None or interest in available_interests:
-        user.interest = interest
-    else:
+def update_interest(user, interest):
+    if interest is not None and interest not in INTERESTS:
         raise ValueError("Invalid interest")
 
+    user.interest = interest
     db.session.commit()

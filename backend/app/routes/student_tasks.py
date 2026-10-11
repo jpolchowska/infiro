@@ -2,9 +2,10 @@ import random
 
 from flask import Blueprint, jsonify, request
 
+from app.auth import authenticate_token, current_user
 from app.clock import utc_now
+from app.constants import TaskType
 from app.extensions import db
-from app.middleware.auth import authenticate_token, current_user
 from app.models.student_answers import StudentAnswer
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
@@ -46,7 +47,7 @@ def get_student_task(task_id):
         "prompt": theme.get("prompt", task.body_text),
     }
 
-    if task.type == "single_choice":
+    if task.type == TaskType.SINGLE_CHOICE:
         options = [
             {"id": option["id"], "text": option["text"]}
             for option in task_options(task, student.interest)
@@ -56,11 +57,11 @@ def get_student_task(task_id):
         response["attempts_used"] = attempts_used
         response["max_attempts"] = MAX_ATTEMPTS
         response["solution"] = None
-    elif task.type == "short_answer":
+    elif task.type == TaskType.SHORT_ANSWER:
         response["attempts_used"] = attempts_used
         response["max_attempts"] = MAX_ATTEMPTS
         response["solution"] = None
-    elif task.type == "memory":
+    elif task.type == TaskType.MEMORY:
         pairs = theme.get("pairs", task.memory_pairs or [])
         response["pairs"] = [
             {"id": index, "a": pair["a"], "b": pair["b"]}
@@ -98,7 +99,7 @@ def submit_student_answer(task_id):
 
     previous_difficulty_level = determine_student_difficulty_level(student.id, task.subsection_id)
 
-    if task.type == "memory":
+    if task.type == TaskType.MEMORY:
         if data.get("completed") is not True:
             return jsonify({
                 "error": "completed must be true"
@@ -122,7 +123,7 @@ def submit_student_answer(task_id):
             "solution": None,
         }), 200
 
-    if task.type not in ("single_choice", "short_answer"):
+    if task.type not in (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER):
         return jsonify({
             "error": "Unsupported task type"
         }), 400
@@ -130,7 +131,7 @@ def submit_student_answer(task_id):
     attempts_used = attempts_used_in_current_cycle(task.id, student.id)
     attempt_number = attempts_used + 1
 
-    if task.type == "single_choice":
+    if task.type == TaskType.SINGLE_CHOICE:
         selected_option_id = data.get("selected_option_id")
 
         if not isinstance(selected_option_id, int):

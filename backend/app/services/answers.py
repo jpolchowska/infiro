@@ -1,5 +1,6 @@
 import re
 
+from app.constants import TaskType
 from app.models.student_answers import StudentAnswer
 from app.models.task_answer_options import TaskAnswerOption
 from app.services.themes import resolve_theme
@@ -37,7 +38,7 @@ def attempts_used_in_current_cycle(task_id, student_id):
 
 
 def task_solution(task, interest=None):
-    if task.type == "single_choice":
+    if task.type == TaskType.SINGLE_CHOICE:
         theme_options = resolve_theme(task, interest).get("options")
         if isinstance(theme_options, list):
             correct_indexes = [
@@ -59,7 +60,7 @@ def task_solution(task, interest=None):
             "correct_option_id": correct_option.id
         } if correct_option is not None else None
 
-    if task.type == "short_answer":
+    if task.type == TaskType.SHORT_ANSWER:
         theme = resolve_theme(task, interest)
         return {
             "accepted_answers": theme.get("answers", task.accepted_answers or [])

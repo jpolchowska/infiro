@@ -1,13 +1,14 @@
 from flask import Blueprint, jsonify, request
 
+from app.auth import authenticate_token, require_realm_role
+from app.constants import RealmRole
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_realm_role
 from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
+from app.serializers import task_json
 from app.services import content_deletion
-from app.services.admin_serializers import task_json
 
 admin_tasks_bp = Blueprint("admin_tasks", __name__)
 
@@ -32,7 +33,7 @@ def _validate_options(options):
 
 @admin_tasks_bp.route("/api/admin/subsections/<int:subsection_id>/tasks", methods=["POST"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def create_task(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
@@ -82,7 +83,7 @@ def create_task(subsection_id):
 
 @admin_tasks_bp.route("/api/admin/tasks/<int:task_id>", methods=["PATCH"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def update_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:
@@ -129,7 +130,7 @@ def update_task(task_id):
 
 @admin_tasks_bp.route("/api/admin/tasks/<int:task_id>", methods=["DELETE"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def delete_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:

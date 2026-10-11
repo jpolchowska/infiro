@@ -2,8 +2,9 @@ import random
 
 from flask import Blueprint, jsonify, request
 
+from app.auth import authenticate_token, current_user
+from app.constants import TaskType
 from app.extensions import db
-from app.middleware.auth import authenticate_token, current_user
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
@@ -152,7 +153,7 @@ def get_timed_tasks(subsection_id):
         Task.query
         .filter_by(
             subsection_id=subsection.id,
-            type="single_choice"
+            type=TaskType.SINGLE_CHOICE
         )
         .all()
     )
@@ -232,7 +233,7 @@ def submit_timed_tasks(subsection_id):
         Task.query
         .filter_by(
             subsection_id=subsection.id,
-            type="single_choice"
+            type=TaskType.SINGLE_CHOICE
         )
         .all()
     )

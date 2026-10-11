@@ -1,20 +1,21 @@
 from flask import Blueprint, jsonify, request
 
+from app.auth import authenticate_token, require_any_realm_role, require_realm_role
+from app.constants import RealmRole
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_any_realm_role, require_realm_role
 from app.models.ebooks import Ebook
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
+from app.serializers import subsection_json, task_json
 from app.services import content_deletion
-from app.services.admin_serializers import subsection_json, task_json
 
 admin_subsections_bp = Blueprint("admin_subsections", __name__)
 
 
 @admin_subsections_bp.route("/api/admin/sections/<int:section_id>/subsections", methods=["POST"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def create_subsection(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
@@ -48,7 +49,7 @@ def create_subsection(section_id):
 
 @admin_subsections_bp.route("/api/admin/subsections/<int:subsection_id>", methods=["GET"])
 @authenticate_token
-@require_any_realm_role("admin", "ROLE_TEACHER")
+@require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
 def get_subsection(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
@@ -68,7 +69,7 @@ def get_subsection(subsection_id):
 
 @admin_subsections_bp.route("/api/admin/subsections/<int:subsection_id>", methods=["PATCH"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def update_subsection(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
@@ -92,7 +93,7 @@ def update_subsection(subsection_id):
 
 @admin_subsections_bp.route("/api/admin/subsections/<int:subsection_id>", methods=["DELETE"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def delete_subsection(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:

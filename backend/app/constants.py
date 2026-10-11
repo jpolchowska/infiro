@@ -1,0 +1,18 @@
+class TaskType:
+    SINGLE_CHOICE = "single_choice"
+    SHORT_ANSWER = "short_answer"
+    MEMORY = "memory"
+
+
+class UserRole:
+    STUDENT = "student"
+    TEACHER = "teacher"
+
+
+class RealmRole:
+    ADMIN = "admin"
+    TEACHER = "ROLE_TEACHER"
+
+
+DEFAULT_THEME = "default"
+INTERESTS = ("sport", "gry", "lego", "zwierzeta", "rysowanie", "muzyka", "jedzenie")

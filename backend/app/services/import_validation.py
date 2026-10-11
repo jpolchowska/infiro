@@ -1,9 +1,8 @@
-ALLOWED_TASK_TYPES = ("single_choice", "short_answer", "memory")
-ALLOWED_SECTION_TEST_TYPES = ("single_choice", "short_answer")
-ALLOWED_THEMES = {
-    "default", "sport", "gry", "lego", "zwierzeta",
-    "rysowanie", "muzyka", "jedzenie",
-}
+from app.constants import DEFAULT_THEME, INTERESTS, TaskType
+
+ALLOWED_TASK_TYPES = (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER, TaskType.MEMORY)
+ALLOWED_SECTION_TEST_TYPES = (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)
+ALLOWED_THEMES = {DEFAULT_THEME, *INTERESTS}
 OPTION_COUNT = 3
 MEMORY_DIFFICULTY_BY_PAIRS = {3: 2, 6: 3}
 MIN_DIFFICULTY = 1
@@ -63,14 +62,14 @@ def _validate_pairs(pairs, label, errors):
 
 
 ANSWER_FIELD_BY_TYPE = {
-    "single_choice": ("options", _validate_options),
-    "short_answer": ("answers", _validate_answers),
-    "memory": ("pairs", _validate_pairs),
+    TaskType.SINGLE_CHOICE: ("options", _validate_options),
+    TaskType.SHORT_ANSWER: ("answers", _validate_answers),
+    TaskType.MEMORY: ("pairs", _validate_pairs),
 }
 
 
 def _validate_themes(themes, task_type, label, errors):
-    if "default" not in themes:
+    if DEFAULT_THEME not in themes:
         errors.append(f"{label}: 'themes' must contain 'default'")
 
     field, validate_field = ANSWER_FIELD_BY_TYPE[task_type]
@@ -83,7 +82,7 @@ def _validate_themes(themes, task_type, label, errors):
             continue
         if not _is_non_empty_string(variant.get("prompt")):
             errors.append(f"{variant_label}: 'prompt' must be a non-empty string")
-        if key == "default" or field in variant:
+        if key == DEFAULT_THEME or field in variant:
             validate_field(variant.get(field), variant_label, errors)
 
 
@@ -123,7 +122,7 @@ def _validate_task(task, label, content_keys, errors):
 
     if (
         task.get("type") in ALLOWED_TASK_TYPES
-        and task["type"] != "memory"
+        and task["type"] != TaskType.MEMORY
         and not _is_valid_difficulty(task.get("difficulty"))
     ):
         errors.append(

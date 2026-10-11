@@ -1,3 +1,4 @@
+from app.constants import TaskType
 from app.extensions import db
 
 
@@ -11,7 +12,7 @@ class SectionTestQuestion(db.Model):
         nullable=False
     )
     prompt = db.Column(db.Text, nullable=False)
-    type = db.Column(db.String, nullable=False, default="single_choice")
+    type = db.Column(db.String, nullable=False, default=TaskType.SINGLE_CHOICE)
     order_index = db.Column(db.Integer, nullable=False, default=0)
     content_key = db.Column(db.String, unique=True, nullable=True)
     accepted_answers = db.Column(db.JSON, nullable=True)

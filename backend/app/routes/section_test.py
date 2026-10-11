@@ -2,9 +2,10 @@ import random
 
 from flask import Blueprint, jsonify, request
 
+from app.auth import authenticate_token, current_user
 from app.clock import utc_now
+from app.constants import TaskType
 from app.extensions import db
-from app.middleware.auth import authenticate_token, current_user
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.section_test_questions import SectionTestQuestion
@@ -31,7 +32,7 @@ def _question_json(question, interest):
         "type": question.type,
         "prompt": theme.get("prompt", question.prompt),
     }
-    if question.type == "single_choice":
+    if question.type == TaskType.SINGLE_CHOICE:
         options = _question_options(question, interest)
         random_options = list(options)
         random.shuffle(random_options)
@@ -105,7 +106,7 @@ def submit_section_final_test(section_id):
             validated.append((question, False))
             continue
 
-        if question.type == "single_choice":
+        if question.type == TaskType.SINGLE_CHOICE:
             if not isinstance(selected_option_id, int):
                 return jsonify({
                     "error": f"selected_option_id is required for question {question_id}"
@@ -120,7 +121,7 @@ def submit_section_final_test(section_id):
             theme_options = _question_options(question, user.interest)
             selected = next(item for item in theme_options if item["id"] == option.id)
             validated.append((question, selected["is_correct"]))
-        elif question.type == "short_answer":
+        elif question.type == TaskType.SHORT_ANSWER:
             if not isinstance(answer_text, str):
                 return jsonify({
                     "error": f"answer_text is required for question {question_id}"

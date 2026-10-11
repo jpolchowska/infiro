@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 
+from app.auth import authenticate_token, require_realm_role
+from app.constants import RealmRole, UserRole
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_realm_role
 from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
@@ -15,11 +16,11 @@ admin_students_bp = Blueprint("admin_students", __name__)
 def _current_role_and_user():
     realm_roles = request.user.get("realm_access", {}).get("roles", [])
 
-    if "admin" in realm_roles:
+    if RealmRole.ADMIN in realm_roles:
         return "admin", None
 
-    if "ROLE_TEACHER" in realm_roles:
-        return "teacher", get_or_create_user("teacher")
+    if RealmRole.TEACHER in realm_roles:
+        return "teacher", get_or_create_user(request.user, UserRole.TEACHER)
 
     return None, None
 
@@ -127,9 +128,9 @@ def _recent_activity(student, limit=10):
 
 @admin_students_bp.route("/api/admin/teachers", methods=["GET"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def list_teachers():
-    teachers = User.query.filter_by(role="teacher").order_by(User.last_name, User.first_name, User.id).all()
+    teachers = User.query.filter_by(role=UserRole.TEACHER).order_by(User.last_name, User.first_name, User.id).all()
     return jsonify([
         {
             "id": teacher.id,
@@ -147,7 +148,7 @@ def list_students():
     if role is None:
         return jsonify({"error": "Missing required role: admin or ROLE_TEACHER"}), 403
 
-    query = User.query.filter_by(role="student")
+    query = User.query.filter_by(role=UserRole.STUDENT)
     if role == "teacher":
         query = query.filter_by(teacher_id=current_user.id)
 
@@ -163,7 +164,7 @@ def get_student(student_id):
     if role is None:
         return jsonify({"error": "Missing required role: admin or ROLE_TEACHER"}), 403
 
-    student = User.query.filter_by(id=student_id, role="student").first()
+    student = User.query.filter_by(id=student_id, role=UserRole.STUDENT).first()
     if student is None:
         return jsonify({"error": "student not found"}), 404
 
@@ -180,9 +181,9 @@ def get_student(student_id):
 
 @admin_students_bp.route("/api/admin/students/<int:student_id>", methods=["PATCH"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def update_student(student_id):
-    student = User.query.filter_by(id=student_id, role="student").first()
+    student = User.query.filter_by(id=student_id, role=UserRole.STUDENT).first()
     if student is None:
         return jsonify({"error": "student not found"}), 404
 
@@ -197,7 +198,7 @@ def update_student(student_id):
             if not isinstance(teacher_id, int):
                 return jsonify({"error": "teacher_id must be an integer or null"}), 400
 
-            teacher = User.query.filter_by(id=teacher_id, role="teacher").first()
+            teacher = User.query.filter_by(id=teacher_id, role=UserRole.TEACHER).first()
             if teacher is None:
                 return jsonify({"error": "teacher not found"}), 404
 

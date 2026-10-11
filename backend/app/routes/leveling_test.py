@@ -2,9 +2,10 @@ import random
 
 from flask import Blueprint, jsonify, request
 
+from app.auth import authenticate_token, current_user
 from app.clock import utc_now
+from app.constants import TaskType
 from app.extensions import db
-from app.middleware.auth import authenticate_token, current_user
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
@@ -25,7 +26,7 @@ def _pick_random_task(section_id, difficulty_level):
         .filter(
             Subsection.section_id == section_id,
             Task.difficulty_level == difficulty_level,
-            Task.type.in_(("single_choice", "short_answer")),
+            Task.type.in_((TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)),
         )
         .order_by(db.func.random())
         .first()
@@ -40,7 +41,7 @@ def _task_json(task, interest):
         "difficulty_level": task.difficulty_level,
         "prompt": theme.get("prompt", task.body_text),
     }
-    if task.type == "single_choice":
+    if task.type == TaskType.SINGLE_CHOICE:
         options = task_options(task, interest)
         random_options = list(options)
         random.shuffle(random_options)
@@ -109,7 +110,7 @@ def submit_leveling_test():
             validated.append((task, False, None, None))
             continue
 
-        if task.type == "single_choice":
+        if task.type == TaskType.SINGLE_CHOICE:
             if not isinstance(selected_option_id, int):
                 return jsonify({
                     "error": f"selected_option_id is required for task {task_id}"
@@ -124,7 +125,7 @@ def submit_leveling_test():
             theme_options = task_options(task, user.interest)
             selected = next(item for item in theme_options if item["id"] == option.id)
             validated.append((task, selected["is_correct"], option.id, None))
-        elif task.type == "short_answer":
+        elif task.type == TaskType.SHORT_ANSWER:
             if not isinstance(answer_text, str):
                 return jsonify({
                     "error": f"answer_text is required for task {task_id}"

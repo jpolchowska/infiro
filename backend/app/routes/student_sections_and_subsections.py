@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 
+from app.auth import authenticate_token, current_user
 from app.extensions import db
-from app.middleware.auth import authenticate_token, current_user
 from app.models.ebooks import Ebook
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.sections import Section

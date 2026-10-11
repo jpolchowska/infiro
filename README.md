@@ -340,7 +340,7 @@ infiro/
 ├── backend/
 │   ├── app/
 │   │   ├── models/                # SQLAlchemy models (users, sections, tasks, ebooks, answers, ...)
-│   │   ├── middleware/auth.py     # JWT/JWKS verification, realm role checks
+│   │   ├── auth.py                # JWT/JWKS verification, realm role checks
 │   │   ├── routes/
 │   │   │   ├── student*.py        # profile, sections/subsections, tasks, timed practice, stats
 │   │   │   ├── leveling_test.py   # leveling test, submit, history
