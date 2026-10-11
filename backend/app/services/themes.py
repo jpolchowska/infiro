@@ -42,3 +42,11 @@ def task_options(task, interest):
         .all()
     )
     return themed_options(options, resolve_theme(task, interest).get("options"))
+
+
+def merge_theme_variants(themes):
+    default = themes["default"]
+    return {
+        key: {**default, **variant}
+        for key, variant in themes.items()
+    }
