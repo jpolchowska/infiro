@@ -1,88 +1,29 @@
-import random
-
 from flask import Blueprint, jsonify, request
 
 from app.auth import authenticate_token, current_user
-from app.clock import utc_now
-from app.constants import TaskType
-from app.extensions import db
-from app.models.leveling_test_attempts import LevelingTestAttempt
-from app.models.sections import Section
-from app.models.student_answers import StudentAnswer
-from app.models.subsections import Subsection
-from app.models.task_answer_options import TaskAnswerOption
-from app.models.tasks import Task
-from app.services.answers import is_accepted_answer
-from app.services.themes import resolve_theme, task_options
-
-LEVELING_TEST_DIFFICULTY_LEVELS = [1, 2, 3]
+from app.services.leveling_test import build_leveling_test, leveling_test_history, submit_leveling_test
 
 leveling_test_bp = Blueprint("leveling_test", __name__)
 
-
-def _pick_random_task(section_id, difficulty_level):
-    return (
-        Task.query.join(Subsection, Task.subsection_id == Subsection.id)
-        .filter(
-            Subsection.section_id == section_id,
-            Task.difficulty_level == difficulty_level,
-            Task.type.in_((TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)),
-        )
-        .order_by(db.func.random())
-        .first()
-    )
-
-
-def _task_json(task, interest):
-    theme = resolve_theme(task, interest)
-    payload = {
-        "task_id": task.id,
-        "type": task.type,
-        "difficulty_level": task.difficulty_level,
-        "prompt": theme.get("prompt", task.body_text),
-    }
-    if task.type == TaskType.SINGLE_CHOICE:
-        options = task_options(task, interest)
-        random_options = list(options)
-        random.shuffle(random_options)
-        payload["options"] = [
-            {"id": option["id"], "text": option["text"]}
-            for option in random_options
-        ]
-    return payload
+USER_NOT_FOUND = "user not found, call /api/student/me first"
 
 
 @leveling_test_bp.route("/api/student/leveling-test", methods=["GET"])
 @authenticate_token
 def get_leveling_test():
-    user = current_user()
-    if user is None:
-        return jsonify({"error": "user not found, call /api/student/me first"}), 404
+    student = current_user()
+    if student is None:
+        return jsonify({"error": USER_NOT_FOUND}), 404
 
-    sections_payload = []
-    for section in Section.query.order_by(Section.order_index).all():
-        questions = []
-        for level in LEVELING_TEST_DIFFICULTY_LEVELS:
-            task = _pick_random_task(section.id, level)
-            if task is not None:
-                questions.append(_task_json(task, user.interest))
-
-        if questions:
-            sections_payload.append({
-                "section_id": section.id,
-                "section_title": section.title,
-                "questions": questions,
-            })
-
-    return jsonify({"sections": sections_payload}), 200
+    return jsonify(build_leveling_test(student.interest)), 200
 
 
 @leveling_test_bp.route("/api/student/leveling-test/submit", methods=["POST"])
 @authenticate_token
-def submit_leveling_test():
-    user = current_user()
-    if user is None:
-        return jsonify({"error": "user not found, call /api/student/me first"}), 404
+def submit_leveling_test_answers():
+    student = current_user()
+    if student is None:
+        return jsonify({"error": USER_NOT_FOUND}), 404
 
     data = request.get_json()
     if data is None:
@@ -92,145 +33,18 @@ def submit_leveling_test():
     if not isinstance(answers, list) or len(answers) == 0:
         return jsonify({"error": "answers must be a non-empty list"}), 400
 
-    validated = []
-    for answer in answers:
-        if not isinstance(answer, dict):
-            return jsonify({"error": "each answer must be an object"}), 400
+    result, error = submit_leveling_test(student, answers)
+    if error:
+        return jsonify({"error": error}), 400
 
-        task_id = answer.get("task_id")
-
-        task = db.session.get(Task, task_id)
-        if task is None:
-            return jsonify({"error": f"task {task_id} not found"}), 400
-
-        selected_option_id = answer.get("selected_option_id")
-        answer_text = answer.get("answer_text")
-
-        if selected_option_id is None and answer_text is None:
-            validated.append((task, False, None, None))
-            continue
-
-        if task.type == TaskType.SINGLE_CHOICE:
-            if not isinstance(selected_option_id, int):
-                return jsonify({
-                    "error": f"selected_option_id is required for task {task_id}"
-                }), 400
-            option = TaskAnswerOption.query.filter_by(
-                id=selected_option_id, task_id=task_id
-            ).first()
-            if option is None:
-                return jsonify({
-                    "error": f"option {selected_option_id} does not belong to task {task_id}"
-                }), 400
-            theme_options = task_options(task, user.interest)
-            selected = next(item for item in theme_options if item["id"] == option.id)
-            validated.append((task, selected["is_correct"], option.id, None))
-        elif task.type == TaskType.SHORT_ANSWER:
-            if not isinstance(answer_text, str):
-                return jsonify({
-                    "error": f"answer_text is required for task {task_id}"
-                }), 400
-            accepted_answers = resolve_theme(task, user.interest).get(
-                "answers",
-                task.accepted_answers or [],
-            )
-            is_correct = is_accepted_answer(answer_text, accepted_answers)
-            validated.append((task, is_correct, None, answer_text))
-        else:
-            return jsonify({
-                "error": f"unsupported task type for task {task_id}"
-            }), 400
-
-    score = sum(1 for _, is_correct, _, _ in validated if is_correct)
-    max_score = len(validated)
-    now = utc_now()
-
-    section_stats = {}
-    for task, is_correct, _, _ in validated:
-        subsection = db.session.get(Subsection, task.subsection_id)
-        section = db.session.get(Section, subsection.section_id) if subsection else None
-        if section is None:
-            continue
-        stats = section_stats.setdefault(section.id, {
-            "section_id": section.id,
-            "section_title": section.title,
-            "order_index": section.order_index,
-            "score": 0,
-            "total": 0,
-        })
-        stats["total"] += 1
-        if is_correct:
-            stats["score"] += 1
-
-    per_section = [
-        {
-            "section_id": s["section_id"],
-            "section_title": s["section_title"],
-            "score": s["score"],
-            "total": s["total"],
-        }
-        for s in sorted(section_stats.values(), key=lambda s: s["order_index"])
-    ]
-
-    saved = 0
-    for task, is_correct, selected_option_id, answer_text in validated:
-        last_attempt = (
-            StudentAnswer.query.filter_by(task_id=task.id, student_id=user.id)
-            .order_by(StudentAnswer.attempt_number.desc())
-            .first()
-        )
-        attempt_number = last_attempt.attempt_number + 1 if last_attempt else 1
-
-        db.session.add(
-            StudentAnswer(
-                task_id=task.id,
-                student_id=user.id,
-                selected_option_id=selected_option_id,
-                answer_text=answer_text,
-                is_correct=is_correct,
-                attempt_number=attempt_number,
-                submitted_at=now,
-            )
-        )
-        saved += 1
-
-    attempt = LevelingTestAttempt(
-        student_id=user.id,
-        score=score,
-        max_score=max_score,
-        completed_at=now,
-    )
-    db.session.add(attempt)
-
-    user.leveling_test_completed_at = now
-    db.session.commit()
-
-    return jsonify({
-        "saved": saved,
-        "score": score,
-        "max_score": max_score,
-        "per_section": per_section,
-    }), 201
+    return jsonify(result), 201
 
 
 @leveling_test_bp.route("/api/student/leveling-test/history", methods=["GET"])
 @authenticate_token
 def get_leveling_test_history():
-    user = current_user()
-    if user is None:
-        return jsonify({"error": "user not found, call /api/student/me first"}), 404
+    student = current_user()
+    if student is None:
+        return jsonify({"error": USER_NOT_FOUND}), 404
 
-    leveling_test_attempts = (
-        LevelingTestAttempt.query.filter_by(student_id=user.id)
-        .order_by(LevelingTestAttempt.completed_at.desc())
-        .all()
-    )
-
-    return jsonify([
-        {
-            "score": a.score,
-            "total": a.max_score,
-            "completedAt": a.completed_at.isoformat() + "Z" if a.completed_at else None,
-        }
-        for a in leveling_test_attempts
-    ]), 200
+    return jsonify(leveling_test_history(student)), 200

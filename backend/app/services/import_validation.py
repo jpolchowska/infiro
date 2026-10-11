@@ -1,7 +1,7 @@
 from app.constants import DEFAULT_THEME, INTERESTS, TaskType
 
 ALLOWED_TASK_TYPES = (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER, TaskType.MEMORY)
-ALLOWED_SECTION_TEST_TYPES = (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)
+ALLOWED_FINAL_TEST_TYPES = (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)
 ALLOWED_THEMES = {DEFAULT_THEME, *INTERESTS}
 OPTION_COUNT = 3
 MEMORY_DIFFICULTY_BY_PAIRS = {3: 2, 6: 3}
@@ -138,7 +138,7 @@ def _validate_question(question, label, content_keys, errors):
         return
 
     _validate_content_key(question, label, content_keys, errors, required=False)
-    _validate_item_themes(question, label, ALLOWED_SECTION_TEST_TYPES, errors)
+    _validate_item_themes(question, label, ALLOWED_FINAL_TEST_TYPES, errors)
 
 
 def _validate_subsection(subsection, label, content_keys, errors):
@@ -191,5 +191,5 @@ def validate_task_import(data):
     return _validate_sections(data, "subsections", _validate_subsection, "subsection")
 
 
-def validate_section_test_import(data):
+def validate_final_test_import(data):
     return _validate_sections(data, "questions", _validate_question, "question")

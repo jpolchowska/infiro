@@ -5,7 +5,7 @@ from app.extensions import db
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_questions import SectionTestQuestion
 from app.services.answer_options import sync_answer_options
-from app.services.import_validation import validate_section_test_import
+from app.services.import_validation import validate_final_test_import
 from app.services.themes import merge_theme_variants
 
 
@@ -52,8 +52,8 @@ def _upsert_question(section, question_data, content_key, order_index):
     return question
 
 
-def import_section_test(section, data):
-    errors = validate_section_test_import(data)
+def import_final_test(section, data):
+    errors = validate_final_test_import(data)
     if errors:
         return None, errors
 

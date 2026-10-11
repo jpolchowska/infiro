@@ -1,78 +1,35 @@
-import random
-
 from flask import Blueprint, jsonify, request
 
 from app.auth import authenticate_token, current_user
-from app.clock import utc_now
-from app.constants import TaskType
 from app.extensions import db
-from app.models.section_test_answer_options import SectionTestAnswerOption
-from app.models.section_test_attempts import SectionTestAttempt
-from app.models.section_test_questions import SectionTestQuestion
 from app.models.sections import Section
-from app.services.answers import is_accepted_answer
-from app.services.themes import resolve_theme, themed_options
+from app.services.final_test import build_final_test, final_test_history, submit_final_test
 
 section_test_bp = Blueprint("section_test", __name__)
 
-
-def _question_options(question, interest):
-    options = (
-        SectionTestAnswerOption.query.filter_by(section_test_question_id=question.id)
-        .order_by(SectionTestAnswerOption.order_index)
-        .all()
-    )
-    return themed_options(options, resolve_theme(question, interest).get("options"))
-
-
-def _question_json(question, interest):
-    theme = resolve_theme(question, interest)
-    payload = {
-        "question_id": question.id,
-        "type": question.type,
-        "prompt": theme.get("prompt", question.prompt),
-    }
-    if question.type == TaskType.SINGLE_CHOICE:
-        options = _question_options(question, interest)
-        random_options = list(options)
-        random.shuffle(random_options)
-        payload["options"] = [
-            {"id": option["id"], "text": option["text"]}
-            for option in random_options
-        ]
-    return payload
+USER_NOT_FOUND = "user not found, call /api/student/me first"
 
 
 @section_test_bp.route("/api/student/sections/<int:section_id>/final-test", methods=["GET"])
 @authenticate_token
-def get_section_final_test(section_id):
-    user = current_user()
-    if user is None:
-        return jsonify({"error": "user not found, call /api/student/me first"}), 404
+def get_final_test(section_id):
+    student = current_user()
+    if student is None:
+        return jsonify({"error": USER_NOT_FOUND}), 404
 
     section = db.session.get(Section, section_id)
     if section is None:
         return jsonify({"error": "section not found"}), 404
 
-    questions = (
-        SectionTestQuestion.query.filter_by(section_id=section.id)
-        .order_by(SectionTestQuestion.order_index)
-        .all()
-    )
-
-    return jsonify({
-        "section_id": section.id,
-        "section_title": section.title,
-        "questions": [_question_json(question, user.interest) for question in questions],
-    }), 200
+    return jsonify(build_final_test(section, student.interest)), 200
 
 
 @section_test_bp.route("/api/student/sections/<int:section_id>/final-test/submit", methods=["POST"])
 @authenticate_token
-def submit_section_final_test(section_id):
-    user = current_user()
-    if user is None:
-        return jsonify({"error": "user not found, call /api/student/me first"}), 404
+def submit_final_test_answers(section_id):
+    student = current_user()
+    if student is None:
+        return jsonify({"error": USER_NOT_FOUND}), 404
 
     section = db.session.get(Section, section_id)
     if section is None:
@@ -86,95 +43,18 @@ def submit_section_final_test(section_id):
     if not isinstance(answers, list) or len(answers) == 0:
         return jsonify({"error": "answers must be a non-empty list"}), 400
 
-    validated = []
-    for answer in answers:
-        if not isinstance(answer, dict):
-            return jsonify({"error": "each answer must be an object"}), 400
+    result, error = submit_final_test(student, section, answers)
+    if error:
+        return jsonify({"error": error}), 400
 
-        question_id = answer.get("question_id")
-
-        question = SectionTestQuestion.query.filter_by(
-            id=question_id, section_id=section.id
-        ).first()
-        if question is None:
-            return jsonify({"error": f"question {question_id} not found in this section"}), 400
-
-        selected_option_id = answer.get("selected_option_id")
-        answer_text = answer.get("answer_text")
-
-        if selected_option_id is None and answer_text is None:
-            validated.append((question, False))
-            continue
-
-        if question.type == TaskType.SINGLE_CHOICE:
-            if not isinstance(selected_option_id, int):
-                return jsonify({
-                    "error": f"selected_option_id is required for question {question_id}"
-                }), 400
-            option = SectionTestAnswerOption.query.filter_by(
-                id=selected_option_id, section_test_question_id=question.id
-            ).first()
-            if option is None:
-                return jsonify({
-                    "error": f"option {selected_option_id} does not belong to question {question_id}"
-                }), 400
-            theme_options = _question_options(question, user.interest)
-            selected = next(item for item in theme_options if item["id"] == option.id)
-            validated.append((question, selected["is_correct"]))
-        elif question.type == TaskType.SHORT_ANSWER:
-            if not isinstance(answer_text, str):
-                return jsonify({
-                    "error": f"answer_text is required for question {question_id}"
-                }), 400
-            accepted_answers = resolve_theme(question, user.interest).get(
-                "answers",
-                question.accepted_answers or [],
-            )
-            is_correct = is_accepted_answer(answer_text, accepted_answers)
-            validated.append((question, is_correct))
-        else:
-            return jsonify({
-                "error": f"unsupported question type for question {question_id}"
-            }), 400
-
-    score = sum(1 for _, is_correct in validated if is_correct)
-    max_score = len(validated)
-    now = utc_now()
-
-    attempt = SectionTestAttempt(
-        student_id=user.id,
-        section_id=section.id,
-        score=score,
-        max_score=max_score,
-        completed_at=now,
-    )
-    db.session.add(attempt)
-    db.session.commit()
-
-    return jsonify({
-        "score": score,
-        "max_score": max_score,
-    }), 201
+    return jsonify(result), 201
 
 
 @section_test_bp.route("/api/student/sections/<int:section_id>/final-test/history", methods=["GET"])
 @authenticate_token
-def get_section_final_test_history(section_id):
-    user = current_user()
-    if user is None:
-        return jsonify({"error": "user not found, call /api/student/me first"}), 404
+def get_final_test_history(section_id):
+    student = current_user()
+    if student is None:
+        return jsonify({"error": USER_NOT_FOUND}), 404
 
-    attempts = (
-        SectionTestAttempt.query.filter_by(student_id=user.id, section_id=section_id)
-        .order_by(SectionTestAttempt.completed_at.desc())
-        .all()
-    )
-
-    return jsonify([
-        {
-            "score": a.score,
-            "total": a.max_score,
-            "completedAt": a.completed_at.isoformat() + "Z" if a.completed_at else None,
-        }
-        for a in attempts
-    ]), 200
+    return jsonify(final_test_history(student, section_id)), 200

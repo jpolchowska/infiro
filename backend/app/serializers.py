@@ -3,6 +3,18 @@ from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
 
 
+def iso_utc(value):
+    return value.isoformat() + "Z" if value else None
+
+
+def attempt_json(attempt):
+    return {
+        "score": attempt.score,
+        "total": attempt.max_score,
+        "completedAt": iso_utc(attempt.completed_at),
+    }
+
+
 def section_json(section):
     return {
         "id": section.id,

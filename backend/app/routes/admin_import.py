@@ -5,7 +5,7 @@ from app.constants import RealmRole
 from app.extensions import db
 from app.models.sections import Section
 from app.services.ebook_import import import_ebook
-from app.services.section_test_import import import_section_test
+from app.services.final_test_import import import_final_test
 from app.services.task_import import import_tasks
 from app.services.uploads import extract_image_zip
 
@@ -52,7 +52,7 @@ def upload_ebooks():
 @admin_import_bp.route("/api/admin/sections/<int:section_id>/final-test/import", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
-def import_section_final_test(section_id):
+def import_final_test_json(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
         return jsonify({"errors": [f"Section does not exist: {section_id}"]}), 404
@@ -61,7 +61,7 @@ def import_section_final_test(section_id):
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
-    result, errors = import_section_test(section, data)
+    result, errors = import_final_test(section, data)
     if errors:
         return jsonify({"errors": errors}), 400
 
