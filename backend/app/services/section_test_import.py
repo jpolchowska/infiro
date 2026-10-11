@@ -3,8 +3,8 @@ from uuid import uuid4
 from app.extensions import db
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_questions import SectionTestQuestion
-from app.schemas.section_test_import import SECTION_TEST_IMPORT_SCHEMA
-from app.services.import_helpers import matches_schema, sync_answer_options
+from app.services.import_helpers import sync_answer_options
+from app.services.import_validation import validate_section_test_import
 from app.services.themes import merge_theme_variants
 
 
@@ -52,8 +52,9 @@ def _upsert_question(section, question_data, content_key, order_index):
 
 
 def import_section_test(section, data):
-    if not matches_schema(data, SECTION_TEST_IMPORT_SCHEMA, "Section test import"):
-        return None, ["Invalid JSON format"]
+    errors = validate_section_test_import(data)
+    if errors:
+        return None, errors
 
     section_entry = next(
         (entry for entry in data if entry["section"].strip() == section.title), None
@@ -61,15 +62,10 @@ def import_section_test(section, data):
     if section_entry is None:
         return None, [f"payload does not contain a 'section' matching '{section.title}'"]
 
-    content_keys = set()
     imported_questions = []
 
     for question_order, question_data in enumerate(section_entry["questions"], start=1):
         content_key = question_data.get("content_key") or str(uuid4())
-        if content_key in content_keys:
-            return None, [f"duplicate content_key: '{content_key}'"]
-        content_keys.add(content_key)
-
         question = _upsert_question(section, question_data, content_key, question_order)
         imported_questions.append(_question_output(question))
 

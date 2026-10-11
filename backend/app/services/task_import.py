@@ -4,7 +4,7 @@ from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
 from app.services.import_helpers import sync_answer_options
-from app.services.task_import_validation import MEMORY_DIFFICULTY_BY_PAIRS, validate_task_import
+from app.services.import_validation import MEMORY_DIFFICULTY_BY_PAIRS, validate_task_import
 from app.services.themes import merge_theme_variants
 
 

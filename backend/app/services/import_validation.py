@@ -1,4 +1,5 @@
 ALLOWED_TASK_TYPES = ("single_choice", "short_answer", "memory")
+ALLOWED_SECTION_TEST_TYPES = ("single_choice", "short_answer")
 ALLOWED_THEMES = {
     "default", "sport", "gry", "lego", "zwierzeta",
     "rysowanie", "muzyka", "jedzenie",
@@ -86,12 +87,11 @@ def _validate_themes(themes, task_type, label, errors):
             validate_field(variant.get(field), variant_label, errors)
 
 
-def _validate_task(task, label, content_keys, errors):
-    if not isinstance(task, dict):
-        errors.append(f"{label}: must be an object")
+def _validate_content_key(item, label, content_keys, errors, required):
+    content_key = item.get("content_key")
+    if content_key is None and not required:
         return
 
-    content_key = task.get("content_key")
     if not _is_non_empty_string(content_key):
         errors.append(f"{label}: 'content_key' must be a non-empty string")
     elif content_key in content_keys:
@@ -99,22 +99,47 @@ def _validate_task(task, label, content_keys, errors):
     else:
         content_keys.add(content_key)
 
-    task_type = task.get("type")
-    if task_type not in ALLOWED_TASK_TYPES:
-        errors.append(f"{label}: 'type' must be one of: {', '.join(ALLOWED_TASK_TYPES)}")
+
+def _validate_item_themes(item, label, allowed_types, errors):
+    item_type = item.get("type")
+    if item_type not in allowed_types:
+        errors.append(f"{label}: 'type' must be one of: {', '.join(allowed_types)}")
         return
 
-    if task_type != "memory" and not _is_valid_difficulty(task.get("difficulty")):
-        errors.append(
-            f"{label}: 'difficulty' must be an integer {MIN_DIFFICULTY}-{MAX_DIFFICULTY}"
-        )
-
-    themes = task.get("themes")
+    themes = item.get("themes")
     if not isinstance(themes, dict):
         errors.append(f"{label}: 'themes' must be an object")
         return
 
-    _validate_themes(themes, task_type, label, errors)
+    _validate_themes(themes, item_type, label, errors)
+
+
+def _validate_task(task, label, content_keys, errors):
+    if not isinstance(task, dict):
+        errors.append(f"{label}: must be an object")
+        return
+
+    _validate_content_key(task, label, content_keys, errors, required=True)
+
+    if (
+        task.get("type") in ALLOWED_TASK_TYPES
+        and task["type"] != "memory"
+        and not _is_valid_difficulty(task.get("difficulty"))
+    ):
+        errors.append(
+            f"{label}: 'difficulty' must be an integer {MIN_DIFFICULTY}-{MAX_DIFFICULTY}"
+        )
+
+    _validate_item_themes(task, label, ALLOWED_TASK_TYPES, errors)
+
+
+def _validate_question(question, label, content_keys, errors):
+    if not isinstance(question, dict):
+        errors.append(f"{label}: must be an object")
+        return
+
+    _validate_content_key(question, label, content_keys, errors, required=False)
+    _validate_item_themes(question, label, ALLOWED_SECTION_TEST_TYPES, errors)
 
 
 def _validate_subsection(subsection, label, content_keys, errors):
@@ -134,7 +159,7 @@ def _validate_subsection(subsection, label, content_keys, errors):
         _validate_task(task, f"{label} / task #{index}", content_keys, errors)
 
 
-def validate_task_import(data):
+def _validate_sections(data, children_field, validate_child, child_name):
     if not isinstance(data, list):
         return ["payload must be a JSON array of sections"]
     if not data:
@@ -152,14 +177,20 @@ def validate_task_import(data):
         if not _is_non_empty_string(section.get("section")):
             errors.append(f"{label}: 'section' must be a non-empty string")
 
-        subsections = section.get("subsections")
-        if not isinstance(subsections, list):
-            errors.append(f"{label}: 'subsections' must be a list")
+        children = section.get(children_field)
+        if not isinstance(children, list):
+            errors.append(f"{label}: '{children_field}' must be a list")
             continue
 
-        for subsection_index, subsection in enumerate(subsections, start=1):
-            _validate_subsection(
-                subsection, f"{label} / subsection #{subsection_index}", content_keys, errors
-            )
+        for child_index, child in enumerate(children, start=1):
+            validate_child(child, f"{label} / {child_name} #{child_index}", content_keys, errors)
 
     return errors
+
+
+def validate_task_import(data):
+    return _validate_sections(data, "subsections", _validate_subsection, "subsection")
+
+
+def validate_section_test_import(data):
+    return _validate_sections(data, "questions", _validate_question, "question")

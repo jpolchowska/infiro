@@ -1,16 +1,4 @@
-import jsonschema
-from flask import current_app
-
 from app.extensions import db
-
-
-def matches_schema(data, schema, label):
-    try:
-        jsonschema.validate(instance=data, schema=schema)
-        return True
-    except jsonschema.exceptions.ValidationError as err:
-        current_app.logger.warning("%s validation failed: %s", label, err.message)
-        return False
 
 
 def sync_answer_options(option_model, owner, options):
