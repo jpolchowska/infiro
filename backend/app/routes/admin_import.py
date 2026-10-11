@@ -1,24 +1,25 @@
-from flask import Blueprint, current_app, jsonify, request
-from uuid import uuid4
 import io
 import json
-import jsonschema
 import os
 import posixpath
 import zipfile
+from uuid import uuid4
+
+import jsonschema
+from flask import Blueprint, current_app, jsonify, request
 from jsonschema import validate
 from PIL import Image as PILImage
 from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_realm_role
+from app.models.ebooks import Ebook
+from app.models.section_test_answer_options import SectionTestAnswerOption
+from app.models.section_test_questions import SectionTestQuestion
 from app.models.sections import Section
 from app.models.subsections import Subsection
-from app.models.tasks import Task
 from app.models.task_answer_options import TaskAnswerOption
-from app.models.ebooks import ebooks
-from app.models.section_test_questions import SectionTestQuestion
-from app.models.section_test_answer_options import SectionTestAnswerOption
+from app.models.tasks import Task
 from app.services.uploads import extract_image_zip
 
 admin_import_bp = Blueprint("admin_import", __name__)
@@ -127,6 +128,7 @@ def validate_import_payload(data):
         current_app.logger.warning("Task import validation failed: %s", err.message)
         return False
 
+
 ALLOWED_SECTION_TEST_TYPES = {"single_choice", "short_answer"}
 
 
@@ -233,6 +235,7 @@ def _resolved_themes(themes):
         key: {**default, **variant}
         for key, variant in themes.items()
     }
+
 
 def _replace_options(task, options):
     existing = TaskAnswerOption.query.filter_by(task_id=task.id).order_by(
@@ -386,6 +389,7 @@ def _load_ebook_zip(file_storage):
             return None, errors
         return {"data": data, "image_bytes": image_bytes, "ebook_root": ebook_root}, None
 
+
 @admin_import_bp.route("/api/admin/tasks/import", methods=["POST"])
 @authenticate_token
 @require_realm_role("admin")
@@ -394,8 +398,7 @@ def import_tasks():
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
-    isOk = validate_import_payload(data)
-    if isOk == False:
+    if not validate_import_payload(data):
         return jsonify({"errors": ["Invalid JSON format"]}), 400
 
     section_cache = {}
@@ -492,6 +495,7 @@ def import_tasks():
         "data": data,
     }), 201
 
+
 @admin_import_bp.route("/api/admin/ebooks/import", methods=["POST"])
 @authenticate_token
 @require_realm_role("admin")
@@ -547,9 +551,9 @@ def upload_ebooks():
         if block["type"] == "image" else block
         for block in data["blocks"]
     ]
-    ebook = ebooks.query.filter_by(subsection_id=subsection.id).first()
+    ebook = Ebook.query.filter_by(subsection_id=subsection.id).first()
     if ebook is None:
-        ebook = ebooks(subsection_id=subsection.id, title=content["title"])
+        ebook = Ebook(subsection_id=subsection.id, title=content["title"])
         db.session.add(ebook)
     ebook.title = content["title"]
     ebook.intro = content.get("intro")
@@ -577,8 +581,7 @@ def import_section_test(section_id):
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
-    isOk = validate_section_test_payload(data)
-    if isOk == False:
+    if not validate_section_test_payload(data):
         return jsonify({"errors": ["Invalid JSON format"]}), 400
 
     section_entry = next(

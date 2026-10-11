@@ -1,13 +1,16 @@
 from functools import wraps
-from flask import request, jsonify
+
 import jwt
-from app.models.users import User
+from flask import jsonify, request
 from jwt import PyJWKClient
+
+from app.models.users import User
 
 KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/matematyka-app/protocol/openid-connect/certs"
 KEYCLOAK_ISSUER_PATH = "/realms/matematyka-app"
 
 jwks_client = PyJWKClient(KEYCLOAK_JWKS_URI)
+
 
 def authenticate_token(f):
     @wraps(f)
@@ -97,6 +100,7 @@ def require_realm_role(role):
         return decorated
 
     return decorator
+
 
 def _current_user():
     sub = request.user.get("sub")

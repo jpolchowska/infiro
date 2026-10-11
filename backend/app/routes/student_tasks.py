@@ -1,25 +1,24 @@
-from datetime import datetime
-
-from app.routes import student as student_routes
-from flask import Blueprint, jsonify, request, redirect, url_for
-
-from app.middleware.auth import authenticate_token
-from app.middleware.auth import require_role
-from app.models.users import User
-from app.services.users import get_or_create_user, update_interest
-from app.extensions import db
-from app.models.sections import Section
-from app.models.subsections import Subsection
-from app.models.tasks import Task
-from app.models.student_answers import StudentAnswer
-from app.models.leveling_test_attempts import LevelingTestAttempt
-from app.models.task_answer_options import TaskAnswerOption
-from app.models.ebooks import ebooks
-from app.utils import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options, determine_student_difficulty_level, _attempts_used_in_current_cycle, _task_solution
 import random
 import re
+from datetime import datetime
+
+from flask import Blueprint, jsonify, request
+
+from app.extensions import db
+from app.middleware.auth import authenticate_token
+from app.models.student_answers import StudentAnswer
+from app.models.task_answer_options import TaskAnswerOption
+from app.models.tasks import Task
+from app.routes import student as student_routes
+from app.utils import (
+    _attempts_used_in_current_cycle,
+    _task_solution,
+    _task_theme,
+    determine_student_difficulty_level,
+)
 
 student_tasks_bp = Blueprint("student_tasks", __name__)
+
 
 @student_tasks_bp.route("/api/student/tasks/<int:task_id>", methods=["GET"])
 @authenticate_token
@@ -85,7 +84,8 @@ def get_student_task(task_id):
 
     return jsonify(response), 200
 
-@student_tasks_bp.route("/api/student/tasks/<int:task_id>/answers",methods=["POST"])
+
+@student_tasks_bp.route("/api/student/tasks/<int:task_id>/answers", methods=["POST"])
 @authenticate_token
 def submit_student_answer(task_id):
     student = student_routes._current_user()

@@ -35,6 +35,7 @@ def _get_solved_task_ids(student_id, subsection_id=None):
 
     return {task_id for (task_id,) in query.all()}
 
+
 def _get_section_index(section_id):
     sections = (
         Section.query
@@ -65,6 +66,7 @@ def _subsection_progress(student_id, subsection):
         "solved_tasks": len(solved_task_ids),
         "total_tasks": total_tasks,
     }
+
 
 def _attempts_used_in_current_cycle(task_id, student_id):
     last_answer = (
@@ -106,6 +108,7 @@ def _timed_options(task, interest):
         for option in options
     ]
 
+
 def _get_section_progress(student_id, section):
     subsections = (
         Subsection.query
@@ -129,6 +132,7 @@ def _get_section_progress(student_id, section):
         "solved_tasks": solved_tasks,
         "total_tasks": total_tasks,
     }
+
 
 def _get_current_subsection(student_id):
     answers = (
@@ -170,6 +174,7 @@ def _get_current_subsection(student_id):
 
     return None
 
+
 def _get_recent_sections(student_id, limit=5):
     rows = (
         db.session.query(
@@ -200,6 +205,7 @@ def _get_recent_sections(student_id, limit=5):
         for section_id in section_ids
     ]
 
+
 def _current_subsection_json(student_id, subsection):
     if subsection is None:
         return None
@@ -222,6 +228,7 @@ def _current_subsection_json(student_id, subsection):
         "solved_tasks": progress["solved_tasks"],
         "total_tasks": progress["total_tasks"],
     }
+
 
 def _task_solution(task, interest=None):
     if task.type == "single_choice":
@@ -253,6 +260,7 @@ def _task_solution(task, interest=None):
         }
 
     return None
+
 
 def determine_student_difficulty_level(student_id, subsection_id):
     tasks_done_by_student = (
@@ -304,6 +312,7 @@ def determine_student_difficulty_level(student_id, subsection_id):
         .first()
     )
     return max_difficulty.difficulty_level if max_difficulty else 3
+
 
 def _student_subsection_json(student_id, subsection):
     progress = _subsection_progress(student_id, subsection)

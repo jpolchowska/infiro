@@ -2,7 +2,8 @@ from datetime import datetime
 
 from app.extensions import db
 
-class ebooks(db.Model):
+
+class Ebook(db.Model):
     __tablename__ = "ebooks"
     id = db.Column(db.Integer, primary_key=True)
     subsection_id = db.Column(

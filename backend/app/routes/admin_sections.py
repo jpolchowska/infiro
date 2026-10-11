@@ -1,20 +1,21 @@
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_realm_role, require_any_realm_role
-from app.models.sections import Section
-from app.models.subsections import Subsection
-from app.models.tasks import Task
-from app.models.task_answer_options import TaskAnswerOption
+from app.middleware.auth import authenticate_token, require_any_realm_role, require_realm_role
+from app.models.ebooks import Ebook
 from app.models.knowledge_resources import KnowledgeResource
-from app.models.student_answers import StudentAnswer
-from app.models.ebooks import ebooks
-from app.models.section_test_questions import SectionTestQuestion
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_attempts import SectionTestAttempt
+from app.models.section_test_questions import SectionTestQuestion
+from app.models.sections import Section
+from app.models.student_answers import StudentAnswer
+from app.models.subsections import Subsection
+from app.models.task_answer_options import TaskAnswerOption
+from app.models.tasks import Task
 from app.routes.admin_materials import _material_json
 
 admin_sections_bp = Blueprint("admin_sections", __name__)
+
 
 def _section_json(section):
     return {
@@ -28,6 +29,7 @@ def _section_json(section):
         ),
     }
 
+
 def _subsection_json(subsection):
     return {
         "id": subsection.id,
@@ -37,6 +39,7 @@ def _subsection_json(subsection):
         "order_index": subsection.order_index,
         "task_count": Task.query.filter_by(subsection_id=subsection.id).count(),
     }
+
 
 def _validate_options(options):
     if not isinstance(options, list) or len(options) < 2:
@@ -179,7 +182,7 @@ def get_subsection(subsection_id):
     materials = KnowledgeResource.query.filter_by(subsection_id=subsection_id).order_by(
         KnowledgeResource.order_index
     ).all()
-    ebook = ebooks.query.filter_by(subsection_id=subsection_id).first()
+    ebook = Ebook.query.filter_by(subsection_id=subsection_id).first()
 
     payload = _subsection_json(subsection)
     payload["tasks"] = [_task_json(t) for t in tasks]
@@ -288,7 +291,7 @@ def delete_section(section_id):
         KnowledgeResource.query.filter(
             KnowledgeResource.subsection_id.in_(subsection_ids)
         ).delete(synchronize_session=False)
-        ebooks.query.filter(ebooks.subsection_id.in_(subsection_ids)).delete(
+        Ebook.query.filter(Ebook.subsection_id.in_(subsection_ids)).delete(
             synchronize_session=False
         )
         Subsection.query.filter(Subsection.id.in_(subsection_ids)).delete(synchronize_session=False)
@@ -355,7 +358,7 @@ def delete_subsection(subsection_id):
         Task.query.filter(Task.id.in_(task_ids)).delete(synchronize_session=False)
 
     KnowledgeResource.query.filter_by(subsection_id=subsection_id).delete(synchronize_session=False)
-    ebooks.query.filter_by(subsection_id=subsection_id).delete(synchronize_session=False)
+    Ebook.query.filter_by(subsection_id=subsection_id).delete(synchronize_session=False)
     db.session.delete(subsection)
     db.session.commit()
 

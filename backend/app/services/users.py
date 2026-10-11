@@ -36,9 +36,9 @@ def update_interest():
     user = User.query.filter_by(keycloak_sub=sub).first()
     interest = (request.get_json(silent=True) or {}).get("interest")
 
-    anivableInterests_options = ["sport", "zwierzeta", "lego", "gry", "rysowanie", "muzyka", "jedzenie"]
+    available_interests = ["sport", "zwierzeta", "lego", "gry", "rysowanie", "muzyka", "jedzenie"]
 
-    if interest is None or interest in anivableInterests_options:
+    if interest is None or interest in available_interests:
         user.interest = interest
     else:
         raise ValueError("Invalid interest")

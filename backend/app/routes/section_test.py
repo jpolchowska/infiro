@@ -1,16 +1,16 @@
-from datetime import datetime
 import random
+from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token
-from app.models.sections import Section
-from app.models.section_test_questions import SectionTestQuestion
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_attempts import SectionTestAttempt
-from app.routes.student import _current_user
+from app.models.section_test_questions import SectionTestQuestion
+from app.models.sections import Section
 from app.routes.leveling_test import _normalize_answer
+from app.routes.student import _current_user
 
 section_test_bp = Blueprint("section_test", __name__)
 

@@ -1,24 +1,28 @@
-from datetime import datetime
-
-from flask import Blueprint, jsonify, request, redirect, url_for
-
-from app.middleware.auth import authenticate_token
-from app.middleware.auth import require_role
-from app.models.users import User
-from app.services.users import get_or_create_user, update_interest
-from app.extensions import db
-from app.models.sections import Section
-from app.models.subsections import Subsection
-from app.models.tasks import Task
-from app.models.student_answers import StudentAnswer
-from app.models.leveling_test_attempts import LevelingTestAttempt
-from app.models.task_answer_options import TaskAnswerOption
-from app.models.ebooks import ebooks
-from app.middleware.auth import _current_user
-from app.utils import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options
 import random
 
+from flask import Blueprint, jsonify, request
+
+from app.extensions import db
+from app.middleware.auth import _current_user, authenticate_token
+from app.models.leveling_test_attempts import LevelingTestAttempt
+from app.models.sections import Section
+from app.models.student_answers import StudentAnswer
+from app.models.subsections import Subsection
+from app.models.task_answer_options import TaskAnswerOption
+from app.models.tasks import Task
+from app.utils import (
+    _current_subsection_json,
+    _get_current_subsection,
+    _get_recent_sections,
+    _get_section_index,
+    _get_section_progress,
+    _get_solved_task_ids,
+    _task_theme,
+    _timed_options,
+)
+
 student_bp = Blueprint("student", __name__)
+
 
 @student_bp.route("/api/student", methods=["GET"])
 @authenticate_token
@@ -26,6 +30,7 @@ def student():
     return jsonify({
         "message": "Hello"
     })
+
 
 @student_bp.route("/api/student/stats")
 @authenticate_token
@@ -102,11 +107,11 @@ def get_student_stats():
         )
 
     last_leveling_test = (
-    LevelingTestAttempt.query
-    .filter_by(student_id=student_id)
-    .order_by(LevelingTestAttempt.completed_at.desc())
-    .first()
-)
+        LevelingTestAttempt.query
+        .filter_by(student_id=student_id)
+        .order_by(LevelingTestAttempt.completed_at.desc())
+        .first()
+    )
 
     return jsonify(
         {
@@ -132,7 +137,7 @@ def get_student_stats():
     ), 200
 
 
-@student_bp.route("/api/student/subsections/<int:subsection_id>/timed",methods=["GET"])
+@student_bp.route("/api/student/subsections/<int:subsection_id>/timed", methods=["GET"])
 @authenticate_token
 def get_timed_tasks(subsection_id):
     student = _current_user()
@@ -187,7 +192,8 @@ def get_timed_tasks(subsection_id):
         "questions": questions
     }), 200
 
-@student_bp.route("/api/student/subsections/<int:subsection_id>/timed/submit",methods=["POST"])
+
+@student_bp.route("/api/student/subsections/<int:subsection_id>/timed/submit", methods=["POST"])
 @authenticate_token
 def submit_timed_tasks(subsection_id):
     student = _current_user()

@@ -193,6 +193,7 @@ def test_get_student_tasks_subsection_not_found(client, monkeypatch):
 
     assert response.status_code == 404
 
+
 def test_unlocked_new_tasks(client, monkeypatch):
     student = User(
         keycloak_sub="student-sub",
@@ -281,7 +282,7 @@ def test_unlocked_new_tasks(client, monkeypatch):
     ]
 
     response = client.get(
-        f"/api/student/subsections/{subsection.id}/tasks", 
+        f"/api/student/subsections/{subsection.id}/tasks",
         headers={
             "Authorization": "Bearer test-token",
         },
@@ -315,13 +316,14 @@ def test_unlocked_new_tasks(client, monkeypatch):
     assert all(answer.is_correct for answer in saved_answers)
 
     response = client.get(
-        f"/api/student/subsections/{subsection.id}/tasks", 
+        f"/api/student/subsections/{subsection.id}/tasks",
         headers={
             "Authorization": "Bearer test-token",
         },
     )
     data = response.get_json()
     assert len(data["tasks"]) == 3
+
 
 def test_wrong_answer_does_not_unlock_new_tasks(client, monkeypatch):
     student = User(keycloak_sub="student-sub", role="student")
@@ -498,5 +500,3 @@ def test_single_choice_answer_unlocks_new_tasks(client, monkeypatch):
         task1.id,
         task2.id,
     ]
-
-    

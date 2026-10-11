@@ -1,4 +1,3 @@
-from datetime import datetime
 from types import SimpleNamespace
 from pathlib import Path
 
@@ -9,8 +8,6 @@ from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
 from app.models.subsections import Subsection
-from app.models.tasks import Task
-from app.models.student_answers import StudentAnswer
 
 
 @pytest.fixture
@@ -25,7 +22,6 @@ def client():
         yield app.test_client()
         db.session.remove()
         db.drop_all()
-
 
 
 def test_post_correct_zip(client, monkeypatch):
@@ -132,6 +128,7 @@ def test_post_bad_zip(client, monkeypatch):
         )
 
     assert response.status_code == 400
+
 
 def test_post_zip_without_subsection(client, monkeypatch):
     monkeypatch.setattr(

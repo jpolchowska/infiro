@@ -2,11 +2,11 @@ from flask import Blueprint, jsonify, request
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_realm_role
-from app.models.users import User
-from app.models.student_answers import StudentAnswer
-from app.models.tasks import Task
-from app.models.subsections import Subsection
 from app.models.sections import Section
+from app.models.student_answers import StudentAnswer
+from app.models.subsections import Subsection
+from app.models.tasks import Task
+from app.models.users import User
 from app.services.users import get_or_create_user
 
 admin_students_bp = Blueprint("admin_students", __name__)

@@ -4,9 +4,9 @@ from flask import Blueprint, current_app, jsonify, request
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_realm_role
+from app.models.knowledge_resources import KnowledgeResource
 from app.models.sections import Section
 from app.models.subsections import Subsection
-from app.models.knowledge_resources import KnowledgeResource
 from app.services.uploads import save_upload_file
 
 admin_materials_bp = Blueprint("admin_materials", __name__)

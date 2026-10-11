@@ -1,17 +1,17 @@
-from datetime import datetime
-import re
 import random
+import re
+from datetime import datetime
 
-from app.models.leveling_test_attempts import LevelingTestAttempt
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_role
+from app.middleware.auth import authenticate_token
+from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.sections import Section
-from app.models.subsections import Subsection
-from app.models.tasks import Task
-from app.models.task_answer_options import TaskAnswerOption
 from app.models.student_answers import StudentAnswer
+from app.models.subsections import Subsection
+from app.models.task_answer_options import TaskAnswerOption
+from app.models.tasks import Task
 from app.routes.student import _current_user
 
 LEVELING_TEST_DIFFICULTY_LEVELS = [1, 2, 3]
@@ -258,6 +258,7 @@ def submit_leveling_test():
         "per_section": per_section,
     }), 201
 
+
 @leveling_test_bp.route("/api/student/leveling-test/history", methods=["GET"])
 @authenticate_token
 def get_leveling_test_history():
@@ -265,7 +266,11 @@ def get_leveling_test_history():
     if user is None:
         return jsonify({"error": "user not found, call /api/student/me first"}), 404
 
-    leveling_test_attempts = LevelingTestAttempt.query.filter_by(student_id=user.id).order_by(LevelingTestAttempt.completed_at.desc()).all()
+    leveling_test_attempts = (
+        LevelingTestAttempt.query.filter_by(student_id=user.id)
+        .order_by(LevelingTestAttempt.completed_at.desc())
+        .all()
+    )
 
     return jsonify([
         {

@@ -1,10 +1,9 @@
 from flask import Blueprint, jsonify, request
-from datetime import datetime
 
-from app.models.tasks import Task
-from app.models.task_answer_options import TaskAnswerOption
-from app.models.subsections import Subsection
 from app.middleware.auth import authenticate_token
+from app.models.subsections import Subsection
+from app.models.task_answer_options import TaskAnswerOption
+from app.models.tasks import Task
 
 tasks_bp = Blueprint("tasks", __name__)
 
@@ -41,6 +40,7 @@ def get_task(task_id):
             for option in options
         ]
     }), 200
+
 
 @tasks_bp.route("/api/tasks", methods=["GET"])
 @authenticate_token
