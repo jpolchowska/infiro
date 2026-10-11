@@ -135,7 +135,6 @@ def submit_leveling_test():
     if not isinstance(answers, list) or len(answers) == 0:
         return jsonify({"error": "answers must be a non-empty list"}), 400
 
-    # Walidacja wszystkich wpisów najpierw -- jeśli cokolwiek złe, nic się nie zapisuje.
     validated = []
     for answer in answers:
         if not isinstance(answer, dict):
@@ -150,7 +149,6 @@ def submit_leveling_test():
         selected_option_id = answer.get("selected_option_id")
         answer_text = answer.get("answer_text")
 
-        # "Nie wiem" -- brak odpowiedzi, liczone jako błędne
         if selected_option_id is None and answer_text is None:
             validated.append((task, False, None, None))
             continue
@@ -189,12 +187,10 @@ def submit_leveling_test():
                 "error": f"unsupported task type for task {task_id}"
             }), 400
 
-    # Obliczenie wyniku
     score = sum(1 for _, is_correct, _, _ in validated if is_correct)
     max_score = len(validated)
     now = datetime.utcnow()
 
-    # Podział wyniku na sekcje -- ekran wyniku na mobile nie liczy już nic sam.
     section_stats = {}
     for task, is_correct, _, _ in validated:
         subsection = db.session.get(Subsection, task.subsection_id)
@@ -222,7 +218,6 @@ def submit_leveling_test():
         for s in sorted(section_stats.values(), key=lambda s: s["order_index"])
     ]
 
-    # Zapis odpowiedzi na poszczególne zadania
     saved = 0
     for task, is_correct, selected_option_id, answer_text in validated:
         last_attempt = (
@@ -245,7 +240,6 @@ def submit_leveling_test():
         )
         saved += 1
 
-    # Wstawienie rekordu podejścia do nowej tabeli
     attempt = LevelingTestAttempt(
         student_id=user.id,
         score=score,
@@ -254,7 +248,6 @@ def submit_leveling_test():
     )
     db.session.add(attempt)
 
-    # Zachowanie dotychczasowej flagi w profilu
     user.leveling_test_completed_at = now
     db.session.commit()
 

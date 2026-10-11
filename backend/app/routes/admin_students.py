@@ -13,12 +13,6 @@ admin_students_bp = Blueprint("admin_students", __name__)
 
 
 def _current_role_and_user():
-    """Sprawdza role realmowe z tokena. Dla admina zwraca ('admin', None) --
-    admin nie potrzebuje własnego wiersza w users do przeglądania uczniów.
-    Dla nauczyciela zwraca ('teacher', User) i przy pierwszym wejściu zakłada
-    mu wiersz w users (tak jak _current_user()/me w student.py dla ucznia).
-    Zwraca (None, None), jeśli użytkownik nie ma żadnej z tych ról.
-    """
     realm_roles = request.user.get("realm_access", {}).get("roles", [])
 
     if "admin" in realm_roles:
@@ -88,7 +82,6 @@ def _section_progress(student):
 
 
 def _needs_practice(student):
-    """Zadania, których ostatnia próba ucznia była błędna."""
     answers = StudentAnswer.query.filter_by(student_id=student.id).order_by(
         StudentAnswer.task_id, StudentAnswer.attempt_number.desc()
     ).all()
@@ -174,8 +167,6 @@ def get_student(student_id):
     if student is None:
         return jsonify({"error": "student not found"}), 404
 
-    # Nauczyciel nie widzi cudzych uczniów -- 404, nie 403, żeby nie zdradzać
-    # że dany uczeń w ogóle istnieje w systemie.
     if role == "teacher" and student.teacher_id != current_user.id:
         return jsonify({"error": "student not found"}), 404
 

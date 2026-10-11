@@ -51,11 +51,6 @@ ALLOWED_EBOOK_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 
 def validate_import_payload(data):
-    """Waliduje sparsowany JSON z importem zadań (format zagnieżdżony:
-    sekcje -> podsekcje -> zadania). Zwraca listę błędów jako tekst;
-    pusta lista oznacza poprawny plik. Odzwierciedla logikę
-    staff/lib/validateImport.ts -- trzymać oba pliki w zgodzie.
-    """
     schema = {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "array",
@@ -127,23 +122,15 @@ def validate_import_payload(data):
     }
     try:
         validate(instance=data, schema=schema)
-        print("✓ JSON jest poprawny!")
         return True
     except jsonschema.exceptions.ValidationError as err:
-        print(f"Błąd walidacji: {err.message}")
+        current_app.logger.warning("Task import validation failed: %s", err.message)
         return False
 
 ALLOWED_SECTION_TEST_TYPES = {"single_choice", "short_answer"}
 
 
 def validate_section_test_payload(data):
-    """Waliduje sparsowany JSON z importem testu końcowego działu (format:
-    sekcje -> pytania, bez podsekcji i bez difficulty -- to nie jest zadanie
-    ćwiczeniowe). Zwraca listę błędów jako tekst; pusta lista oznacza
-    poprawny plik. Odzwierciedla logikę
-    staff/lib/validateImport.ts's validateSectionTestPayload -- trzymać oba
-    pliki w zgodzie.
-    """
     schema = {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "array",
@@ -199,7 +186,7 @@ def validate_section_test_payload(data):
         validate(instance=data, schema=schema)
         return True
     except jsonschema.exceptions.ValidationError as err:
-        print(f"Błąd walidacji: {err.message}")
+        current_app.logger.warning("Section test import validation failed: %s", err.message)
         return False
 
 
@@ -650,4 +637,3 @@ def import_section_test(section_id):
         "questions": imported_questions,
         "data": data,
     }), 201
-

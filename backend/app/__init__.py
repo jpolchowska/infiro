@@ -13,7 +13,7 @@ def create_app(config=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from app import models  # noqa: F401 -- rejestruje modele w db.metadata
+    from app import models  # noqa: F401
 
     from app.routes.public import public_bp
     from app.routes.student import student_bp

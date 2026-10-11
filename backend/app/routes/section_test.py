@@ -113,7 +113,6 @@ def submit_section_final_test(section_id):
     if not isinstance(answers, list) or len(answers) == 0:
         return jsonify({"error": "answers must be a non-empty list"}), 400
 
-    # Walidacja wszystkich wpisów najpierw -- jeśli cokolwiek złe, nic się nie zapisuje.
     validated = []
     for answer in answers:
         if not isinstance(answer, dict):
@@ -130,7 +129,6 @@ def submit_section_final_test(section_id):
         selected_option_id = answer.get("selected_option_id")
         answer_text = answer.get("answer_text")
 
-        # "Nie wiem" -- brak odpowiedzi, liczone jako błędne
         if selected_option_id is None and answer_text is None:
             validated.append((question, False))
             continue
@@ -173,8 +171,6 @@ def submit_section_final_test(section_id):
     max_score = len(validated)
     now = datetime.utcnow()
 
-    # Test końcowy jest izolowany od zwykłego postępu -- w przeciwieństwie do
-    # testu poziomującego, nic tu nie trafia do StudentAnswer.
     attempt = SectionTestAttempt(
         student_id=user.id,
         section_id=section.id,

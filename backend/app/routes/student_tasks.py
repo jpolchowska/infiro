@@ -109,12 +109,7 @@ def submit_student_answer(task_id):
             "error": "Invalid JSON body"
         }), 400
 
-    # difficulty level of exercise
     previous_difficulty_level = determine_student_difficulty_level(student.id, task.subsection_id)
-
-    # ---------------------------------------------------------
-    # MEMORY
-    # ---------------------------------------------------------
 
     if task.type == "memory":
         if data.get("completed") is not True:
@@ -147,10 +142,6 @@ def submit_student_answer(task_id):
 
     attempts_used = _attempts_used_in_current_cycle(task.id, student.id)
     attempt_number = attempts_used + 1
-
-    # ---------------------------------------------------------
-    # SINGLE CHOICE
-    # ---------------------------------------------------------
 
     if task.type == "single_choice":
         selected_option_id = data.get("selected_option_id")
@@ -190,10 +181,6 @@ def submit_student_answer(task_id):
             submitted_at=datetime.utcnow(),
         )
 
-    # ---------------------------------------------------------
-    # SHORT ANSWER
-    # ---------------------------------------------------------
-
     else:
         answer_text = data.get("answer_text")
 
@@ -229,10 +216,6 @@ def submit_student_answer(task_id):
             attempt_number=attempt_number,
             submitted_at=datetime.utcnow(),
         )
-
-    # ---------------------------------------------------------
-    # SAVE
-    # ---------------------------------------------------------
 
     db.session.add(answer)
     db.session.commit()

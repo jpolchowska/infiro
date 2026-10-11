@@ -14,10 +14,6 @@ def allowed_file(filename):
 
 
 def save_upload_file(file_storage):
-    """Zapisuje przesłany plik w app/static/uploads i zwraca (resource_type, file_url).
-
-    Zwraca (None, None) jeśli rozszerzenie pliku jest niedozwolone.
-    """
     if not file_storage or not file_storage.filename or not allowed_file(file_storage.filename):
         return None, None
 
@@ -35,11 +31,6 @@ def save_upload_file(file_storage):
 
 
 def extract_image_zip(file_storage):
-    """Wypakowuje obrazy z ZIP-a do app/static/uploads.
-
-    Zwraca listę ścieżek URL albo (None, komunikat) dla niepoprawnego archiwum.
-    Cała zawartość jest walidowana przed zapisaniem pierwszego pliku.
-    """
     if not file_storage or not file_storage.filename:
         return None, "ZIP file is required"
 

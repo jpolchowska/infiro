@@ -5,11 +5,6 @@ from app.models.users import User
 
 
 def get_or_create_user(role):
-    """Znajduje User po claimie 'sub' z JWT. Jeśli nie ma jeszcze lokalnego
-    wiersza, zakłada go z podaną rolą i danymi z tokena (first_name/last_name/email).
-    Jeśli wiersz już istnieje, odświeża te dane z bieżącego tokena -- inaczej
-    konta założone zanim zaczęliśmy je zapisywać zostałyby bez imienia na zawsze.
-    """
     sub = request.user.get("sub")
     user = User.query.filter_by(keycloak_sub=sub).first()
 

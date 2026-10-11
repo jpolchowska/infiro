@@ -39,7 +39,6 @@ def _subsection_json(subsection):
     }
 
 def _validate_options(options):
-    """Zwraca komunikat błędu (string), albo None jeśli opcje są poprawne."""
     if not isinstance(options, list) or len(options) < 2:
         return "options must be a list with at least 2 items"
 

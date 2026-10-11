@@ -211,7 +211,6 @@ def test_submit_scores_correctly_and_isolates_from_student_answers(client, monke
     assert len(attempts) == 1
     assert attempts[0].score == 2
 
-    # Test końcowy musi być izolowany od zwykłego postępu ucznia.
     assert StudentAnswer.query.count() == 0
 
 

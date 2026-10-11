@@ -31,9 +31,6 @@ def authenticate_token(f):
                 options={"verify_aud": False, "verify_iss": False}
             )
 
-            # Host w 'iss' zależy od tego, jak klient dotarł do Keycloaka
-            # (localhost w przeglądarce, adres LAN/10.0.2.2 z telefonu/emulatora)
-            # -- sprawdzamy tylko, że to token z naszego realmu, nie z jakiegoś innego.
             issuer = decoded.get("iss", "")
             if not issuer.endswith(KEYCLOAK_ISSUER_PATH):
                 return jsonify({"message": "Invalid issuer"}), 403
@@ -69,8 +66,6 @@ def require_role(role):
 
 
 def require_any_realm_role(*roles):
-    """Jak require_realm_role, ale wpuszcza, jeśli user ma KTÓRĄKOLWIEK
-    z podanych ról (np. "admin" LUB "ROLE_TEACHER")."""
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -88,11 +83,6 @@ def require_any_realm_role(*roles):
 
 
 def require_realm_role(role):
-    """Sprawdza natywną rolę realmową Keycloaka (realm_access.roles) -- ten sam
-    mechanizm co keycloak.hasRealmRole() już używany w AuthGate panelu admina.
-    Inaczej niż require_role(), który sprawdza custom claim 'realm_access.roles'
-    używany przez aplikację mobilną.
-    """
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -109,10 +99,5 @@ def require_realm_role(role):
     return decorator
 
 def _current_user():
-    """Znajduje User po claimie 'sub' z JWT. Zwraca None, jeśli nie ma
-    jeszcze lokalnego wiersza -- używane tam, gdzie brak wiersza ma być
-    błędem (np. leveling-test wymaga wcześniejszego wywołania /me),
-    w odróżnieniu od get_or_create_user(), który go zakłada.
-    """
     sub = request.user.get("sub")
     return User.query.filter_by(keycloak_sub=sub).first()
