@@ -1,9 +1,8 @@
-from pathlib import Path
-
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
 from app.models.subsections import Subsection
+from tests.ebook_archive import build_ebook_zip, import_ebook
 
 
 def test_get_student_ebooks_existing_ebook(client, login):
@@ -41,17 +40,7 @@ def test_get_student_ebooks_existing_ebook(client, login):
     db.session.add_all([subsection])
     db.session.commit()
 
-    zip_path = Path(__file__).with_name("kawalki-calosci-correct.zip")
-
-    with zip_path.open("rb") as file:
-        response = client.post(
-            "/api/admin/ebooks/import",
-            data={
-                "file": (file, "kawalki-calosci-correct.zip"),
-            },
-            content_type="multipart/form-data",
-            headers={"Authorization": "Bearer test-token"},
-        )
+    response = import_ebook(client, build_ebook_zip())
 
     assert response.status_code == 201
 

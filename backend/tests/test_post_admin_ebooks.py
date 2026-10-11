@@ -1,47 +1,25 @@
-from pathlib import Path
-
 from app.extensions import db
-from app.models.users import User
 from app.models.sections import Section
 from app.models.subsections import Subsection
+from tests.ebook_archive import build_ebook_zip, import_ebook
+
+
+def _create_subsection():
+    section = Section(title="Ułamki proste", order_index=0)
+    db.session.add(section)
+    db.session.flush()
+
+    subsection = Subsection(section_id=section.id, title="Kawałki całości", order_index=0)
+    db.session.add(subsection)
+    db.session.commit()
+    return subsection
 
 
 def test_post_correct_zip(client, login):
     login("admin-sub", ["admin"])
+    subsection = _create_subsection()
 
-    admin = User(
-        keycloak_sub="admin-sub",
-        role="admin",
-    )
-
-    db.session.add(admin)
-    db.session.commit()
-
-    section = Section(
-        title="Ułamki proste",
-        order_index=0,
-    )
-    db.session.add(section)
-    db.session.commit()
-
-    subsection = Subsection(
-        section_id=section.id,
-        title="Kawałki całości",
-        order_index=0,
-    )
-    db.session.add(subsection)
-    db.session.commit()
-
-    zip_path = Path(__file__).with_name("kawalki-calosci-correct.zip")
-    with zip_path.open("rb") as file:
-        response = client.post(
-            "/api/admin/ebooks/import",
-            data={
-                "file": (file, "kawalki-calosci-correct.zip"),
-            },
-            content_type="multipart/form-data",
-            headers={"Authorization": "Bearer test-token"},
-        )
+    response = import_ebook(client, build_ebook_zip())
 
     assert response.status_code == 201
     assert response.json["title"] == "Kawałki całości"
@@ -50,40 +28,9 @@ def test_post_correct_zip(client, login):
 
 def test_post_bad_zip(client, login):
     login("admin-sub", ["admin"])
+    _create_subsection()
 
-    admin = User(
-        keycloak_sub="admin-sub",
-        role="admin",
-    )
-
-    db.session.add(admin)
-    db.session.commit()
-
-    section = Section(
-        title="Ułamki proste",
-        order_index=0,
-    )
-    db.session.add(section)
-    db.session.commit()
-
-    subsection = Subsection(
-        section_id=section.id,
-        title="Kawałki całości",
-        order_index=0,
-    )
-    db.session.add(subsection)
-    db.session.commit()
-
-    zip_path = Path(__file__).with_name("kawalki-calosci-incorrect.zip")
-    with zip_path.open("rb") as file:
-        response = client.post(
-            "/api/admin/ebooks/import",
-            data={
-                "file": (file, "kawalki-calosci-incorrect.zip"),
-            },
-            content_type="multipart/form-data",
-            headers={"Authorization": "Bearer test-token"},
-        )
+    response = import_ebook(client, build_ebook_zip(ebook_json='{"section": "Ułamki proste", "blocks": ['))
 
     assert response.status_code == 400
 
@@ -91,23 +38,6 @@ def test_post_bad_zip(client, login):
 def test_post_zip_without_subsection(client, login):
     login("admin-sub", ["admin"])
 
-    admin = User(
-        keycloak_sub="admin-sub",
-        role="admin",
-    )
-
-    db.session.add(admin)
-    db.session.commit()
-
-    zip_path = Path(__file__).with_name("kawalki-calosci-correct.zip")
-    with zip_path.open("rb") as file:
-        response = client.post(
-            "/api/admin/ebooks/import",
-            data={
-                "file": (file, "kawalki-calosci-correct.zip"),
-            },
-            content_type="multipart/form-data",
-            headers={"Authorization": "Bearer test-token"},
-        )
+    response = import_ebook(client, build_ebook_zip())
 
     assert response.status_code == 400

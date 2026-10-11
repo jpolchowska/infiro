@@ -9,11 +9,12 @@ KEYCLOAK_ISSUER = "http://keycloak:8080/realms/matematyka-app"
 
 
 @pytest.fixture
-def client():
+def client(tmp_path):
     app = create_app({
         "TESTING": True,
         "SQLALCHEMY_DATABASE_URI": "sqlite://",
     })
+    app.static_folder = str(tmp_path)
 
     with app.app_context():
         db.create_all()
