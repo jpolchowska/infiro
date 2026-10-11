@@ -27,6 +27,6 @@ def get_subsection_tasks(subsection_id):
 
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
-        return jsonify({"message": "Subsection not found"}), 404
+        return jsonify({"error": "Subsection not found"}), 404
 
     return jsonify(subsection_overview(student.id, subsection)), 200
