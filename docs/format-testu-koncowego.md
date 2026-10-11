@@ -1,7 +1,5 @@
 # Format pliku z testem końcowym działu (JSON)
 
-*Wersja na: 29.09.2026*
-
 Oprócz zwykłych zadań ćwiczeniowych (`docs/format-zadan.md`) każdy dział może mieć **test końcowy** — osobną pulę pytań sprawdzających, czy uczeń faktycznie opanował materiał, a nie tylko zapamiętał odpowiedzi z ćwiczeń. Dlatego pytania testu końcowego są **całkowicie osobne od zwykłych zadań** — nigdy nie pojawiają się podczas normalnej nauki.
 
 Plik wypełnia się ręcznie, a potem wgrywa przez panel admina (zakładka „Import treści", sekcja „Test końcowy działu"). **Dział, do którego test należy, musi już istnieć** (import go nie tworzy — inaczej niż przy zwykłych zadaniach).

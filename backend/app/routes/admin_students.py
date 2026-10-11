@@ -2,23 +2,17 @@ from flask import Blueprint, jsonify, request
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_realm_role
-from app.models.users import User
-from app.models.student_answers import StudentAnswer
-from app.models.tasks import Task
-from app.models.subsections import Subsection
 from app.models.sections import Section
+from app.models.student_answers import StudentAnswer
+from app.models.subsections import Subsection
+from app.models.tasks import Task
+from app.models.users import User
 from app.services.users import get_or_create_user
 
 admin_students_bp = Blueprint("admin_students", __name__)
 
 
 def _current_role_and_user():
-    """Sprawdza role realmowe z tokena. Dla admina zwraca ('admin', None) --
-    admin nie potrzebuje własnego wiersza w users do przeglądania uczniów.
-    Dla nauczyciela zwraca ('teacher', User) i przy pierwszym wejściu zakłada
-    mu wiersz w users (tak jak _current_user()/me w student.py dla ucznia).
-    Zwraca (None, None), jeśli użytkownik nie ma żadnej z tych ról.
-    """
     realm_roles = request.user.get("realm_access", {}).get("roles", [])
 
     if "admin" in realm_roles:
@@ -88,7 +82,6 @@ def _section_progress(student):
 
 
 def _needs_practice(student):
-    """Zadania, których ostatnia próba ucznia była błędna."""
     answers = StudentAnswer.query.filter_by(student_id=student.id).order_by(
         StudentAnswer.task_id, StudentAnswer.attempt_number.desc()
     ).all()
@@ -101,10 +94,10 @@ def _needs_practice(student):
     for task_id, answer in latest_by_task.items():
         if answer.is_correct:
             continue
-        task = Task.query.get(task_id)
+        task = db.session.get(Task, task_id)
         if task is None:
             continue
-        subsection = Subsection.query.get(task.subsection_id)
+        subsection = db.session.get(Subsection, task.subsection_id)
         items.append({
             "task_title": task.title,
             "subsection_title": subsection.title if subsection else None,
@@ -120,8 +113,8 @@ def _recent_activity(student, limit=10):
 
     items = []
     for answer in answers:
-        task = Task.query.get(answer.task_id)
-        subsection = Subsection.query.get(task.subsection_id) if task else None
+        task = db.session.get(Task, answer.task_id)
+        subsection = db.session.get(Subsection, task.subsection_id) if task else None
         items.append({
             "task_title": task.title if task else None,
             "subsection_title": subsection.title if subsection else None,
@@ -174,8 +167,6 @@ def get_student(student_id):
     if student is None:
         return jsonify({"error": "student not found"}), 404
 
-    # Nauczyciel nie widzi cudzych uczniów -- 404, nie 403, żeby nie zdradzać
-    # że dany uczeń w ogóle istnieje w systemie.
     if role == "teacher" and student.teacher_id != current_user.id:
         return jsonify({"error": "student not found"}), 404
 

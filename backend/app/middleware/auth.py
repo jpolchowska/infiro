@@ -1,13 +1,16 @@
 from functools import wraps
-from flask import request, jsonify
+
 import jwt
-from app.models.users import User
+from flask import jsonify, request
 from jwt import PyJWKClient
+
+from app.models.users import User
 
 KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/matematyka-app/protocol/openid-connect/certs"
 KEYCLOAK_ISSUER_PATH = "/realms/matematyka-app"
 
 jwks_client = PyJWKClient(KEYCLOAK_JWKS_URI)
+
 
 def authenticate_token(f):
     @wraps(f)
@@ -31,9 +34,6 @@ def authenticate_token(f):
                 options={"verify_aud": False, "verify_iss": False}
             )
 
-            # Host w 'iss' zależy od tego, jak klient dotarł do Keycloaka
-            # (localhost w przeglądarce, adres LAN/10.0.2.2 z telefonu/emulatora)
-            # -- sprawdzamy tylko, że to token z naszego realmu, nie z jakiegoś innego.
             issuer = decoded.get("iss", "")
             if not issuer.endswith(KEYCLOAK_ISSUER_PATH):
                 return jsonify({"message": "Invalid issuer"}), 403
@@ -51,26 +51,7 @@ def authenticate_token(f):
     return decorated
 
 
-def require_role(role):
-    def decorator(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            user = getattr(request, "user", {})
-
-            roles = user.get("realm_access", {}).get("roles", [])
-            if role not in roles:
-                return jsonify({"message": f"Missing required role: {role}"}), 403
-
-            return f(*args, **kwargs)
-
-        return decorated
-
-    return decorator
-
-
 def require_any_realm_role(*roles):
-    """Jak require_realm_role, ale wpuszcza, jeśli user ma KTÓRĄKOLWIEK
-    z podanych ról (np. "admin" LUB "ROLE_TEACHER")."""
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -88,11 +69,6 @@ def require_any_realm_role(*roles):
 
 
 def require_realm_role(role):
-    """Sprawdza natywną rolę realmową Keycloaka (realm_access.roles) -- ten sam
-    mechanizm co keycloak.hasRealmRole() już używany w AuthGate panelu admina.
-    Inaczej niż require_role(), który sprawdza custom claim 'realm_access.roles'
-    używany przez aplikację mobilną.
-    """
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -108,11 +84,7 @@ def require_realm_role(role):
 
     return decorator
 
-def _current_user():
-    """Znajduje User po claimie 'sub' z JWT. Zwraca None, jeśli nie ma
-    jeszcze lokalnego wiersza -- używane tam, gdzie brak wiersza ma być
-    błędem (np. leveling-test wymaga wcześniejszego wywołania /me),
-    w odróżnieniu od get_or_create_user(), który go zakłada.
-    """
+
+def current_user():
     sub = request.user.get("sub")
     return User.query.filter_by(keycloak_sub=sub).first()

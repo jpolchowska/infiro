@@ -1,56 +1,51 @@
-from datetime import datetime
+from flask import Blueprint, jsonify
 
-from app.routes import student as student_routes
-from flask import Blueprint, jsonify, request, redirect, url_for
-
-from app.middleware.auth import authenticate_token
-from app.middleware.auth import require_role
-from app.models.users import User
-from app.services.users import get_or_create_user, update_interest
 from app.extensions import db
+from app.middleware.auth import authenticate_token, current_user
+from app.models.ebooks import Ebook
+from app.models.section_test_attempts import SectionTestAttempt
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
-from app.models.student_answers import StudentAnswer
-from app.models.leveling_test_attempts import LevelingTestAttempt
-from app.models.section_test_attempts import SectionTestAttempt
-from app.models.task_answer_options import TaskAnswerOption
-from app.models.ebooks import ebooks
-from app.utils import _task_theme, _get_solved_task_ids, _get_section_index, _get_current_subsection, _get_recent_sections, _get_section_progress, _current_subsection_json, _timed_options, determine_student_difficulty_level, _student_subsection_json
-import random
-import re
+from app.services.progress import (
+    determine_student_difficulty_level,
+    get_section_index,
+    get_solved_task_ids,
+    student_subsection_json,
+)
 
 student_sections_and_subsections_bp = Blueprint("student_sections_and_subsections", __name__)
+
 
 @student_sections_and_subsections_bp.route("/api/student/sections")
 @authenticate_token
 def get_student_sections():
-    student = student_routes._current_user()
+    student = current_user()
+    if student is None:
+        return jsonify({"error": "User not found"}), 404
+
     student_id = student.id
-    sections = ( 
-        Section.query 
-        .order_by(Section.order_index) 
+    sections = (
+        Section.query
+        .order_by(Section.order_index)
         .all()
-          ) 
-    
-    result = [] 
+    )
 
-    for index, section in enumerate(sections): 
-        subsections = ( 
-            Subsection.query 
-            .filter_by(section_id=section.id) 
-            .order_by(Subsection.order_index, Subsection.id) 
-            .all() 
-            ) 
-        
-        subsection_data = [] 
+    result = []
 
-        for subsection in subsections:
-             subsection_data.append( 
-                _student_subsection_json( 
-                    student_id, 
-                    subsection )
-             )
+    for index, section in enumerate(sections):
+        subsections = (
+            Subsection.query
+            .filter_by(section_id=section.id)
+            .order_by(Subsection.order_index, Subsection.id)
+            .all()
+        )
+
+        subsection_data = [
+            student_subsection_json(student_id, subsection)
+            for subsection in subsections
+        ]
+
         last_final_test = (
             SectionTestAttempt.query
             .filter_by(student_id=student_id, section_id=section.id)
@@ -62,16 +57,22 @@ def get_student_sections():
             "id": section.id,
             "title": section.title,
             "description": section.description,
-            "index": index, "subsections": subsection_data,
+            "index": index,
+            "subsections": subsection_data,
             "last_final_test_score": last_final_test.score if last_final_test else None,
             "last_final_test_max_score": last_final_test.max_score if last_final_test else None,
-            })
+        })
+
     return jsonify(result), 200
+
 
 @student_sections_and_subsections_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
 @authenticate_token
 def get_student_subsection_tasks(subsection_id):
-    student = student_routes._current_user()
+    student = current_user()
+    if student is None:
+        return jsonify({"error": "User not found"}), 404
+
     student_id = student.id
 
     subsection = db.session.get(Subsection, subsection_id)
@@ -81,7 +82,7 @@ def get_student_subsection_tasks(subsection_id):
 
     section = db.session.get(Section, subsection.section_id)
 
-    solved_task_ids = _get_solved_task_ids(
+    solved_task_ids = get_solved_task_ids(
         student_id,
         subsection.id,
     )
@@ -140,7 +141,7 @@ def get_student_subsection_tasks(subsection_id):
             "description": subsection.description,
             "section_id": section.id,
             "section_title": section.title,
-            "section_index": _get_section_index(section.id),
+            "section_index": get_section_index(section.id),
             "next_subsection_id": (
                 next_subsection.id
                 if next_subsection is not None
@@ -150,10 +151,11 @@ def get_student_subsection_tasks(subsection_id):
         }
     ), 200
 
-@student_sections_and_subsections_bp.route("/api/student/subsections/<int:id>/ebook",methods=["GET"])
+
+@student_sections_and_subsections_bp.route("/api/student/subsections/<int:id>/ebook", methods=["GET"])
 @authenticate_token
 def get_student_ebook(id):
-    ebook = ebooks.query.filter_by(subsection_id=id).first()
+    ebook = Ebook.query.filter_by(subsection_id=id).first()
 
     if ebook is None:
         return jsonify({

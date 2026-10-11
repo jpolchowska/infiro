@@ -1,7 +1,5 @@
 # Format pliku z ebookiem (JSON)
 
-*Wersja na: 10.09.2026*
-
 Ebook to strona teorii przypisana do jednej podsekcji. Treść jest renderowana w aplikacji jako czytelna, kolorowa strona dla dzieci. Jeden ebook przypada na jedną podsekcję.
 
 Jeden ebook = jeden folder: plik `ebook.json` z treścią + folder `images/` z grafikami. Folder pakuje się w `.zip` i wgrywa przez panel administratora.

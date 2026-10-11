@@ -1,8 +1,5 @@
-from types import SimpleNamespace
+import copy
 
-import pytest
-
-from app import create_app
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
@@ -10,35 +7,6 @@ from app.models.section_test_questions import SectionTestQuestion
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.student_answers import StudentAnswer
-
-
-@pytest.fixture
-def client():
-    app = create_app({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite://",
-    })
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
-
-
-def _mock_auth(monkeypatch, sub, roles):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": sub,
-            "realm_access": {"roles": roles},
-        },
-    )
 
 
 IMPORT_PAYLOAD = [
@@ -74,8 +42,8 @@ IMPORT_PAYLOAD = [
 ]
 
 
-def test_admin_import_creates_questions_and_options(client, monkeypatch):
-    _mock_auth(monkeypatch, "admin-sub", ["admin"])
+def test_admin_import_creates_questions_and_options(client, login):
+    login("admin-sub", ["admin"])
 
     admin = User(keycloak_sub="admin-sub", role="admin")
     section = Section(title="Ułamki", order_index=0)
@@ -102,8 +70,8 @@ def test_admin_import_creates_questions_and_options(client, monkeypatch):
     assert sum(1 for o in options if o.is_correct) == 1
 
 
-def test_admin_import_rejects_unknown_section_title(client, monkeypatch):
-    _mock_auth(monkeypatch, "admin-sub", ["admin"])
+def test_admin_import_rejects_unknown_section_title(client, login):
+    login("admin-sub", ["admin"])
 
     admin = User(keycloak_sub="admin-sub", role="admin")
     section = Section(title="Inny dział", order_index=0)
@@ -164,8 +132,8 @@ def _seed_section_with_questions():
     return section, choice_question, correct_option, wrong_option, short_question
 
 
-def test_get_final_test_returns_themed_questions(client, monkeypatch):
-    _mock_auth(monkeypatch, "student-sub", ["student"])
+def test_get_final_test_returns_themed_questions(client, login):
+    login("student-sub", ["student"])
     student = User(keycloak_sub="student-sub", role="student")
     db.session.add(student)
     db.session.commit()
@@ -182,8 +150,8 @@ def test_get_final_test_returns_themed_questions(client, monkeypatch):
     assert len(response.json["questions"]) == 2
 
 
-def test_submit_scores_correctly_and_isolates_from_student_answers(client, monkeypatch):
-    _mock_auth(monkeypatch, "student-sub", ["student"])
+def test_submit_scores_correctly_and_isolates_from_student_answers(client, login):
+    login("student-sub", ["student"])
     student = User(keycloak_sub="student-sub", role="student")
     db.session.add(student)
     db.session.commit()
@@ -211,12 +179,11 @@ def test_submit_scores_correctly_and_isolates_from_student_answers(client, monke
     assert len(attempts) == 1
     assert attempts[0].score == 2
 
-    # Test końcowy musi być izolowany od zwykłego postępu ucznia.
     assert StudentAnswer.query.count() == 0
 
 
-def test_submit_with_wrong_answer_scores_zero(client, monkeypatch):
-    _mock_auth(monkeypatch, "student-sub", ["student"])
+def test_submit_with_wrong_answer_scores_zero(client, login):
+    login("student-sub", ["student"])
     student = User(keycloak_sub="student-sub", role="student")
     db.session.add(student)
     db.session.commit()
@@ -241,8 +208,8 @@ def test_submit_with_wrong_answer_scores_zero(client, monkeypatch):
     assert response.json["max_score"] == 2
 
 
-def test_history_lists_past_attempts_newest_first(client, monkeypatch):
-    _mock_auth(monkeypatch, "student-sub", ["student"])
+def test_history_lists_past_attempts_newest_first(client, login):
+    login("student-sub", ["student"])
     student = User(keycloak_sub="student-sub", role="student")
     db.session.add(student)
     db.session.commit()
@@ -277,8 +244,8 @@ def test_history_lists_past_attempts_newest_first(client, monkeypatch):
     assert response.json[1]["score"] == 1
 
 
-def test_sections_list_surfaces_latest_final_test_score(client, monkeypatch):
-    _mock_auth(monkeypatch, "student-sub", ["student"])
+def test_sections_list_surfaces_latest_final_test_score(client, login):
+    login("student-sub", ["student"])
     student = User(keycloak_sub="student-sub", role="student")
     db.session.add(student)
     db.session.commit()
@@ -307,3 +274,44 @@ def test_sections_list_surfaces_latest_final_test_score(client, monkeypatch):
     section_data = next(s for s in response.json if s["id"] == section.id)
     assert section_data["last_final_test_score"] == 2
     assert section_data["last_final_test_max_score"] == 2
+
+
+def test_admin_import_rejects_question_without_options(client, login):
+    login("admin-sub", ["admin"])
+    section = Section(title="Ułamki", order_index=0)
+    db.session.add(section)
+    db.session.commit()
+    payload = copy.deepcopy(IMPORT_PAYLOAD)
+    del payload[0]["questions"][0]["themes"]["default"]["options"]
+
+    response = client.post(
+        f"/api/admin/sections/{section.id}/final-test/import",
+        json=payload,
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["errors"] == [
+        "section #1 / question #1 theme 'default': 'options' must be a list of exactly 3 items",
+    ]
+    assert SectionTestQuestion.query.count() == 0
+
+
+def test_admin_import_rejects_memory_question(client, login):
+    login("admin-sub", ["admin"])
+    section = Section(title="Ułamki", order_index=0)
+    db.session.add(section)
+    db.session.commit()
+    payload = copy.deepcopy(IMPORT_PAYLOAD)
+    payload[0]["questions"][0]["type"] = "memory"
+
+    response = client.post(
+        f"/api/admin/sections/{section.id}/final-test/import",
+        json=payload,
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["errors"] == [
+        "section #1 / question #1: 'type' must be one of: single_choice, short_answer",
+    ]

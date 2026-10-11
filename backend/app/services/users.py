@@ -5,11 +5,6 @@ from app.models.users import User
 
 
 def get_or_create_user(role):
-    """Znajduje User po claimie 'sub' z JWT. Jeśli nie ma jeszcze lokalnego
-    wiersza, zakłada go z podaną rolą i danymi z tokena (first_name/last_name/email).
-    Jeśli wiersz już istnieje, odświeża te dane z bieżącego tokena -- inaczej
-    konta założone zanim zaczęliśmy je zapisywać zostałyby bez imienia na zawsze.
-    """
     sub = request.user.get("sub")
     user = User.query.filter_by(keycloak_sub=sub).first()
 
@@ -41,9 +36,9 @@ def update_interest():
     user = User.query.filter_by(keycloak_sub=sub).first()
     interest = (request.get_json(silent=True) or {}).get("interest")
 
-    anivableInterests_options = ["sport", "zwierzeta", "lego", "gry", "rysowanie", "muzyka", "jedzenie"]
+    available_interests = ["sport", "zwierzeta", "lego", "gry", "rysowanie", "muzyka", "jedzenie"]
 
-    if interest is None or interest in anivableInterests_options:
+    if interest is None or interest in available_interests:
         user.interest = interest
     else:
         raise ValueError("Invalid interest")

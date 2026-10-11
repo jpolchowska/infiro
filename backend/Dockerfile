@@ -2,7 +2,6 @@ FROM python:3.12-slim AS base
 
 WORKDIR /app
 
-# PYTHONUNBUFFERED - logi lecą od razu na stdout, nie czekają w buforze.
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 

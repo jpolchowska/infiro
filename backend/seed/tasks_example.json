@@ -6,6 +6,7 @@
         "subsection": "Zrozumienie mnożenia",
         "tasks": [
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-zrozumienie-mnozenia-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -23,6 +24,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-zrozumienie-mnozenia-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -45,6 +47,7 @@
         "subsection": "Łatwe mnożenie",
         "tasks": [
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-latwe-mnozenie-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -65,6 +68,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-latwe-mnozenie-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -82,6 +86,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-latwe-mnozenie-03",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -99,6 +104,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-latwe-mnozenie-04",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -116,6 +122,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-latwe-mnozenie-05",
             "type": "short_answer",
             "difficulty": 1,
             "themes": {
@@ -129,6 +136,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-latwe-mnozenie-06",
             "type": "memory",
             "themes": {
               "default": {
@@ -147,6 +155,7 @@
         "subsection": "Trudniejsze mnożenie i ćwiczenia pamięciowe",
         "tasks": [
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-trudniejsze-mnozenie-i-cwiczenia-pamieciowe-01",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -164,6 +173,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-trudniejsze-mnozenie-i-cwiczenia-pamieciowe-02",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -181,6 +191,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-trudniejsze-mnozenie-i-cwiczenia-pamieciowe-03",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -198,6 +209,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-trudniejsze-mnozenie-i-cwiczenia-pamieciowe-04",
             "type": "single_choice",
             "difficulty": 3,
             "themes": {
@@ -212,6 +224,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-trudniejsze-mnozenie-i-cwiczenia-pamieciowe-05",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {
@@ -222,6 +235,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-trudniejsze-mnozenie-i-cwiczenia-pamieciowe-06",
             "type": "memory",
             "themes": {
               "default": {
@@ -243,6 +257,7 @@
         "subsection": "Zrozumienie dzielenia",
         "tasks": [
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-zrozumienie-dzielenia-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -260,6 +275,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-zrozumienie-dzielenia-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -279,6 +295,7 @@
         "subsection": "Dzielenie w praktyce",
         "tasks": [
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-dzielenie-w-praktyce-01",
             "type": "single_choice",
             "difficulty": 3,
             "themes": {
@@ -296,6 +313,7 @@
             }
           },
           {
+            "content_key": "example-tabliczka-mnozenia-i-dzielenia-dzielenie-w-praktyce-02",
             "type": "short_answer",
             "difficulty": 3,
             "themes": {
@@ -320,6 +338,7 @@
         "subsection": "Kawałki całości",
         "tasks": [
           {
+            "content_key": "example-ulamki-proste-kawalki-calosci-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -340,6 +359,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-kawalki-calosci-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -362,6 +382,7 @@
         "subsection": "Jak wygląda ułamek?",
         "tasks": [
           {
+            "content_key": "example-ulamki-proste-jak-wyglada-ulamek-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -384,6 +405,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-jak-wyglada-ulamek-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -403,6 +425,7 @@
         "subsection": "Rodzaje ułamków",
         "tasks": [
           {
+            "content_key": "example-ulamki-proste-rodzaje-ulamkow-01",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -438,6 +461,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-rodzaje-ulamkow-02",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -457,6 +481,7 @@
         "subsection": "Liczby mieszane",
         "tasks": [
           {
+            "content_key": "example-ulamki-proste-liczby-mieszane-01",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -474,6 +499,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-liczby-mieszane-02",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {
@@ -489,6 +515,7 @@
         "subsection": "Skracanie i rozszerzanie ułamków",
         "tasks": [
           {
+            "content_key": "example-ulamki-proste-skracanie-i-rozszerzanie-ulamkow-01",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -514,6 +541,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-skracanie-i-rozszerzanie-ulamkow-02",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -533,6 +561,7 @@
         "subsection": "Mnożenie i dzielenie",
         "tasks": [
           {
+            "content_key": "example-ulamki-proste-mnozenie-i-dzielenie-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -550,6 +579,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-mnozenie-i-dzielenie-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -564,6 +594,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-mnozenie-i-dzielenie-03",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -581,6 +612,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-mnozenie-i-dzielenie-04",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -598,6 +630,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-mnozenie-i-dzielenie-05",
             "type": "short_answer",
             "difficulty": 1,
             "themes": {
@@ -608,6 +641,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-mnozenie-i-dzielenie-06",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {
@@ -626,6 +660,7 @@
         "subsection": "Dodawanie i odejmowanie",
         "tasks": [
           {
+            "content_key": "example-ulamki-proste-dodawanie-i-odejmowanie-01",
             "type": "single_choice",
             "difficulty": 3,
             "themes": {
@@ -640,6 +675,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-proste-dodawanie-i-odejmowanie-02",
             "type": "single_choice",
             "difficulty": 3,
             "themes": {
@@ -668,6 +704,7 @@
         "subsection": "Wprowadzenie do \"przecinka\"",
         "tasks": [
           {
+            "content_key": "example-ulamki-dziesietne-wprowadzenie-do-przecinka-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -682,6 +719,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-dziesietne-wprowadzenie-do-przecinka-02",
             "type": "short_answer",
             "difficulty": 1,
             "themes": {
@@ -697,6 +735,7 @@
         "subsection": "Porównywanie i oś liczbowa",
         "tasks": [
           {
+            "content_key": "example-ulamki-dziesietne-porownywanie-i-os-liczbowa-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -711,6 +750,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-dziesietne-porownywanie-i-os-liczbowa-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -730,6 +770,7 @@
         "subsection": "Dodawanie i odejmowanie",
         "tasks": [
           {
+            "content_key": "example-ulamki-dziesietne-dodawanie-i-odejmowanie-01",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -744,6 +785,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-dziesietne-dodawanie-i-odejmowanie-02",
             "type": "single_choice",
             "difficulty": 3,
             "themes": {
@@ -758,6 +800,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-dziesietne-dodawanie-i-odejmowanie-03",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {
@@ -776,6 +819,7 @@
         "subsection": "Mnożenie i dzielenie",
         "tasks": [
           {
+            "content_key": "example-ulamki-dziesietne-mnozenie-i-dzielenie-01",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -798,6 +842,7 @@
             }
           },
           {
+            "content_key": "example-ulamki-dziesietne-mnozenie-i-dzielenie-02",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {
@@ -819,6 +864,7 @@
         "subsection": "Czym są procenty?",
         "tasks": [
           {
+            "content_key": "example-procenty-czym-sa-procenty-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -836,6 +882,7 @@
             }
           },
           {
+            "content_key": "example-procenty-czym-sa-procenty-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -855,6 +902,7 @@
         "subsection": "Zamiana ról",
         "tasks": [
           {
+            "content_key": "example-procenty-zamiana-rol-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -869,6 +917,7 @@
             }
           },
           {
+            "content_key": "example-procenty-zamiana-rol-02",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -891,6 +940,7 @@
         "subsection": "Procent z liczby",
         "tasks": [
           {
+            "content_key": "example-procenty-procent-z-liczby-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -905,6 +955,7 @@
             }
           },
           {
+            "content_key": "example-procenty-procent-z-liczby-02",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -919,6 +970,7 @@
             }
           },
           {
+            "content_key": "example-procenty-procent-z-liczby-03",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -933,6 +985,7 @@
             }
           },
           {
+            "content_key": "example-procenty-procent-z-liczby-04",
             "type": "single_choice",
             "difficulty": 3,
             "themes": {
@@ -947,6 +1000,7 @@
             }
           },
           {
+            "content_key": "example-procenty-procent-z-liczby-05",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {
@@ -965,6 +1019,7 @@
         "subsection": "Szukanie całości i zniżki",
         "tasks": [
           {
+            "content_key": "example-procenty-szukanie-calosci-i-znizki-01",
             "type": "single_choice",
             "difficulty": 2,
             "themes": {
@@ -982,6 +1037,7 @@
             }
           },
           {
+            "content_key": "example-procenty-szukanie-calosci-i-znizki-02",
             "type": "single_choice",
             "difficulty": 3,
             "themes": {
@@ -996,6 +1052,7 @@
             }
           },
           {
+            "content_key": "example-procenty-szukanie-calosci-i-znizki-03",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {

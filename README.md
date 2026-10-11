@@ -102,7 +102,7 @@ graph LR
 | Layer | Technology |
 |---|---|
 | Authorization Server | Keycloak 26 |
-| Backend | Python 3.12, Flask, Flask-SQLAlchemy, Flask-Migrate (applied on startup), PyJWT, jsonschema, Pillow |
+| Backend | Python 3.12, Flask, Flask-SQLAlchemy, Flask-Migrate (applied on startup), PyJWT, Pillow |
 | Web panel (staff) | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4, keycloak-js |
 | Mobile app | Expo SDK 57, React Native 0.86, React 19, TypeScript, Expo Router, expo-auth-session, NativeWind |
 | Database | PostgreSQL 16 |
@@ -271,9 +271,10 @@ Account creation and role assignment currently happen directly in the Keycloak a
 
 Course content is loaded through the admin panel (`http://localhost`, **Import treści** tab), which is available to admins only. Every file is validated before anything is saved, and errors are listed in the panel.
 
-1. **Tasks (JSON)** — a single file describing sections → subsections → tasks. Missing sections and subsections are created automatically. Format: [docs/format-zadan.md](docs/format-zadan.md).
+1. **Tasks (JSON)** — a single file describing sections → subsections → tasks. Missing sections and subsections are created automatically. Every task needs a unique `content_key`; re-importing a file updates the tasks with matching keys instead of duplicating them. Format: [docs/format-zadan.md](docs/format-zadan.md).
 2. **Images (ZIP, optional)** — a ZIP archive with images used by tasks; the panel returns the uploaded file URLs.
 3. **E-books (ZIP)** — one archive per subsection with an `ebook.json` file and an `images/` folder. The section and subsection must already exist, so import tasks first. Format: [docs/format-ebookow.md](docs/format-ebookow.md).
+4. **Section final test (JSON)** — a separate pool of questions for one section, imported for a section that already exists. Format: [docs/format-testu-koncowego.md](docs/format-testu-koncowego.md).
 
 ## API Reference
 
@@ -291,7 +292,6 @@ Available to any authenticated user; the local student record is resolved from t
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/student` | Authenticated ping |
 | `GET` | `/api/student/me` | Current student's profile (interest, leveling test status) |
 | `PATCH` | `/api/student/interest` | Set the student's interest (theme) |
 | `GET` | `/api/student/stats` | Solved tasks, accuracy, current subsection, recent sections |
@@ -302,6 +302,9 @@ Available to any authenticated user; the local student record is resolved from t
 | `GET` | `/api/student/subsections/:id/ebook` | Get the subsection's theory e-book |
 | `GET` | `/api/student/subsections/:id/timed` | Get timed practice questions (60 s) |
 | `POST` | `/api/student/subsections/:id/timed/submit` | Submit timed practice answers |
+| `GET` | `/api/student/sections/:id/final-test` | Get the section's final test |
+| `POST` | `/api/student/sections/:id/final-test/submit` | Submit the final test; returns the score |
+| `GET` | `/api/student/sections/:id/final-test/history` | List past final test attempts |
 | `GET` | `/api/student/leveling-test` | Get a leveling test |
 | `POST` | `/api/student/leveling-test/submit` | Submit a leveling test; returns score with per-section breakdown |
 | `GET` | `/api/student/leveling-test/history` | List past leveling test attempts |
@@ -324,22 +327,11 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `POST` | `/api/admin/tasks/import` | admin | Bulk-import tasks from JSON |
 | `POST` | `/api/admin/uploads/images` | admin | Upload a ZIP with images |
 | `POST` | `/api/admin/ebooks/import` | admin | Import an e-book from a ZIP |
+| `POST` | `/api/admin/sections/:id/final-test/import` | admin | Import a section's final test from JSON |
 | `GET` | `/api/admin/teachers` | admin | List teachers |
 | `GET` | `/api/admin/students` | admin, teacher | List students |
 | `GET` | `/api/admin/students/:id` | admin, teacher | Get a student's progress details |
 | `PATCH` | `/api/admin/students/:id` | admin | Update a student (e.g. assign a teacher) |
-
-### Legacy
-
-Still served by the backend, but not used by the current mobile app or admin panel UI.
-
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `GET` | `/api/tasks` | authenticated | List tasks |
-| `GET` | `/api/tasks/:id` | authenticated | Get a single task |
-| `POST` | `/api/admin/sections/:id/materials` | admin | Add a material to a section |
-| `POST` | `/api/admin/subsections/:id/materials` | admin | Add a material to a subsection |
-| `PATCH`/`DELETE` | `/api/admin/materials/:id` | admin | Update or delete a material |
 
 ## Project Structure
 
@@ -352,15 +344,14 @@ infiro/
 │   │   ├── routes/
 │   │   │   ├── student*.py        # profile, sections/subsections, tasks, timed practice, stats
 │   │   │   ├── leveling_test.py   # leveling test, submit, history
-│   │   │   ├── admin_*.py         # sections, materials, students, task/e-book import
-│   │   │   ├── tasks.py           # legacy task endpoints
+│   │   │   ├── section_test.py    # section final test, submit, history
+│   │   │   ├── admin_*.py         # sections, subsections, tasks, students, imports
 │   │   │   └── public.py          # status check
-│   │   ├── services/              # user handling, image upload/ZIP extraction
-│   │   ├── static/uploads/        # uploaded task and e-book images (bind-mounted)
-│   │   └── utils.py               # task themes, attempts, difficulty unlocking helpers
+│   │   ├── services/              # import and validation, themes, answers, progress, uploads, users
+│   │   └── static/uploads/        # uploaded task and e-book images (bind-mounted)
 │   ├── migrations/                # Flask-Migrate migrations, applied on startup
 │   ├── seed/                      # sample task import file (tasks_example.json)
-│   └── tests/                     # pytest suite, including e-book ZIP fixtures
+│   └── tests/                     # pytest suite
 ├── staff/                         # Next.js panel (admin + teacher)
 │   ├── app/                       # pages: sections, results, teachers, import, login
 │   ├── components/                # AuthGate, header nav, shared UI
@@ -387,3 +378,4 @@ infiro/
 
 - [docs/format-zadan.md](docs/format-zadan.md) — JSON format spec for the task import file used by the admin panel's import feature. A sample file is in [backend/seed/tasks_example.json](backend/seed/tasks_example.json).
 - [docs/format-ebookow.md](docs/format-ebookow.md) — format spec for e-book ZIP archives (`ebook.json` + `images/`) imported through the admin panel.
+- [docs/format-testu-koncowego.md](docs/format-testu-koncowego.md) — JSON format spec for the section final test import file.

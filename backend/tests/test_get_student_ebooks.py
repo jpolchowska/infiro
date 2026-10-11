@@ -1,47 +1,12 @@
-from datetime import datetime
-from types import SimpleNamespace
-from pathlib import Path
-
-import pytest
-
-from app import create_app
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
 from app.models.subsections import Subsection
-from app.models.tasks import Task
-from app.models.student_answers import StudentAnswer
+from tests.ebook_archive import build_ebook_zip, import_ebook
 
 
-@pytest.fixture
-def client():
-    app = create_app({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite://",
-    })
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
-
-
-
-def test_get_student_ebooks_existing_ebook(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin", "student"]},
-        },
-    )
+def test_get_student_ebooks_existing_ebook(client, login):
+    login("admin-sub", ["admin", "student"])
 
     admin = User(
         keycloak_sub="admin-sub",
@@ -75,17 +40,7 @@ def test_get_student_ebooks_existing_ebook(client, monkeypatch):
     db.session.add_all([subsection])
     db.session.commit()
 
-    zip_path = Path(__file__).with_name("kawalki-calosci-correct.zip")
-
-    with zip_path.open("rb") as file:
-        response = client.post(
-            "/api/admin/ebooks/import",
-            data={
-                "file": (file, "kawalki-calosci-correct.zip"),
-            },
-            content_type="multipart/form-data",
-            headers={"Authorization": "Bearer test-token"},
-        )
+    response = import_ebook(client, build_ebook_zip())
 
     assert response.status_code == 201
 
@@ -99,20 +54,9 @@ def test_get_student_ebooks_existing_ebook(client, monkeypatch):
     assert response.status_code == 200
     assert response.json["title"] == "Kawałki całości"
 
-def test_get_student_ebooks_nonexisting_ebook(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
 
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "admin-sub",
-            "realm_access": {"roles": ["admin", "student"]},
-        },
-    )
+def test_get_student_ebooks_nonexisting_ebook(client, login):
+    login("admin-sub", ["admin", "student"])
 
     section = Section(
         title="Ułamki proste",

@@ -1,9 +1,5 @@
 from datetime import datetime
-from types import SimpleNamespace
 
-import pytest
-
-from app import create_app
 from app.extensions import db
 from app.models.users import User
 from app.models.sections import Section
@@ -13,34 +9,8 @@ from app.models.student_answers import StudentAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
 
 
-@pytest.fixture
-def client():
-    app = create_app({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite://",
-    })
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
-
-
-def test_get_student_stats(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
-        lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.middleware.auth.jwt.decode",
-        lambda *args, **kwargs: {
-            "iss": "http://keycloak:8080/realms/matematyka-app",
-            "sub": "student-sub",
-            "realm_access": {"roles": ["student"]},
-        },
-    )
+def test_get_student_stats(client, login):
+    login("student-sub", ["student"])
 
     student = User(
         keycloak_sub="student-sub",
@@ -130,8 +100,6 @@ def test_get_student_stats(client, monkeypatch):
     ])
     db.session.commit()
 
-    # subsection1:
-    # jedna poprawna i jedna błędna odpowiedź
     answer1 = StudentAnswer(
         task_id=task1.id,
         student_id=student.id,
@@ -148,8 +116,6 @@ def test_get_student_stats(client, monkeypatch):
         submitted_at=datetime(2026, 8, 31, 10, 5),
     )
 
-    # subsection3:
-    # poprawna odpowiedź -> podsekcja ukończona
     answer3 = StudentAnswer(
         task_id=task4.id,
         student_id=student.id,
@@ -158,9 +124,6 @@ def test_get_student_stats(client, monkeypatch):
         submitted_at=datetime(2026, 8, 31, 11, 0),
     )
 
-    # subsection2:
-    # ostatnia aktywność, ale odpowiedź błędna
-    # -> podsekcja nadal nieukończona
     answer4 = StudentAnswer(
         task_id=task3.id,
         student_id=student.id,
@@ -177,7 +140,6 @@ def test_get_student_stats(client, monkeypatch):
     ])
     db.session.commit()
 
-    # Ostatni test poziomujący
     leveling_test = LevelingTestAttempt(
         student_id=student.id,
         score=9,
@@ -199,34 +161,16 @@ def test_get_student_stats(client, monkeypatch):
 
     data = response.get_json()
 
-    # ---------------------------------------------------------
-    # Overall statistics
-    # ---------------------------------------------------------
-
-    # Poprawnie rozwiązane zadania:
-    # task1 + task4 = 2
     assert data["solved_tasks"] == 2
 
-    # Wszystkich zadań:
-    # task1, task2, task3, task4 = 4
     assert data["total_tasks"] == 4
 
-    # Wszystkie próby:
-    # 2 poprawne + 2 błędne = 4
-    # 2 / 4 * 100 = 50%
     assert data["accuracy"] == 50
 
-    # Poprawne odpowiedzi pojawiły się w:
-    # section1 oraz section2
     assert data["started_sections"] == 2
-
-    # ---------------------------------------------------------
-    # Current subsection
-    # ---------------------------------------------------------
 
     assert data["current"] is not None
 
-    # Ostatnia aktywność była w subsection2
     assert data["current"]["subsection_id"] == subsection2.id
 
     assert data["current"]["subsection_title"] == "Mnożenie przez 3"
@@ -235,32 +179,19 @@ def test_get_student_stats(client, monkeypatch):
 
     assert data["current"]["section_index"] == 0
 
-    # W subsection2 zadanie nie zostało rozwiązane poprawnie
     assert data["current"]["solved_tasks"] == 0
 
     assert data["current"]["total_tasks"] == 1
 
-    # ---------------------------------------------------------
-    # Recent sections
-    # ---------------------------------------------------------
-
     assert len(data["recent_sections"]) == 2
 
-    # Ostatnia aktywność była w section1
-    # (subsection2, godz. 13:00)
     assert data["recent_sections"][0]["section_id"] == section1.id
     assert data["recent_sections"][0]["section_title"] == "Tabliczka mnożenia"
     assert data["recent_sections"][0]["section_index"] == 0
 
-    # Wcześniejsza aktywność była w section2
-    # (subsection3, godz. 11:00)
     assert data["recent_sections"][1]["section_id"] == section2.id
     assert data["recent_sections"][1]["section_title"] == "Dzielenie"
     assert data["recent_sections"][1]["section_index"] == 1
-
-    # ---------------------------------------------------------
-    # Last leveling test
-    # ---------------------------------------------------------
 
     assert data["last_leveling_test"] is not None
 

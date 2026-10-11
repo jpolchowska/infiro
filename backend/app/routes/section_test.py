@@ -1,29 +1,18 @@
-from datetime import datetime
 import random
 
 from flask import Blueprint, jsonify, request
 
+from app.clock import utc_now
 from app.extensions import db
-from app.middleware.auth import authenticate_token
-from app.models.sections import Section
-from app.models.section_test_questions import SectionTestQuestion
+from app.middleware.auth import authenticate_token, current_user
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_attempts import SectionTestAttempt
-from app.routes.student import _current_user
-from app.routes.leveling_test import _normalize_answer
+from app.models.section_test_questions import SectionTestQuestion
+from app.models.sections import Section
+from app.services.answers import is_accepted_answer
+from app.services.themes import resolve_theme, themed_options
 
 section_test_bp = Blueprint("section_test", __name__)
-
-
-def _question_theme(question, interest):
-    themes = question.themes if isinstance(question.themes, dict) else {}
-    default = themes.get("default", {})
-    selected = themes.get(interest, {}) if interest else {}
-    if not isinstance(default, dict):
-        default = {}
-    if not isinstance(selected, dict):
-        selected = {}
-    return {**default, **selected}
 
 
 def _question_options(question, interest):
@@ -32,28 +21,11 @@ def _question_options(question, interest):
         .order_by(SectionTestAnswerOption.order_index)
         .all()
     )
-    theme_options = _question_theme(question, interest).get("options")
-    if isinstance(theme_options, list) and len(theme_options) == len(options):
-        return [
-            {
-                "id": option.id,
-                "text": option_data["text"],
-                "is_correct": option_data.get("correct") is True,
-            }
-            for option, option_data in zip(options, theme_options)
-        ]
-    return [
-        {
-            "id": option.id,
-            "text": option.option_text,
-            "is_correct": option.is_correct,
-        }
-        for option in options
-    ]
+    return themed_options(options, resolve_theme(question, interest).get("options"))
 
 
 def _question_json(question, interest):
-    theme = _question_theme(question, interest)
+    theme = resolve_theme(question, interest)
     payload = {
         "question_id": question.id,
         "type": question.type,
@@ -73,7 +45,7 @@ def _question_json(question, interest):
 @section_test_bp.route("/api/student/sections/<int:section_id>/final-test", methods=["GET"])
 @authenticate_token
 def get_section_final_test(section_id):
-    user = _current_user()
+    user = current_user()
     if user is None:
         return jsonify({"error": "user not found, call /api/student/me first"}), 404
 
@@ -97,7 +69,7 @@ def get_section_final_test(section_id):
 @section_test_bp.route("/api/student/sections/<int:section_id>/final-test/submit", methods=["POST"])
 @authenticate_token
 def submit_section_final_test(section_id):
-    user = _current_user()
+    user = current_user()
     if user is None:
         return jsonify({"error": "user not found, call /api/student/me first"}), 404
 
@@ -113,7 +85,6 @@ def submit_section_final_test(section_id):
     if not isinstance(answers, list) or len(answers) == 0:
         return jsonify({"error": "answers must be a non-empty list"}), 400
 
-    # Walidacja wszystkich wpisów najpierw -- jeśli cokolwiek złe, nic się nie zapisuje.
     validated = []
     for answer in answers:
         if not isinstance(answer, dict):
@@ -130,7 +101,6 @@ def submit_section_final_test(section_id):
         selected_option_id = answer.get("selected_option_id")
         answer_text = answer.get("answer_text")
 
-        # "Nie wiem" -- brak odpowiedzi, liczone jako błędne
         if selected_option_id is None and answer_text is None:
             validated.append((question, False))
             continue
@@ -155,14 +125,11 @@ def submit_section_final_test(section_id):
                 return jsonify({
                     "error": f"answer_text is required for question {question_id}"
                 }), 400
-            accepted_answers = _question_theme(question, user.interest).get(
+            accepted_answers = resolve_theme(question, user.interest).get(
                 "answers",
                 question.accepted_answers or [],
             )
-            is_correct = any(
-                _normalize_answer(answer_text) == _normalize_answer(accepted)
-                for accepted in accepted_answers
-            )
+            is_correct = is_accepted_answer(answer_text, accepted_answers)
             validated.append((question, is_correct))
         else:
             return jsonify({
@@ -171,10 +138,8 @@ def submit_section_final_test(section_id):
 
     score = sum(1 for _, is_correct in validated if is_correct)
     max_score = len(validated)
-    now = datetime.utcnow()
+    now = utc_now()
 
-    # Test końcowy jest izolowany od zwykłego postępu -- w przeciwieństwie do
-    # testu poziomującego, nic tu nie trafia do StudentAnswer.
     attempt = SectionTestAttempt(
         student_id=user.id,
         section_id=section.id,
@@ -194,7 +159,7 @@ def submit_section_final_test(section_id):
 @section_test_bp.route("/api/student/sections/<int:section_id>/final-test/history", methods=["GET"])
 @authenticate_token
 def get_section_final_test_history(section_id):
-    user = _current_user()
+    user = current_user()
     if user is None:
         return jsonify({"error": "user not found, call /api/student/me first"}), 404
 
