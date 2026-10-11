@@ -5,10 +5,10 @@ from app.extensions import db
 from app.models.tasks import Task
 from app.services.student_tasks import submit_task_answer, task_view
 
-student_tasks_bp = Blueprint("student_tasks", __name__)
+bp = Blueprint("student_tasks", __name__, url_prefix="/api/student")
 
 
-@student_tasks_bp.route("/api/student/tasks/<int:task_id>", methods=["GET"])
+@bp.route("/tasks/<int:task_id>", methods=["GET"])
 @authenticate_token
 def get_student_task(task_id):
     student = current_user()
@@ -26,7 +26,7 @@ def get_student_task(task_id):
     return jsonify(view), 200
 
 
-@student_tasks_bp.route("/api/student/tasks/<int:task_id>/answers", methods=["POST"])
+@bp.route("/tasks/<int:task_id>/answers", methods=["POST"])
 @authenticate_token
 def submit_student_answer(task_id):
     student = current_user()

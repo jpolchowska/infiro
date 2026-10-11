@@ -10,10 +10,10 @@ from app.models.tasks import Task
 from app.serializers import subsection_json, task_json
 from app.services import content_deletion
 
-admin_subsections_bp = Blueprint("admin_subsections", __name__)
+bp = Blueprint("admin_subsections", __name__, url_prefix="/api/admin")
 
 
-@admin_subsections_bp.route("/api/admin/sections/<int:section_id>/subsections", methods=["POST"])
+@bp.route("/sections/<int:section_id>/subsections", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def create_subsection(section_id):
@@ -47,7 +47,7 @@ def create_subsection(section_id):
     return jsonify(subsection_json(subsection)), 201
 
 
-@admin_subsections_bp.route("/api/admin/subsections/<int:subsection_id>", methods=["GET"])
+@bp.route("/subsections/<int:subsection_id>", methods=["GET"])
 @authenticate_token
 @require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
 def get_subsection(subsection_id):
@@ -67,7 +67,7 @@ def get_subsection(subsection_id):
     return jsonify(payload), 200
 
 
-@admin_subsections_bp.route("/api/admin/subsections/<int:subsection_id>", methods=["PATCH"])
+@bp.route("/subsections/<int:subsection_id>", methods=["PATCH"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def update_subsection(subsection_id):
@@ -91,7 +91,7 @@ def update_subsection(subsection_id):
     return jsonify(subsection_json(subsection)), 200
 
 
-@admin_subsections_bp.route("/api/admin/subsections/<int:subsection_id>", methods=["DELETE"])
+@bp.route("/subsections/<int:subsection_id>", methods=["DELETE"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def delete_subsection(subsection_id):

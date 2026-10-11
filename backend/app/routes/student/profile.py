@@ -4,10 +4,10 @@ from app.auth import authenticate_token, current_user
 from app.constants import UserRole
 from app.services.users import get_or_create_user, update_interest
 
-student_profile_bp = Blueprint("student_profile", __name__)
+bp = Blueprint("student_profile", __name__, url_prefix="/api/student")
 
 
-@student_profile_bp.route("/api/student/me", methods=["GET"])
+@bp.route("/me", methods=["GET"])
 @authenticate_token
 def me():
     user = get_or_create_user(request.user, UserRole.STUDENT)
@@ -20,7 +20,7 @@ def me():
     }), 200
 
 
-@student_profile_bp.route("/api/student/interest", methods=["PATCH"])
+@bp.route("/interest", methods=["PATCH"])
 @authenticate_token
 def add_interest():
     user = current_user()

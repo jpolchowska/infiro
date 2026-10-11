@@ -342,12 +342,10 @@ infiro/
 │   │   ├── models/                # SQLAlchemy models (users, sections, tasks, ebooks, answers, ...)
 │   │   ├── auth.py                # JWT/JWKS verification, realm role checks
 │   │   ├── routes/
-│   │   │   ├── student*.py        # profile, sections/subsections, tasks, timed practice, stats
-│   │   │   ├── leveling_test.py   # leveling test, submit, history
-│   │   │   ├── section_test.py    # section final test, submit, history
-│   │   │   ├── admin_*.py         # sections, subsections, tasks, students, imports
-│   │   │   └── public.py          # status check
-│   │   ├── services/              # import and validation, themes, answers, progress, uploads, users
+│   │   │   ├── admin/             # sections, subsections, tasks, students, imports
+│   │   │   ├── student/           # profile, stats, sections, tasks, timed practice, tests, e-books
+│   │   │   └── health.py          # status check
+│   │   ├── services/              # business logic: imports, grading, progress, reports, uploads
 │   │   └── static/uploads/        # uploaded task and e-book images (bind-mounted)
 │   ├── migrations/                # Flask-Migrate migrations, applied on startup
 │   ├── seed/                      # sample task import file (tasks_example.json)

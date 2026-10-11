@@ -1,11 +1,10 @@
 from flask import Blueprint, jsonify
 
+bp = Blueprint("health", __name__)
 
-public_bp = Blueprint("public", __name__)
 
-
-@public_bp.route("/api/public", methods=["GET"])
-def public():
+@bp.route("/api/public", methods=["GET"])
+def health():
     return jsonify({
         "message": "Backend is running"
     })

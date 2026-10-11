@@ -5,12 +5,12 @@ from app.extensions import db
 from app.models.sections import Section
 from app.services.final_test import build_final_test, final_test_history, submit_final_test
 
-section_test_bp = Blueprint("section_test", __name__)
+bp = Blueprint("student_final_test", __name__, url_prefix="/api/student")
 
 USER_NOT_FOUND = "user not found, call /api/student/me first"
 
 
-@section_test_bp.route("/api/student/sections/<int:section_id>/final-test", methods=["GET"])
+@bp.route("/sections/<int:section_id>/final-test", methods=["GET"])
 @authenticate_token
 def get_final_test(section_id):
     student = current_user()
@@ -24,7 +24,7 @@ def get_final_test(section_id):
     return jsonify(build_final_test(section, student.interest)), 200
 
 
-@section_test_bp.route("/api/student/sections/<int:section_id>/final-test/submit", methods=["POST"])
+@bp.route("/sections/<int:section_id>/final-test/submit", methods=["POST"])
 @authenticate_token
 def submit_final_test_answers(section_id):
     student = current_user()
@@ -50,7 +50,7 @@ def submit_final_test_answers(section_id):
     return jsonify(result), 201
 
 
-@section_test_bp.route("/api/student/sections/<int:section_id>/final-test/history", methods=["GET"])
+@bp.route("/sections/<int:section_id>/final-test/history", methods=["GET"])
 @authenticate_token
 def get_final_test_history(section_id):
     student = current_user()

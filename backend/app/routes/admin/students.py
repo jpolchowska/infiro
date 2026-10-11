@@ -7,7 +7,7 @@ from app.models.users import User
 from app.services.student_reports import student_report, student_summaries, student_summary, teacher_json
 from app.services.users import get_or_create_user
 
-admin_students_bp = Blueprint("admin_students", __name__)
+bp = Blueprint("admin_students", __name__, url_prefix="/api/admin")
 
 MISSING_ROLE = "Missing required role: admin or ROLE_TEACHER"
 
@@ -24,7 +24,7 @@ def _viewer():
     return None, None
 
 
-@admin_students_bp.route("/api/admin/teachers", methods=["GET"])
+@bp.route("/teachers", methods=["GET"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def list_teachers():
@@ -36,7 +36,7 @@ def list_teachers():
     return jsonify([teacher_json(teacher) for teacher in teachers]), 200
 
 
-@admin_students_bp.route("/api/admin/students", methods=["GET"])
+@bp.route("/students", methods=["GET"])
 @authenticate_token
 def list_students():
     role, teacher = _viewer()
@@ -50,7 +50,7 @@ def list_students():
     return jsonify(student_summaries(query.all())), 200
 
 
-@admin_students_bp.route("/api/admin/students/<int:student_id>", methods=["GET"])
+@bp.route("/students/<int:student_id>", methods=["GET"])
 @authenticate_token
 def get_student(student_id):
     role, teacher = _viewer()
@@ -67,7 +67,7 @@ def get_student(student_id):
     return jsonify(student_report(student)), 200
 
 
-@admin_students_bp.route("/api/admin/students/<int:student_id>", methods=["PATCH"])
+@bp.route("/students/<int:student_id>", methods=["PATCH"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def update_student(student_id):

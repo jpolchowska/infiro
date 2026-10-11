@@ -3,12 +3,12 @@ from flask import Blueprint, jsonify, request
 from app.auth import authenticate_token, current_user
 from app.services.leveling_test import build_leveling_test, leveling_test_history, submit_leveling_test
 
-leveling_test_bp = Blueprint("leveling_test", __name__)
+bp = Blueprint("student_leveling_test", __name__, url_prefix="/api/student")
 
 USER_NOT_FOUND = "user not found, call /api/student/me first"
 
 
-@leveling_test_bp.route("/api/student/leveling-test", methods=["GET"])
+@bp.route("/leveling-test", methods=["GET"])
 @authenticate_token
 def get_leveling_test():
     student = current_user()
@@ -18,7 +18,7 @@ def get_leveling_test():
     return jsonify(build_leveling_test(student.interest)), 200
 
 
-@leveling_test_bp.route("/api/student/leveling-test/submit", methods=["POST"])
+@bp.route("/leveling-test/submit", methods=["POST"])
 @authenticate_token
 def submit_leveling_test_answers():
     student = current_user()
@@ -40,7 +40,7 @@ def submit_leveling_test_answers():
     return jsonify(result), 201
 
 
-@leveling_test_bp.route("/api/student/leveling-test/history", methods=["GET"])
+@bp.route("/leveling-test/history", methods=["GET"])
 @authenticate_token
 def get_leveling_test_history():
     student = current_user()

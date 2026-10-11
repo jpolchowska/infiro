@@ -8,10 +8,10 @@ from app.models.subsections import Subsection
 from app.serializers import section_json, subsection_json
 from app.services import content_deletion
 
-admin_sections_bp = Blueprint("admin_sections", __name__)
+bp = Blueprint("admin_sections", __name__, url_prefix="/api/admin")
 
 
-@admin_sections_bp.route("/api/admin/sections", methods=["GET"])
+@bp.route("/sections", methods=["GET"])
 @authenticate_token
 @require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
 def list_sections():
@@ -19,7 +19,7 @@ def list_sections():
     return jsonify([section_json(s) for s in sections]), 200
 
 
-@admin_sections_bp.route("/api/admin/sections", methods=["POST"])
+@bp.route("/sections", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def create_section():
@@ -42,7 +42,7 @@ def create_section():
     return jsonify(section_json(section)), 201
 
 
-@admin_sections_bp.route("/api/admin/sections/<int:section_id>", methods=["GET"])
+@bp.route("/sections/<int:section_id>", methods=["GET"])
 @authenticate_token
 @require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
 def get_section(section_id):
@@ -60,7 +60,7 @@ def get_section(section_id):
     return jsonify(payload), 200
 
 
-@admin_sections_bp.route("/api/admin/sections/<int:section_id>", methods=["PATCH"])
+@bp.route("/sections/<int:section_id>", methods=["PATCH"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def update_section(section_id):
@@ -84,7 +84,7 @@ def update_section(section_id):
     return jsonify(section_json(section)), 200
 
 
-@admin_sections_bp.route("/api/admin/sections/<int:section_id>", methods=["DELETE"])
+@bp.route("/sections/<int:section_id>", methods=["DELETE"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def delete_section(section_id):

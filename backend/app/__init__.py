@@ -1,7 +1,9 @@
 from flask import Flask
 
+from app import models  # noqa: F401
 from app.config import Config
 from app.extensions import db, migrate
+from app.routes import register_blueprints
 
 
 def create_app(config=None):
@@ -12,33 +14,6 @@ def create_app(config=None):
 
     db.init_app(app)
     migrate.init_app(app, db)
-
-    from app import models  # noqa: F401
-
-    from app.routes.public import public_bp
-    from app.routes.student import student_bp
-    from app.routes.leveling_test import leveling_test_bp
-    from app.routes.section_test import section_test_bp
-    from app.routes.admin_sections import admin_sections_bp
-    from app.routes.admin_subsections import admin_subsections_bp
-    from app.routes.admin_tasks import admin_tasks_bp
-    from app.routes.admin_import import admin_import_bp
-    from app.routes.admin_students import admin_students_bp
-    from app.routes.student_profile import student_profile_bp
-    from app.routes.student_tasks import student_tasks_bp
-    from app.routes.student_sections_and_subsections import student_sections_and_subsections_bp
-
-    app.register_blueprint(student_bp)
-    app.register_blueprint(leveling_test_bp)
-    app.register_blueprint(section_test_bp)
-    app.register_blueprint(public_bp)
-    app.register_blueprint(admin_sections_bp)
-    app.register_blueprint(admin_subsections_bp)
-    app.register_blueprint(admin_tasks_bp)
-    app.register_blueprint(admin_import_bp)
-    app.register_blueprint(admin_students_bp)
-    app.register_blueprint(student_profile_bp)
-    app.register_blueprint(student_tasks_bp)
-    app.register_blueprint(student_sections_and_subsections_bp)
+    register_blueprints(app)
 
     return app

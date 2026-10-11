@@ -9,10 +9,10 @@ from app.services.final_test_import import import_final_test
 from app.services.task_import import import_tasks
 from app.services.uploads import extract_image_zip
 
-admin_import_bp = Blueprint("admin_import", __name__)
+bp = Blueprint("admin_imports", __name__, url_prefix="/api/admin")
 
 
-@admin_import_bp.route("/api/admin/uploads/images", methods=["POST"])
+@bp.route("/uploads/images", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def upload_images_zip():
@@ -23,7 +23,7 @@ def upload_images_zip():
     return jsonify({"file_count": len(urls), "files": urls}), 201
 
 
-@admin_import_bp.route("/api/admin/tasks/import", methods=["POST"])
+@bp.route("/tasks/import", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def import_tasks_json():
@@ -38,7 +38,7 @@ def import_tasks_json():
     return jsonify(result), 201
 
 
-@admin_import_bp.route("/api/admin/ebooks/import", methods=["POST"])
+@bp.route("/ebooks/import", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def upload_ebooks():
@@ -49,7 +49,7 @@ def upload_ebooks():
     return jsonify(result), 201
 
 
-@admin_import_bp.route("/api/admin/sections/<int:section_id>/final-test/import", methods=["POST"])
+@bp.route("/sections/<int:section_id>/final-test/import", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def import_final_test_json(section_id):

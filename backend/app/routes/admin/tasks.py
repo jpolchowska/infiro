@@ -10,7 +10,7 @@ from app.models.tasks import Task
 from app.serializers import task_json
 from app.services import content_deletion
 
-admin_tasks_bp = Blueprint("admin_tasks", __name__)
+bp = Blueprint("admin_tasks", __name__, url_prefix="/api/admin")
 
 
 def _validate_options(options):
@@ -31,7 +31,7 @@ def _validate_options(options):
     return None
 
 
-@admin_tasks_bp.route("/api/admin/subsections/<int:subsection_id>/tasks", methods=["POST"])
+@bp.route("/subsections/<int:subsection_id>/tasks", methods=["POST"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def create_task(subsection_id):
@@ -81,7 +81,7 @@ def create_task(subsection_id):
     return jsonify(task_json(task)), 201
 
 
-@admin_tasks_bp.route("/api/admin/tasks/<int:task_id>", methods=["PATCH"])
+@bp.route("/tasks/<int:task_id>", methods=["PATCH"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def update_task(task_id):
@@ -128,7 +128,7 @@ def update_task(task_id):
     return jsonify(task_json(task)), 200
 
 
-@admin_tasks_bp.route("/api/admin/tasks/<int:task_id>", methods=["DELETE"])
+@bp.route("/tasks/<int:task_id>", methods=["DELETE"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def delete_task(task_id):
