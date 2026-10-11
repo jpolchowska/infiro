@@ -23,14 +23,6 @@ from app.services.themes import resolve_theme, task_options
 student_bp = Blueprint("student", __name__)
 
 
-@student_bp.route("/api/student", methods=["GET"])
-@authenticate_token
-def student():
-    return jsonify({
-        "message": "Hello"
-    })
-
-
 @student_bp.route("/api/student/stats")
 @authenticate_token
 def get_student_stats():

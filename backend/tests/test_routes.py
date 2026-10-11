@@ -5,21 +5,13 @@ def test_public_endpoint(client):
     assert response.json["message"] == "Backend is running"
 
 
-def test_student_without_token(client):
-    response = client.get("/api/student")
+def test_protected_endpoint_without_token(client):
+    response = client.get("/api/student/me")
 
     assert response.status_code == 401
 
 
-def test_student_with_token(client, login):
-    login("student-sub", ["student"])
+def test_protected_endpoint_with_malformed_header(client):
+    response = client.get("/api/student/me", headers={"Authorization": "test-token"})
 
-    response = client.get(
-        "/api/student",
-        headers={
-            "Authorization": "Bearer test-token"
-        }
-    )
-
-    assert response.status_code == 200
-    assert response.json["message"] == "Hello"
+    assert response.status_code == 401

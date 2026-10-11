@@ -1,7 +1,5 @@
 # Format pliku z zadaniami (JSON)
 
-*Wersja na: 04.09.2026*
-
 Pomyśleliśmy, że dobrze byłoby móc kontrolować i zmieniać **kolejność zadań** w podsekcji. Żeby to połączyć z **wariantami zadań pod różne motywy** (zainteresowania), wymyśliliśmy takie rozwiązanie. To **propozycja** — może się jeszcze zmienić. Poniżej opisujemy, jak plik jest zbudowany i jak go wypełniać.
 
 Wszystkie zadania siedzą w **jednym pliku `.json`**. Plik wypełnia się ręcznie, a potem wgrywa przez panel admina (zakładka „Import treści"). Czyta się go od góry do dołu jak spis treści kursu: **sekcje → podsekcje → zadania**.
@@ -32,6 +30,7 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
         "tasks": [
 
           {
+            "content_key": "nazwa-podsekcji-01",
             "type": "single_choice",
             "difficulty": 1,
             "themes": {
@@ -56,6 +55,7 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
           },
 
           {
+            "content_key": "nazwa-podsekcji-02",
             "type": "short_answer",
             "difficulty": 2,
             "themes": {
@@ -73,6 +73,7 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
           },
 
           {
+            "content_key": "nazwa-podsekcji-03",
             "type": "memory",
             "themes": {
               "default": {
@@ -109,6 +110,7 @@ Nazwa sekcji i podsekcji jest wpisana **raz**, w nagłówku — nie przy każdym
 | `subsections` | lista podsekcji, w kolejności |
 | `subsection` | nazwa podsekcji |
 | `tasks` | lista zadań, w kolejności przechodzenia |
+| `content_key` | stały, unikalny identyfikator zadania (np. `latwe-mnozenie-01`); obowiązkowy |
 | `type` | rodzaj zadania: `single_choice`, `short_answer` albo `memory` |
 | `difficulty` | trudność: `1`, `2` albo `3` (przy `memory` się pomija) |
 | `themes` | warianty treści per motyw; `default` musi być zawsze; wariant motywu podaje zwykle tylko `prompt`, resztę dziedziczy z `default` |
@@ -171,6 +173,7 @@ Zadanie z kilkoma motywami:
 
 ```json
 {
+  "content_key": "rodzaje-ulamkow-01",
   "type": "single_choice",
   "difficulty": 2,
   "themes": {
@@ -226,6 +229,7 @@ Pole `type` mówi, jakie to zadanie. Trzy typy:
 
 ```json
 {
+  "content_key": "latwe-mnozenie-01",
   "type": "single_choice",
   "difficulty": 1,
   "themes": {
@@ -248,6 +252,7 @@ Pole `type` mówi, jakie to zadanie. Trzy typy:
 
 ```json
 {
+  "content_key": "ulamki-dziesietne-01",
   "type": "short_answer",
   "difficulty": 2,
   "themes": {
@@ -266,6 +271,7 @@ Pole `type` mówi, jakie to zadanie. Trzy typy:
 
 ```json
 {
+  "content_key": "latwe-mnozenie-02",
   "type": "memory",
   "themes": {
     "default": {
@@ -306,7 +312,7 @@ Liczba `1`, `2` albo `3` przy każdym zadaniu (poza `memory`). To etykieta „ja
 2. W środku — obiekt sekcji: `"section"` + `"subsections": []`.
 3. W `subsections` — obiekt podsekcji: `"subsection"` + `"tasks": []`.
 4. W `tasks` — zadania **w kolejności**, w jakiej uczeń ma je przechodzić.
-5. Każde zadanie ma: `type`, `difficulty` (poza `memory`), `themes` z **obowiązkowym `default`**.
+5. Każde zadanie ma: `content_key`, `type`, `difficulty` (poza `memory`), `themes` z **obowiązkowym `default`**.
 6. Wariant motywu to kolejny klucz w `themes` — podaje zwykle tylko `prompt`; `options` / `answers` / `pairs` dziedziczy z `default`.
 7. Kolejne podsekcje, kolejne sekcje — wszystko w kolejności listy.
 
@@ -315,18 +321,30 @@ Liczba `1`, `2` albo `3` przy każdym zadaniu (poza `memory`). To etykieta „ja
 ## Edycja i wgrywanie
 
 - **Plik to źródło prawdy.** Poprawka = edycja pliku i ponowne wgranie przez „Import treści".
-- Docelowo wgranie pliku **podmienia** treść działów, których dotyczy — bez dokładania duplikatów (obecny import tylko dokłada; podmianę trzeba jeszcze zbudować razem z tym formatem).
-- Usunięcie zadania z pliku = zadanie znika, a jego dotychczasowe odpowiedzi przestają się liczyć.
+- Ponowne wgranie pliku **aktualizuje** zadania, które już istnieją (dopasowane po `content_key`), i dodaje nowe — bez dokładania duplikatów.
+- Usunięcie zadania z pliku **nie usuwa** go z aplikacji. Zadanie, które ma zniknąć, usuwa się w panelu.
+- Przed zapisaniem czegokolwiek import sprawdza cały plik. Jeśli znajdzie błędy, nie zapisuje nic i wypisuje wszystkie naraz, ze wskazaniem sekcji, podsekcji i numeru zadania.
 
 ### Identyfikatory zadań a postępy uczniów
 
-Żeby ponowny import nie gubił postępów uczniów przy **poprawianiu treści** ani przy **zmianie kolejności**, każde zadanie potrzebuje stałego `id`. Nie wpisuje się go ręcznie:
+Żeby ponowny import nie gubił postępów uczniów przy **poprawianiu treści** ani przy **zmianie kolejności**, każde zadanie ma stały identyfikator — pole `content_key`. Wpisuje się go ręcznie, przy każdym zadaniu:
 
-1. Plik pisze się **bez `id`** (dokładnie jak w przykładach powyżej).
-2. Pierwszy import nadaje każdemu zadaniu `id` i zwraca plik z dopisanymi `id`.
-3. Od tej pory edytuje się **ten plik (już z `id`)** i wgrywa ponownie. Import dopasowuje zadania **po `id`, nie po pozycji** — więc bloki można dowolnie przestawiać bez utraty postępów.
+```json
+{
+  "content_key": "latwe-mnozenie-01",
+  "type": "single_choice",
+  "difficulty": 1,
+  "themes": { "default": { "prompt": "…", "options": [ … ] } }
+}
+```
 
-W praktyce jeden dodatkowy krok: po pierwszym imporcie pobiera się plik z `id` i dalej pracuje się na nim.
+Zasady:
+
+- **`content_key` jest obowiązkowy.** Plik z zadaniem bez klucza zostanie odrzucony.
+- **Musi być unikalny** — nie tylko w pliku, ale wśród wszystkich zadań w aplikacji. Najprościej budować go z nazwy podsekcji i numeru: `latwe-mnozenie-01`, `latwe-mnozenie-02`… Jeśli podsekcje w różnych sekcjach nazywają się tak samo, dodaj do klucza nazwę sekcji.
+- **Raz nadanego klucza się nie zmienia.** Import dopasowuje zadania **po `content_key`, nie po pozycji** — więc bloki można dowolnie przestawiać i poprawiać ich treść bez utraty postępów.
+- Zmiana klucza = dla aplikacji nowe zadanie. Stare zostaje razem ze swoimi odpowiedziami, dopóki nie usunie się go w panelu.
+- Użycie w pliku klucza, który ma już zadanie w innej podsekcji, **przenosi** to zadanie do nowej podsekcji.
 
 ---
 

@@ -51,23 +51,6 @@ def authenticate_token(f):
     return decorated
 
 
-def require_role(role):
-    def decorator(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            user = getattr(request, "user", {})
-
-            roles = user.get("realm_access", {}).get("roles", [])
-            if role not in roles:
-                return jsonify({"message": f"Missing required role: {role}"}), 403
-
-            return f(*args, **kwargs)
-
-        return decorated
-
-    return decorator
-
-
 def require_any_realm_role(*roles):
     def decorator(f):
         @wraps(f)
