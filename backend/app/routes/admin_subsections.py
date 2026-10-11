@@ -3,12 +3,11 @@ from flask import Blueprint, jsonify, request
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_any_realm_role, require_realm_role
 from app.models.ebooks import Ebook
-from app.models.knowledge_resources import KnowledgeResource
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.services import content_deletion
-from app.services.admin_serializers import material_json, subsection_json, task_json
+from app.services.admin_serializers import subsection_json, task_json
 
 admin_subsections_bp = Blueprint("admin_subsections", __name__)
 
@@ -58,14 +57,11 @@ def get_subsection(subsection_id):
     tasks = Task.query.filter_by(subsection_id=subsection_id).order_by(
         Task.order_index, Task.id
     ).all()
-    materials = KnowledgeResource.query.filter_by(subsection_id=subsection_id).order_by(
-        KnowledgeResource.order_index
-    ).all()
     ebook = Ebook.query.filter_by(subsection_id=subsection_id).first()
 
     payload = subsection_json(subsection)
     payload["tasks"] = [task_json(t) for t in tasks]
-    payload["materials"] = [material_json(m) for m in materials]
+    payload["materials"] = []
     payload["ebook"] = {"id": ebook.id, "title": ebook.title} if ebook else None
     return jsonify(payload), 200
 

@@ -22,7 +22,6 @@ def create_app(config=None):
     from app.routes.admin_sections import admin_sections_bp
     from app.routes.admin_subsections import admin_subsections_bp
     from app.routes.admin_tasks import admin_tasks_bp
-    from app.routes.admin_materials import admin_materials_bp
     from app.routes.admin_import import admin_import_bp
     from app.routes.admin_students import admin_students_bp
     from app.routes.student_profile import student_profile_bp
@@ -36,7 +35,6 @@ def create_app(config=None):
     app.register_blueprint(admin_sections_bp)
     app.register_blueprint(admin_subsections_bp)
     app.register_blueprint(admin_tasks_bp)
-    app.register_blueprint(admin_materials_bp)
     app.register_blueprint(admin_import_bp)
     app.register_blueprint(admin_students_bp)
     app.register_blueprint(student_profile_bp)

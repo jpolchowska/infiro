@@ -2,11 +2,10 @@ from flask import Blueprint, jsonify, request
 
 from app.extensions import db
 from app.middleware.auth import authenticate_token, require_any_realm_role, require_realm_role
-from app.models.knowledge_resources import KnowledgeResource
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.services import content_deletion
-from app.services.admin_serializers import material_json, section_json, subsection_json
+from app.services.admin_serializers import section_json, subsection_json
 
 admin_sections_bp = Blueprint("admin_sections", __name__)
 
@@ -53,13 +52,10 @@ def get_section(section_id):
     subsections = Subsection.query.filter_by(section_id=section_id).order_by(
         Subsection.order_index
     ).all()
-    materials = KnowledgeResource.query.filter_by(section_id=section_id).order_by(
-        KnowledgeResource.order_index
-    ).all()
 
     payload = section_json(section)
     payload["subsections"] = [subsection_json(s) for s in subsections]
-    payload["materials"] = [material_json(m) for m in materials]
+    payload["materials"] = []
     return jsonify(payload), 200
 
 

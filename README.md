@@ -333,16 +333,6 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `GET` | `/api/admin/students/:id` | admin, teacher | Get a student's progress details |
 | `PATCH` | `/api/admin/students/:id` | admin | Update a student (e.g. assign a teacher) |
 
-### Legacy
-
-Still served by the backend, but not used by the current mobile app or admin panel UI.
-
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `POST` | `/api/admin/sections/:id/materials` | admin | Add a material to a section |
-| `POST` | `/api/admin/subsections/:id/materials` | admin | Add a material to a subsection |
-| `PATCH`/`DELETE` | `/api/admin/materials/:id` | admin | Update or delete a material |
-
 ## Project Structure
 
 ```
@@ -355,7 +345,7 @@ infiro/
 │   │   │   ├── student*.py        # profile, sections/subsections, tasks, timed practice, stats
 │   │   │   ├── leveling_test.py   # leveling test, submit, history
 │   │   │   ├── section_test.py    # section final test, submit, history
-│   │   │   ├── admin_*.py         # sections, subsections, tasks, materials, students, imports
+│   │   │   ├── admin_*.py         # sections, subsections, tasks, students, imports
 │   │   │   └── public.py          # status check
 │   │   ├── services/              # import and validation, themes, answers, progress, uploads, users
 │   │   └── static/uploads/        # uploaded task and e-book images (bind-mounted)

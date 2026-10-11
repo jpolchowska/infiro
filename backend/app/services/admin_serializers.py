@@ -48,16 +48,3 @@ def task_json(task):
             for option in options
         ],
     }
-
-
-def material_json(resource):
-    return {
-        "id": resource.id,
-        "section_id": resource.section_id,
-        "subsection_id": resource.subsection_id,
-        "type": resource.type,
-        "title": resource.title,
-        "content_text": resource.content_text,
-        "file_url": resource.file_url,
-        "order_index": resource.order_index,
-    }

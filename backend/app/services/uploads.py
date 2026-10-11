@@ -2,33 +2,8 @@ import os
 import zipfile
 
 from flask import current_app
-from werkzeug.utils import secure_filename
 
-from app.clock import utc_now
-
-ALLOWED_EXTENSIONS = {"pdf", "png", "jpg", "jpeg", "gif"}
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def save_upload_file(file_storage):
-    if not file_storage or not file_storage.filename or not allowed_file(file_storage.filename):
-        return None, None
-
-    ext = file_storage.filename.rsplit(".", 1)[1].lower()
-    resource_type = "pdf" if ext == "pdf" else "image"
-
-    upload_dir = os.path.join(current_app.static_folder, "uploads")
-    os.makedirs(upload_dir, exist_ok=True)
-
-    filename = secure_filename(f"{utc_now().timestamp():.0f}_{file_storage.filename}")
-    file_storage.save(os.path.join(upload_dir, filename))
-
-    file_url = f"/static/uploads/{filename}"
-    return resource_type, file_url
 
 
 def extract_image_zip(file_storage):

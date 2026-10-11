@@ -1,6 +1,5 @@
 from app.extensions import db
 from app.models.ebooks import Ebook
-from app.models.knowledge_resources import KnowledgeResource
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.section_test_questions import SectionTestQuestion
@@ -27,9 +26,6 @@ def _delete_subsections(subsection_ids):
         task.id for task in Task.query.filter(Task.subsection_id.in_(subsection_ids)).all()
     ]
     _delete_tasks(task_ids)
-    KnowledgeResource.query.filter(
-        KnowledgeResource.subsection_id.in_(subsection_ids)
-    ).delete(synchronize_session=False)
     Ebook.query.filter(Ebook.subsection_id.in_(subsection_ids)).delete(synchronize_session=False)
     Subsection.query.filter(Subsection.id.in_(subsection_ids)).delete(synchronize_session=False)
 
@@ -62,5 +58,4 @@ def delete_section(section):
     ]
     _delete_subsections(subsection_ids)
     _delete_section_test(section.id)
-    KnowledgeResource.query.filter_by(section_id=section.id).delete(synchronize_session=False)
     db.session.delete(section)
