@@ -7,22 +7,10 @@ from app.middleware.auth import authenticate_token, require_realm_role
 from app.models.knowledge_resources import KnowledgeResource
 from app.models.sections import Section
 from app.models.subsections import Subsection
+from app.services.admin_serializers import material_json
 from app.services.uploads import save_upload_file
 
 admin_materials_bp = Blueprint("admin_materials", __name__)
-
-
-def _material_json(resource):
-    return {
-        "id": resource.id,
-        "section_id": resource.section_id,
-        "subsection_id": resource.subsection_id,
-        "type": resource.type,
-        "title": resource.title,
-        "content_text": resource.content_text,
-        "file_url": resource.file_url,
-        "order_index": resource.order_index,
-    }
 
 
 def _create_material(*, section_id=None, subsection_id=None):
@@ -64,7 +52,7 @@ def _create_material(*, section_id=None, subsection_id=None):
     db.session.add(resource)
     db.session.commit()
 
-    return jsonify(_material_json(resource)), 201
+    return jsonify(material_json(resource)), 201
 
 
 @admin_materials_bp.route("/api/admin/sections/<int:section_id>/materials", methods=["POST"])
@@ -112,7 +100,7 @@ def update_material(material_id):
         resource.content_text = content_text
 
     db.session.commit()
-    return jsonify(_material_json(resource)), 200
+    return jsonify(material_json(resource)), 200
 
 
 @admin_materials_bp.route("/api/admin/materials/<int:material_id>", methods=["DELETE"])
