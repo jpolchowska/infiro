@@ -12,7 +12,7 @@ Setup, environment variables and deployment are described in the [main README](.
 | `app/routes/` | HTTP endpoints grouped into blueprints |
 | `app/services/` | Business logic: imports and validation, themes, answers, progress, uploads |
 | `app/models/` | SQLAlchemy models |
-| `app/middleware/auth.py` | Token verification and role checks |
+| `app/auth.py` | Token verification and role checks |
 | `migrations/` | Flask-Migrate migrations, applied on container start |
 | `seed/` | Example import files |
 | `tests/` | pytest suite |

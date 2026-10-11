@@ -1,7 +1,7 @@
 from app.extensions import db
 from app.models.sections import Section
 from app.models.subsections import Subsection
-from tests.ebook_archive import build_ebook_zip, import_ebook
+from tests.ebook_zip import build_ebook_zip, import_ebook
 
 
 def _create_subsection():

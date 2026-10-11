@@ -34,11 +34,11 @@ def login(monkeypatch):
             claims["sub"] = sub
 
         monkeypatch.setattr(
-            "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
+            "app.auth.jwks_client.get_signing_key_from_jwt",
             lambda token: SimpleNamespace(key="test-key"),
         )
         monkeypatch.setattr(
-            "app.middleware.auth.jwt.decode",
+            "app.auth.jwt.decode",
             lambda *args, **kwargs: claims,
         )
 

@@ -142,6 +142,7 @@ def test_get_student_tasks_subsection_not_found(client, login):
     )
 
     assert response.status_code == 404
+    assert response.json == {"error": "Subsection not found"}
 
 
 def test_unlocked_new_tasks(client, login):

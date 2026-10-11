@@ -278,13 +278,13 @@ Course content is loaded through the admin panel (`http://localhost`, **Import t
 
 ## API Reference
 
-All endpoints except `/api/public` require `Authorization: Bearer <token>`. Errors return a JSON body with an `error` (or `message`) field and an appropriate status code.
+All endpoints except `/api/health` require `Authorization: Bearer <token>`. Errors return a JSON body with an `error` (or `message`) field and an appropriate status code.
 
 ### Public
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/public` | Health/status check |
+| `GET` | `/api/health` | Health check |
 
 ### Student
 
@@ -340,14 +340,12 @@ infiro/
 ├── backend/
 │   ├── app/
 │   │   ├── models/                # SQLAlchemy models (users, sections, tasks, ebooks, answers, ...)
-│   │   ├── middleware/auth.py     # JWT/JWKS verification, realm role checks
+│   │   ├── auth.py                # JWT/JWKS verification, realm role checks
 │   │   ├── routes/
-│   │   │   ├── student*.py        # profile, sections/subsections, tasks, timed practice, stats
-│   │   │   ├── leveling_test.py   # leveling test, submit, history
-│   │   │   ├── section_test.py    # section final test, submit, history
-│   │   │   ├── admin_*.py         # sections, subsections, tasks, students, imports
-│   │   │   └── public.py          # status check
-│   │   ├── services/              # import and validation, themes, answers, progress, uploads, users
+│   │   │   ├── admin/             # sections, subsections, tasks, students, imports
+│   │   │   ├── student/           # profile, stats, sections, tasks, timed practice, tests, e-books
+│   │   │   └── health.py          # status check
+│   │   ├── services/              # business logic: imports, grading, progress, reports, uploads
 │   │   └── static/uploads/        # uploaded task and e-book images (bind-mounted)
 │   ├── migrations/                # Flask-Migrate migrations, applied on startup
 │   ├── seed/                      # sample task import file (tasks_example.json)

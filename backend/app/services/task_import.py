@@ -1,15 +1,16 @@
+from app.constants import DEFAULT_THEME, TaskType
 from app.extensions import db
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
-from app.services.import_helpers import sync_answer_options
+from app.services.answer_options import sync_answer_options
 from app.services.import_validation import MEMORY_DIFFICULTY_BY_PAIRS, validate_task_import
 from app.services.themes import merge_theme_variants
 
 
 def _task_difficulty(task_data, default):
-    if task_data["type"] != "memory":
+    if task_data["type"] != TaskType.MEMORY:
         return task_data.get("difficulty")
     return MEMORY_DIFFICULTY_BY_PAIRS.get(len(default.get("pairs") or []))
 
@@ -51,7 +52,7 @@ def _upsert_subsection(section, title, order_index, cache):
 
 def _upsert_task(subsection, task_data, order_index):
     themes = merge_theme_variants(task_data["themes"])
-    default = themes["default"]
+    default = themes[DEFAULT_THEME]
     content_key = task_data["content_key"]
     task = Task.query.filter_by(content_key=content_key).first()
     if task is None:
@@ -79,7 +80,7 @@ def _upsert_task(subsection, task_data, order_index):
     task.content_key = content_key
     task_data["id"] = task.id
 
-    if task.type == "single_choice":
+    if task.type == TaskType.SINGLE_CHOICE:
         sync_answer_options(TaskAnswerOption, {"task_id": task.id}, default["options"])
     return task
 

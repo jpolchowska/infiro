@@ -1,9 +1,13 @@
+import random
+
+from app.constants import DEFAULT_THEME
+from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.task_answer_options import TaskAnswerOption
 
 
 def resolve_theme(item, interest):
     themes = item.themes if isinstance(item.themes, dict) else {}
-    default = themes.get("default", {})
+    default = themes.get(DEFAULT_THEME, {})
     selected = themes.get(interest, {}) if interest else {}
 
     if not isinstance(default, dict):
@@ -44,8 +48,24 @@ def task_options(task, interest):
     return themed_options(options, resolve_theme(task, interest).get("options"))
 
 
+def question_options(question, interest):
+    options = (
+        SectionTestAnswerOption.query
+        .filter_by(section_test_question_id=question.id)
+        .order_by(SectionTestAnswerOption.order_index)
+        .all()
+    )
+    return themed_options(options, resolve_theme(question, interest).get("options"))
+
+
+def shuffled_options(options):
+    shuffled = list(options)
+    random.shuffle(shuffled)
+    return [{"id": option["id"], "text": option["text"]} for option in shuffled]
+
+
 def merge_theme_variants(themes):
-    default = themes["default"]
+    default = themes[DEFAULT_THEME]
     return {
         key: {**default, **variant}
         for key, variant in themes.items()

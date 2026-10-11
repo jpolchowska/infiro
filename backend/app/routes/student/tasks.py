@@ -1,0 +1,41 @@
+from flask import Blueprint, jsonify
+
+from app.auth import require_student
+from app.extensions import db
+from app.models.tasks import Task
+from app.payload import json_object
+from app.services.student_tasks import submit_task_answer, task_view
+
+bp = Blueprint("student_tasks", __name__, url_prefix="/api/student")
+
+
+@bp.route("/tasks/<int:task_id>", methods=["GET"])
+@require_student
+def get_student_task(student, task_id):
+    task = db.session.get(Task, task_id)
+    if task is None:
+        return jsonify({"error": "Task not found"}), 404
+
+    view, error = task_view(task, student)
+    if error:
+        return jsonify({"error": error}), 400
+
+    return jsonify(view), 200
+
+
+@bp.route("/tasks/<int:task_id>/answers", methods=["POST"])
+@require_student
+def submit_student_answer(student, task_id):
+    task = db.session.get(Task, task_id)
+    if task is None:
+        return jsonify({"error": "Task not found"}), 404
+
+    data = json_object()
+    if data is None:
+        return jsonify({"error": "JSON body is required"}), 400
+
+    result, error = submit_task_answer(task, student, data)
+    if error:
+        return jsonify({"error": error}), 400
+
+    return jsonify(result), 200

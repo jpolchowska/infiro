@@ -1,28 +1,30 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
+from app.auth import authenticate_token, require_any_realm_role, require_realm_role
+from app.constants import RealmRole
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_any_realm_role, require_realm_role
 from app.models.sections import Section
 from app.models.subsections import Subsection
+from app.payload import json_object
+from app.serializers import section_json, subsection_json
 from app.services import content_deletion
-from app.services.admin_serializers import section_json, subsection_json
 
-admin_sections_bp = Blueprint("admin_sections", __name__)
+bp = Blueprint("admin_sections", __name__, url_prefix="/api/admin")
 
 
-@admin_sections_bp.route("/api/admin/sections", methods=["GET"])
+@bp.route("/sections", methods=["GET"])
 @authenticate_token
-@require_any_realm_role("admin", "ROLE_TEACHER")
+@require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
 def list_sections():
     sections = Section.query.order_by(Section.order_index).all()
     return jsonify([section_json(s) for s in sections]), 200
 
 
-@admin_sections_bp.route("/api/admin/sections", methods=["POST"])
+@bp.route("/sections", methods=["POST"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def create_section():
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
@@ -41,13 +43,13 @@ def create_section():
     return jsonify(section_json(section)), 201
 
 
-@admin_sections_bp.route("/api/admin/sections/<int:section_id>", methods=["GET"])
+@bp.route("/sections/<int:section_id>", methods=["GET"])
 @authenticate_token
-@require_any_realm_role("admin", "ROLE_TEACHER")
+@require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
 def get_section(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     subsections = Subsection.query.filter_by(section_id=section_id).order_by(
         Subsection.order_index
@@ -59,15 +61,15 @@ def get_section(section_id):
     return jsonify(payload), 200
 
 
-@admin_sections_bp.route("/api/admin/sections/<int:section_id>", methods=["PATCH"])
+@bp.route("/sections/<int:section_id>", methods=["PATCH"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def update_section(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
@@ -83,13 +85,13 @@ def update_section(section_id):
     return jsonify(section_json(section)), 200
 
 
-@admin_sections_bp.route("/api/admin/sections/<int:section_id>", methods=["DELETE"])
+@bp.route("/sections/<int:section_id>", methods=["DELETE"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def delete_section(section_id):
     section = db.session.get(Section, section_id)
     if section is None:
-        return jsonify({"error": "section not found"}), 404
+        return jsonify({"error": "Section not found"}), 404
 
     content_deletion.delete_section(section)
     db.session.commit()

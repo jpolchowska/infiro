@@ -1,15 +1,17 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
+from app.auth import authenticate_token, require_realm_role
+from app.constants import RealmRole
 from app.extensions import db
-from app.middleware.auth import authenticate_token, require_realm_role
 from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
+from app.payload import json_object
+from app.serializers import task_json
 from app.services import content_deletion
-from app.services.admin_serializers import task_json
 
-admin_tasks_bp = Blueprint("admin_tasks", __name__)
+bp = Blueprint("admin_tasks", __name__, url_prefix="/api/admin")
 
 
 def _validate_options(options):
@@ -19,26 +21,26 @@ def _validate_options(options):
     correct_count = 0
     for opt in options:
         if not isinstance(opt, dict) or not isinstance(opt.get("text"), str) or not opt["text"].strip():
-            return "each option needs a non-empty 'text'"
+            return "Each option needs a non-empty 'text'"
         if not isinstance(opt.get("correct"), bool):
-            return "each option needs a boolean 'correct'"
+            return "Each option needs a boolean 'correct'"
         if opt["correct"]:
             correct_count += 1
 
     if correct_count != 1:
-        return "exactly one option must be correct"
+        return "Exactly one option must be correct"
     return None
 
 
-@admin_tasks_bp.route("/api/admin/subsections/<int:subsection_id>/tasks", methods=["POST"])
+@bp.route("/subsections/<int:subsection_id>/tasks", methods=["POST"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def create_task(subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
-        return jsonify({"error": "subsection not found"}), 404
+        return jsonify({"error": "Subsection not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
@@ -80,15 +82,15 @@ def create_task(subsection_id):
     return jsonify(task_json(task)), 201
 
 
-@admin_tasks_bp.route("/api/admin/tasks/<int:task_id>", methods=["PATCH"])
+@bp.route("/tasks/<int:task_id>", methods=["PATCH"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def update_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:
-        return jsonify({"error": "task not found"}), 404
+        return jsonify({"error": "Task not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
@@ -127,13 +129,13 @@ def update_task(task_id):
     return jsonify(task_json(task)), 200
 
 
-@admin_tasks_bp.route("/api/admin/tasks/<int:task_id>", methods=["DELETE"])
+@bp.route("/tasks/<int:task_id>", methods=["DELETE"])
 @authenticate_token
-@require_realm_role("admin")
+@require_realm_role(RealmRole.ADMIN)
 def delete_task(task_id):
     task = db.session.get(Task, task_id)
     if task is None:
-        return jsonify({"error": "task not found"}), 404
+        return jsonify({"error": "Task not found"}), 404
 
     content_deletion.delete_task(task)
     db.session.commit()

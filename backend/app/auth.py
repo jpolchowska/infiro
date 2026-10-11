@@ -88,3 +88,15 @@ def require_realm_role(role):
 def current_user():
     sub = request.user.get("sub")
     return User.query.filter_by(keycloak_sub=sub).first()
+
+
+def require_student(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        student = current_user()
+        if student is None:
+            return jsonify({"error": "User not found"}), 404
+
+        return f(student, *args, **kwargs)
+
+    return authenticate_token(decorated)
