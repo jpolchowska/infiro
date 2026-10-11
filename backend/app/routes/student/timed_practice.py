@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from app.auth import authenticate_token, current_user
+from app.auth import require_student
 from app.extensions import db
 from app.models.subsections import Subsection
 from app.payload import json_object
@@ -14,12 +14,8 @@ def _is_valid_duration(value):
 
 
 @bp.route("/subsections/<int:subsection_id>/timed", methods=["GET"])
-@authenticate_token
-def get_timed_practice(subsection_id):
-    student = current_user()
-    if student is None:
-        return jsonify({"error": "User not found"}), 404
-
+@require_student
+def get_timed_practice(student, subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
         return jsonify({"error": "Subsection not found"}), 404
@@ -28,12 +24,8 @@ def get_timed_practice(subsection_id):
 
 
 @bp.route("/subsections/<int:subsection_id>/timed/submit", methods=["POST"])
-@authenticate_token
-def submit_timed_practice(subsection_id):
-    student = current_user()
-    if student is None:
-        return jsonify({"error": "User not found"}), 404
-
+@require_student
+def submit_timed_practice(student, subsection_id):
     subsection = db.session.get(Subsection, subsection_id)
     if subsection is None:
         return jsonify({"error": "Subsection not found"}), 404

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from app.auth import authenticate_token, current_user
+from app.auth import require_student
 from app.extensions import db
 from app.models.tasks import Task
 from app.payload import json_object
@@ -10,12 +10,8 @@ bp = Blueprint("student_tasks", __name__, url_prefix="/api/student")
 
 
 @bp.route("/tasks/<int:task_id>", methods=["GET"])
-@authenticate_token
-def get_student_task(task_id):
-    student = current_user()
-    if student is None:
-        return jsonify({"error": "User not found"}), 404
-
+@require_student
+def get_student_task(student, task_id):
     task = db.session.get(Task, task_id)
     if task is None:
         return jsonify({"error": "Task not found"}), 404
@@ -28,12 +24,8 @@ def get_student_task(task_id):
 
 
 @bp.route("/tasks/<int:task_id>/answers", methods=["POST"])
-@authenticate_token
-def submit_student_answer(task_id):
-    student = current_user()
-    if student is None:
-        return jsonify({"error": "User not found"}), 404
-
+@require_student
+def submit_student_answer(student, task_id):
     task = db.session.get(Task, task_id)
     if task is None:
         return jsonify({"error": "Task not found"}), 404

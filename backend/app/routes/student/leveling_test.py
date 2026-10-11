@@ -1,31 +1,21 @@
 from flask import Blueprint, jsonify
 
-from app.auth import authenticate_token, current_user
+from app.auth import require_student
 from app.payload import json_object
 from app.services.leveling_test import build_leveling_test, leveling_test_history, submit_leveling_test
 
 bp = Blueprint("student_leveling_test", __name__, url_prefix="/api/student")
 
-USER_NOT_FOUND = "user not found, call /api/student/me first"
-
 
 @bp.route("/leveling-test", methods=["GET"])
-@authenticate_token
-def get_leveling_test():
-    student = current_user()
-    if student is None:
-        return jsonify({"error": USER_NOT_FOUND}), 404
-
+@require_student
+def get_leveling_test(student):
     return jsonify(build_leveling_test(student.interest)), 200
 
 
 @bp.route("/leveling-test/submit", methods=["POST"])
-@authenticate_token
-def submit_leveling_test_answers():
-    student = current_user()
-    if student is None:
-        return jsonify({"error": USER_NOT_FOUND}), 404
-
+@require_student
+def submit_leveling_test_answers(student):
     data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
@@ -42,10 +32,6 @@ def submit_leveling_test_answers():
 
 
 @bp.route("/leveling-test/history", methods=["GET"])
-@authenticate_token
-def get_leveling_test_history():
-    student = current_user()
-    if student is None:
-        return jsonify({"error": USER_NOT_FOUND}), 404
-
+@require_student
+def get_leveling_test_history(student):
     return jsonify(leveling_test_history(student)), 200

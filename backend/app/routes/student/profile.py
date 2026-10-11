@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from app.auth import authenticate_token, current_user
+from app.auth import authenticate_token, require_student
 from app.constants import UserRole
 from app.payload import json_object
 from app.services.users import get_or_create_user, update_interest
@@ -22,15 +22,11 @@ def me():
 
 
 @bp.route("/interest", methods=["PATCH"])
-@authenticate_token
-def add_interest():
-    user = current_user()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
+@require_student
+def add_interest(student):
     interest = (json_object() or {}).get("interest")
     try:
-        update_interest(user, interest)
+        update_interest(student, interest)
     except ValueError:
         return jsonify({"error": "Invalid interest"}), 400
 
