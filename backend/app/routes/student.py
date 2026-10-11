@@ -3,23 +3,22 @@ import random
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
-from app.middleware.auth import _current_user, authenticate_token
+from app.middleware.auth import authenticate_token, current_user
 from app.models.leveling_test_attempts import LevelingTestAttempt
 from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
-from app.utils import (
-    _current_subsection_json,
-    _get_current_subsection,
-    _get_recent_sections,
-    _get_section_index,
-    _get_section_progress,
-    _get_solved_task_ids,
-    _task_theme,
-    _timed_options,
+from app.services.progress import (
+    current_subsection_json,
+    get_current_subsection,
+    get_recent_sections,
+    get_section_index,
+    get_section_progress,
+    get_solved_task_ids,
 )
+from app.services.themes import resolve_theme, task_options
 
 student_bp = Blueprint("student", __name__)
 
@@ -35,12 +34,12 @@ def student():
 @student_bp.route("/api/student/stats")
 @authenticate_token
 def get_student_stats():
-    student = _current_user()
+    student = current_user()
     student_id = student.id
 
     total_tasks = Task.query.count()
 
-    solved_task_ids = _get_solved_task_ids(student_id)
+    solved_task_ids = get_solved_task_ids(student_id)
 
     solved_tasks = len(solved_task_ids)
 
@@ -79,11 +78,11 @@ def get_student_stats():
         .count()
     )
 
-    current_subsection = _get_current_subsection(
+    current_subsection = get_current_subsection(
         student_id,
     )
 
-    recent_sections = _get_recent_sections(
+    recent_sections = get_recent_sections(
         student_id,
         limit=5,
     )
@@ -91,7 +90,7 @@ def get_student_stats():
     recent_section_data = []
 
     for section in recent_sections:
-        progress = _get_section_progress(
+        progress = get_section_progress(
             student_id,
             section,
         )
@@ -100,7 +99,7 @@ def get_student_stats():
             {
                 "section_id": section.id,
                 "section_title": section.title,
-                "section_index": _get_section_index(section.id),
+                "section_index": get_section_index(section.id),
                 "solved_tasks": progress["solved_tasks"],
                 "total_tasks": progress["total_tasks"],
             }
@@ -119,7 +118,7 @@ def get_student_stats():
             "total_tasks": total_tasks,
             "accuracy": accuracy,
             "started_sections": started_sections,
-            "current": _current_subsection_json(
+            "current": current_subsection_json(
                 student_id,
                 current_subsection,
             ),
@@ -140,7 +139,7 @@ def get_student_stats():
 @student_bp.route("/api/student/subsections/<int:subsection_id>/timed", methods=["GET"])
 @authenticate_token
 def get_timed_tasks(subsection_id):
-    student = _current_user()
+    student = current_user()
 
     if student is None:
         return jsonify({
@@ -169,12 +168,12 @@ def get_timed_tasks(subsection_id):
     questions = []
 
     for task in tasks:
-        options = _timed_options(task, student.interest)
+        options = task_options(task, student.interest)
         random.shuffle(options)
 
         questions.append({
             "task_id": task.id,
-            "prompt": _task_theme(task, student.interest).get(
+            "prompt": resolve_theme(task, student.interest).get(
                 "prompt",
                 task.body_text,
             ),
@@ -196,7 +195,7 @@ def get_timed_tasks(subsection_id):
 @student_bp.route("/api/student/subsections/<int:subsection_id>/timed/submit", methods=["POST"])
 @authenticate_token
 def submit_timed_tasks(subsection_id):
-    student = _current_user()
+    student = current_user()
 
     if student is None:
         return jsonify({
@@ -284,7 +283,7 @@ def submit_timed_tasks(subsection_id):
 
         answered_task_ids.add(task_id)
         answered += 1
-        timed_options = _timed_options(
+        timed_options = task_options(
             tasks_by_id[task_id],
             student.interest,
         )

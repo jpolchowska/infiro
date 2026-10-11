@@ -102,6 +102,6 @@ def require_realm_role(role):
     return decorator
 
 
-def _current_user():
+def current_user():
     sub = request.user.get("sub")
     return User.query.filter_by(keycloak_sub=sub).first()

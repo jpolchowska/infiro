@@ -1,21 +1,21 @@
 import random
-import re
 from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
-from app.middleware.auth import authenticate_token
+from app.middleware.auth import authenticate_token, current_user
 from app.models.student_answers import StudentAnswer
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
-from app.routes import student as student_routes
-from app.utils import (
-    _attempts_used_in_current_cycle,
-    _task_solution,
-    _task_theme,
-    determine_student_difficulty_level,
+from app.services.answers import (
+    MAX_ATTEMPTS,
+    attempts_used_in_current_cycle,
+    is_accepted_answer,
+    task_solution,
 )
+from app.services.progress import determine_student_difficulty_level
+from app.services.themes import resolve_theme, task_options
 
 student_tasks_bp = Blueprint("student_tasks", __name__)
 
@@ -23,7 +23,7 @@ student_tasks_bp = Blueprint("student_tasks", __name__)
 @student_tasks_bp.route("/api/student/tasks/<int:task_id>", methods=["GET"])
 @authenticate_token
 def get_student_task(task_id):
-    student = student_routes._current_user()
+    student = current_user()
 
     if student is None:
         return jsonify({
@@ -37,8 +37,8 @@ def get_student_task(task_id):
             "error": "Task not found"
         }), 404
 
-    theme = _task_theme(task, student.interest)
-    attempts_used = _attempts_used_in_current_cycle(task.id, student.id)
+    theme = resolve_theme(task, student.interest)
+    attempts_used = attempts_used_in_current_cycle(task.id, student.id)
     response = {
         "id": task.id,
         "type": task.type,
@@ -47,31 +47,18 @@ def get_student_task(task_id):
     }
 
     if task.type == "single_choice":
-        options = (
-            TaskAnswerOption.query
-            .filter_by(task_id=task.id)
-            .order_by(TaskAnswerOption.order_index)
-            .all()
-        )
-        theme_options = theme.get("options")
-        if isinstance(theme_options, list) and len(theme_options) == len(options):
-            option_data = [
-                {"id": option.id, "text": option_data["text"]}
-                for option, option_data in zip(options, theme_options)
-            ]
-        else:
-            option_data = [
-                {"id": option.id, "text": option.option_text}
-                for option in options
-            ]
-        random.shuffle(option_data)
-        response["options"] = option_data
+        options = [
+            {"id": option["id"], "text": option["text"]}
+            for option in task_options(task, student.interest)
+        ]
+        random.shuffle(options)
+        response["options"] = options
         response["attempts_used"] = attempts_used
-        response["max_attempts"] = 3
+        response["max_attempts"] = MAX_ATTEMPTS
         response["solution"] = None
     elif task.type == "short_answer":
         response["attempts_used"] = attempts_used
-        response["max_attempts"] = 3
+        response["max_attempts"] = MAX_ATTEMPTS
         response["solution"] = None
     elif task.type == "memory":
         pairs = theme.get("pairs", task.memory_pairs or [])
@@ -88,7 +75,7 @@ def get_student_task(task_id):
 @student_tasks_bp.route("/api/student/tasks/<int:task_id>/answers", methods=["POST"])
 @authenticate_token
 def submit_student_answer(task_id):
-    student = student_routes._current_user()
+    student = current_user()
 
     if student is None:
         return jsonify({
@@ -140,7 +127,7 @@ def submit_student_answer(task_id):
             "error": "Unsupported task type"
         }), 400
 
-    attempts_used = _attempts_used_in_current_cycle(task.id, student.id)
+    attempts_used = attempts_used_in_current_cycle(task.id, student.id)
     attempt_number = attempts_used + 1
 
     if task.type == "single_choice":
@@ -165,7 +152,7 @@ def submit_student_answer(task_id):
                 "error": "Invalid option"
             }), 400
 
-        theme_options = _task_theme(task, student.interest).get("options")
+        theme_options = resolve_theme(task, student.interest).get("options")
         option_index = option.order_index - 1
         if isinstance(theme_options, list) and option_index < len(theme_options):
             is_correct = theme_options[option_index].get("correct") is True
@@ -189,24 +176,11 @@ def submit_student_answer(task_id):
                 "error": "answer_text is required"
             }), 400
 
-        def normalize_answer(value):
-            value = value.strip()
-            value = re.sub(r"\s+", " ", value)
-            value = value.lower()
-            value = value.replace(",", ".")
-            return value
-
-        normalized_answer = normalize_answer(answer_text)
-
-        accepted_answers = _task_theme(task, student.interest).get(
+        accepted_answers = resolve_theme(task, student.interest).get(
             "answers",
             task.accepted_answers or [],
         )
-
-        is_correct = any(
-            normalized_answer == normalize_answer(accepted)
-            for accepted in accepted_answers
-        )
+        is_correct = is_accepted_answer(answer_text, accepted_answers)
 
         answer = StudentAnswer(
             task_id=task.id,
@@ -220,32 +194,19 @@ def submit_student_answer(task_id):
     db.session.add(answer)
     db.session.commit()
 
-    attempts_left = 3 - attempt_number
+    attempts_left = MAX_ATTEMPTS - attempt_number
 
     solution = None
     if not is_correct and attempts_left == 0:
-
-        if task.type == "single_choice":
-            solution = _task_solution(task, student.interest)
-
-        elif task.type == "short_answer":
-            solution = _task_solution(task, student.interest)
+        solution = task_solution(task, student.interest)
 
     new_difficulty_level = determine_student_difficulty_level(student.id, task.subsection_id)
-
-    if new_difficulty_level != previous_difficulty_level:
-        return jsonify({
-            "is_correct": is_correct,
-            "attempt_number": attempt_number,
-            "attempts_left": attempts_left,
-            "solution": solution,
-            "unlocked_difficulty": new_difficulty_level
-        }), 200
+    level_changed = new_difficulty_level != previous_difficulty_level
 
     return jsonify({
         "is_correct": is_correct,
         "attempt_number": attempt_number,
         "attempts_left": attempts_left,
         "solution": solution,
-        "unlocked_difficulty": None
+        "unlocked_difficulty": new_difficulty_level if level_changed else None,
     }), 200

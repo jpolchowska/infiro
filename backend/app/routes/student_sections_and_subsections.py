@@ -1,18 +1,17 @@
 from flask import Blueprint, jsonify
 
 from app.extensions import db
-from app.middleware.auth import authenticate_token
+from app.middleware.auth import authenticate_token, current_user
 from app.models.ebooks import Ebook
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
-from app.routes import student as student_routes
-from app.utils import (
-    _get_section_index,
-    _get_solved_task_ids,
-    _student_subsection_json,
+from app.services.progress import (
     determine_student_difficulty_level,
+    get_section_index,
+    get_solved_task_ids,
+    student_subsection_json,
 )
 
 student_sections_and_subsections_bp = Blueprint("student_sections_and_subsections", __name__)
@@ -21,7 +20,7 @@ student_sections_and_subsections_bp = Blueprint("student_sections_and_subsection
 @student_sections_and_subsections_bp.route("/api/student/sections")
 @authenticate_token
 def get_student_sections():
-    student = student_routes._current_user()
+    student = current_user()
     student_id = student.id
     sections = (
         Section.query
@@ -40,7 +39,7 @@ def get_student_sections():
         )
 
         subsection_data = [
-            _student_subsection_json(student_id, subsection)
+            student_subsection_json(student_id, subsection)
             for subsection in subsections
         ]
 
@@ -67,7 +66,7 @@ def get_student_sections():
 @student_sections_and_subsections_bp.route("/api/student/subsections/<int:subsection_id>/tasks")
 @authenticate_token
 def get_student_subsection_tasks(subsection_id):
-    student = student_routes._current_user()
+    student = current_user()
     student_id = student.id
 
     subsection = db.session.get(Subsection, subsection_id)
@@ -77,7 +76,7 @@ def get_student_subsection_tasks(subsection_id):
 
     section = db.session.get(Section, subsection.section_id)
 
-    solved_task_ids = _get_solved_task_ids(
+    solved_task_ids = get_solved_task_ids(
         student_id,
         subsection.id,
     )
@@ -136,7 +135,7 @@ def get_student_subsection_tasks(subsection_id):
             "description": subsection.description,
             "section_id": section.id,
             "section_title": section.title,
-            "section_index": _get_section_index(section.id),
+            "section_index": get_section_index(section.id),
             "next_subsection_id": (
                 next_subsection.id
                 if next_subsection is not None

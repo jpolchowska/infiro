@@ -47,11 +47,6 @@ def test_get_student_tasks(client, monkeypatch):
         },
     )
 
-    monkeypatch.setattr(
-        "app.routes.student._current_user",
-        lambda: student,
-    )
-
     section = Section(
         title="Tabliczka mnożenia",
         description="Nauka mnożenia",
@@ -179,10 +174,8 @@ def test_get_student_tasks_subsection_not_found(client, monkeypatch):
         },
     )
 
-    monkeypatch.setattr(
-        "app.routes.student._current_user",
-        lambda: student,
-    )
+    db.session.add(student)
+    db.session.commit()
 
     response = client.get(
         "/api/student/subsections/9999/tasks",
@@ -203,11 +196,6 @@ def test_unlocked_new_tasks(client, monkeypatch):
     monkeypatch.setattr(
         "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
         lambda token: SimpleNamespace(key="test-key"),
-    )
-
-    monkeypatch.setattr(
-        "app.routes.student._current_user",
-        lambda: student,
     )
 
     monkeypatch.setattr(
@@ -327,7 +315,6 @@ def test_unlocked_new_tasks(client, monkeypatch):
 
 def test_wrong_answer_does_not_unlock_new_tasks(client, monkeypatch):
     student = User(keycloak_sub="student-sub", role="student")
-    monkeypatch.setattr("app.routes.student._current_user", lambda: student)
     monkeypatch.setattr(
         "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
         lambda token: SimpleNamespace(key="test-key"),
@@ -420,7 +407,6 @@ def test_wrong_answer_does_not_unlock_new_tasks(client, monkeypatch):
 
 def test_single_choice_answer_unlocks_new_tasks(client, monkeypatch):
     student = User(keycloak_sub="student-sub", role="student")
-    monkeypatch.setattr("app.routes.student._current_user", lambda: student)
     monkeypatch.setattr(
         "app.middleware.auth.jwks_client.get_signing_key_from_jwt",
         lambda token: SimpleNamespace(key="test-key"),

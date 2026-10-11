@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from app.middleware.auth import _current_user, authenticate_token
+from app.middleware.auth import authenticate_token, current_user
 from app.services.users import get_or_create_user, update_interest
 
 student_profile_bp = Blueprint("student_profile", __name__)
@@ -22,7 +22,7 @@ def me():
 @student_profile_bp.route("/api/student/interest", methods=["PATCH"])
 @authenticate_token
 def add_interest():
-    user = _current_user()
+    user = current_user()
     if not user:
         return jsonify({"error": "User not found"}), 404
 
