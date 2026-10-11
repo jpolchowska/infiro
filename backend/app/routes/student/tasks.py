@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
 from app.auth import authenticate_token, current_user
 from app.extensions import db
 from app.models.tasks import Task
+from app.payload import json_object
 from app.services.student_tasks import submit_task_answer, task_view
 
 bp = Blueprint("student_tasks", __name__, url_prefix="/api/student")
@@ -37,9 +38,9 @@ def submit_student_answer(task_id):
     if task is None:
         return jsonify({"error": "Task not found"}), 404
 
-    data = request.get_json(silent=True)
-    if not isinstance(data, dict):
-        return jsonify({"error": "Invalid JSON body"}), 400
+    data = json_object()
+    if data is None:
+        return jsonify({"error": "JSON body is required"}), 400
 
     result, error = submit_task_answer(task, student, data)
     if error:

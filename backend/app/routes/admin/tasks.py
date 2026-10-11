@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
 from app.auth import authenticate_token, require_realm_role
 from app.constants import RealmRole
@@ -7,6 +7,7 @@ from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
+from app.payload import json_object
 from app.serializers import task_json
 from app.services import content_deletion
 
@@ -39,7 +40,7 @@ def create_task(subsection_id):
     if subsection is None:
         return jsonify({"error": "subsection not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
@@ -89,7 +90,7 @@ def update_task(task_id):
     if task is None:
         return jsonify({"error": "task not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 

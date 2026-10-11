@@ -1,10 +1,11 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
 from app.auth import authenticate_token, require_any_realm_role, require_realm_role
 from app.constants import RealmRole
 from app.extensions import db
 from app.models.sections import Section
 from app.models.subsections import Subsection
+from app.payload import json_object
 from app.serializers import section_json, subsection_json
 from app.services import content_deletion
 
@@ -23,7 +24,7 @@ def list_sections():
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def create_section():
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
@@ -68,7 +69,7 @@ def update_section(section_id):
     if section is None:
         return jsonify({"error": "section not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 

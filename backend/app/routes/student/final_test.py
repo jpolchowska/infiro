@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
 from app.auth import authenticate_token, current_user
 from app.extensions import db
 from app.models.sections import Section
+from app.payload import json_object
 from app.services.final_test import build_final_test, final_test_history, submit_final_test
 
 bp = Blueprint("student_final_test", __name__, url_prefix="/api/student")
@@ -35,7 +36,7 @@ def submit_final_test_answers(section_id):
     if section is None:
         return jsonify({"error": "section not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 

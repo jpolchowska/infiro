@@ -4,6 +4,7 @@ from app.auth import authenticate_token, require_realm_role
 from app.constants import RealmRole
 from app.extensions import db
 from app.models.sections import Section
+from app.payload import json_body
 from app.services.ebook_import import import_ebook
 from app.services.final_test_import import import_final_test
 from app.services.task_import import import_tasks
@@ -27,7 +28,7 @@ def upload_images_zip():
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
 def import_tasks_json():
-    data = request.get_json()
+    data = json_body()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
@@ -57,7 +58,7 @@ def import_final_test_json(section_id):
     if section is None:
         return jsonify({"errors": [f"Section does not exist: {section_id}"]}), 404
 
-    data = request.get_json()
+    data = json_body()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 

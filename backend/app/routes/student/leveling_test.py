@@ -1,6 +1,7 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
 from app.auth import authenticate_token, current_user
+from app.payload import json_object
 from app.services.leveling_test import build_leveling_test, leveling_test_history, submit_leveling_test
 
 bp = Blueprint("student_leveling_test", __name__, url_prefix="/api/student")
@@ -25,7 +26,7 @@ def submit_leveling_test_answers():
     if student is None:
         return jsonify({"error": USER_NOT_FOUND}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 

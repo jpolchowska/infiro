@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 
 from app.auth import authenticate_token, current_user
 from app.extensions import db
 from app.models.subsections import Subsection
+from app.payload import json_object
 from app.services.timed_practice import build_timed_practice, score_timed_practice
 
 bp = Blueprint("student_timed_practice", __name__, url_prefix="/api/student")
@@ -37,9 +38,9 @@ def submit_timed_practice(subsection_id):
     if subsection is None:
         return jsonify({"error": "Subsection not found"}), 404
 
-    data = request.get_json(silent=True)
-    if not isinstance(data, dict):
-        return jsonify({"error": "Invalid JSON body"}), 400
+    data = json_object()
+    if data is None:
+        return jsonify({"error": "JSON body is required"}), 400
 
     answers = data.get("answers")
     if not isinstance(answers, list):

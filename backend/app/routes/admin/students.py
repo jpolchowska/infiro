@@ -4,6 +4,7 @@ from app.auth import authenticate_token, require_realm_role
 from app.constants import RealmRole, UserRole
 from app.extensions import db
 from app.models.users import User
+from app.payload import json_object
 from app.services.student_reports import student_report, student_summaries, student_summary, teacher_json
 from app.services.users import get_or_create_user
 
@@ -75,7 +76,7 @@ def update_student(student_id):
     if student is None:
         return jsonify({"error": "student not found"}), 404
 
-    data = request.get_json()
+    data = json_object()
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 

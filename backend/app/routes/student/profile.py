@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from app.auth import authenticate_token, current_user
 from app.constants import UserRole
+from app.payload import json_object
 from app.services.users import get_or_create_user, update_interest
 
 bp = Blueprint("student_profile", __name__, url_prefix="/api/student")
@@ -27,7 +28,7 @@ def add_interest():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    interest = (request.get_json(silent=True) or {}).get("interest")
+    interest = (json_object() or {}).get("interest")
     try:
         update_interest(user, interest)
     except ValueError:
