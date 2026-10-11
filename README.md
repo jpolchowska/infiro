@@ -278,13 +278,13 @@ Course content is loaded through the admin panel (`http://localhost`, **Import t
 
 ## API Reference
 
-All endpoints except `/api/public` require `Authorization: Bearer <token>`. Errors return a JSON body with an `error` (or `message`) field and an appropriate status code.
+All endpoints except `/api/health` require `Authorization: Bearer <token>`. Errors return a JSON body with an `error` (or `message`) field and an appropriate status code.
 
 ### Public
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/public` | Health/status check |
+| `GET` | `/api/health` | Health check |
 
 ### Student
 

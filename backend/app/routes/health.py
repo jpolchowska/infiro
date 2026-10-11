@@ -3,8 +3,6 @@ from flask import Blueprint, jsonify
 bp = Blueprint("health", __name__)
 
 
-@bp.route("/api/public", methods=["GET"])
+@bp.route("/api/health", methods=["GET"])
 def health():
-    return jsonify({
-        "message": "Backend is running"
-    })
+    return jsonify({"status": "ok"}), 200
