@@ -63,7 +63,6 @@ def get_subsection(subsection_id):
 
     payload = subsection_json(subsection)
     payload["tasks"] = [task_json(t) for t in tasks]
-    payload["materials"] = []
     payload["ebook"] = {"id": ebook.id, "title": ebook.title} if ebook else None
     return jsonify(payload), 200
 

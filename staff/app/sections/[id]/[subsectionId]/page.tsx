@@ -1,64 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
+import { LoadState } from "@/components/LoadState";
 import { getSection, getSubsection, deleteSubsection, deleteTask } from "@/lib/data";
 import { Badge } from "@/components/Badge";
 import { difficultyLabel } from "@/lib/difficulty";
-import type { Section, SubsectionDetail } from "@/lib/types";
+import { useApiData } from "@/lib/useApiData";
+import { DELETE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 export default function SubsectionPage() {
   const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
   const router = useRouter();
-  const { getToken, keycloak } = useAuth();
-  const isTeacher = Boolean(keycloak?.hasRealmRole("ROLE_TEACHER"));
-  const [section, setSection] = useState<Section | null | undefined>(null);
-  const [subsection, setSubsection] = useState<SubsectionDetail | null | undefined>(null);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const token = await getToken();
-      const [sectionData, subsectionData] = await Promise.all([
-        getSection(token ?? "", Number(id)),
-        getSubsection(token ?? "", Number(subsectionId)),
-      ]);
-      if (active) {
-        setSection(sectionData ?? undefined);
-        setSubsection(subsectionData ?? undefined);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, subsectionId]);
+  const { role } = useAuth();
+  const { error, submit } = useSubmit();
+  const isTeacher = role === "teacher";
+  const { state, updateData } = useApiData(async (token) => {
+    const [section, subsection] = await Promise.all([
+      getSection(token, Number(id)),
+      getSubsection(token, Number(subsectionId)),
+    ]);
+    return { section, subsection };
+  }, `${id}/${subsectionId}`);
 
   async function handleDeleteTask(taskId: number) {
     if (!confirm("Usunąć to zadanie?")) return;
-    const token = await getToken();
-    await deleteTask(token ?? "", taskId);
-    setSubsection((prev) =>
-      prev ? { ...prev, tasks: prev.tasks.filter((t) => t.id !== taskId) } : prev
-    );
+    await submit(async (token) => {
+      await deleteTask(token, taskId);
+      updateData((current) => ({
+        ...current,
+        subsection: current.subsection && {
+          ...current.subsection,
+          tasks: current.subsection.tasks.filter((t) => t.id !== taskId),
+        },
+      }));
+    }, DELETE_ERROR);
   }
 
   async function handleDeleteSubsection() {
     if (!confirm("Usunąć tę podsekcję razem z jej zadaniami?")) return;
-    const token = await getToken();
-    await deleteSubsection(token ?? "", Number(subsectionId));
-    router.push(`/sections/${id}`);
+    await submit(async (token) => {
+      await deleteSubsection(token, Number(subsectionId));
+      router.push(`/sections/${id}`);
+    }, DELETE_ERROR);
   }
 
-  if (section === null || subsection === null) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
-      </div>
-    );
-  }
+  if (state.status !== "ready") return <LoadState state={state} />;
+
+  const { section, subsection } = state.data;
   if (!section || !subsection || subsection.sectionId !== section.id) notFound();
 
   return (
@@ -86,6 +77,11 @@ export default function SubsectionPage() {
         )}
       </div>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{subsection.description}</p>
+      {error && (
+        <div className="mt-4 max-w-2xl">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Teoria</h2>
       {subsection.ebook ? (

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { StaffRole } from "@/lib/roles";
 
 const NAV_ITEMS = [
   {
@@ -30,7 +31,7 @@ const NAV_ITEMS = [
   },
 ];
 
-export function HeaderNav({ role }: { role: "admin" | "teacher" }) {
+export function HeaderNav({ role }: { role: StaffRole }) {
   const pathname = usePathname();
   const items = NAV_ITEMS.filter((item) => (item.roles as readonly string[]).includes(role));
 

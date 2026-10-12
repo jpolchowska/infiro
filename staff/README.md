@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Infiro Staff Panel
 
-## Getting Started
+Next.js panel for administrators and teachers. Administrators manage course content, import tasks,
+e-books and final tests, and assign students to teachers. Teachers get a read-only view of the course
+and the progress of their own students.
 
-First, run the development server:
+Setup, environment variables and deployment are described in the [main README](../README.md).
+
+## Structure
+
+| Path | Contents |
+| --- | --- |
+| `app/` | Pages (App Router): course sections, student results, teachers, content import, login |
+| `components/` | Shared UI, authentication context and gate, import forms |
+| `lib/api.ts` | Fetch wrapper with token handling and error mapping |
+| `lib/data/` | Typed API calls grouped by resource |
+| `lib/useApiData.ts` | Hook that loads page data with loading and error states |
+| `lib/validateImport.ts` | Client-side validation of import files, mirroring the backend rules |
+
+## Running
+
+The panel runs as the `staff` service of the project's Docker Compose setup and is served through
+nginx at `http://localhost`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker compose up --build staff
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Authentication goes through Keycloak. The realm URL, realm name and client id come from the
+`NEXT_PUBLIC_KEYCLOAK_*` variables.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Checks
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```

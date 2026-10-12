@@ -4,22 +4,22 @@ import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormField, inputClass } from "@/components/FormField";
-import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
 import { createSection } from "@/lib/data";
+import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 export default function NewSectionPage() {
   const router = useRouter();
-  const { getToken } = useAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const { submitting, error, submit } = useSubmit();
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    const token = await getToken();
-    await createSection(token ?? "", { title, description });
-    router.push("/");
+    await submit(async (token) => {
+      await createSection(token, { title, description });
+      router.push("/");
+    }, SAVE_ERROR);
   }
 
   return (
@@ -48,6 +48,7 @@ export default function NewSectionPage() {
             className={inputClass}
           />
         </FormField>
+        {error && <ErrorMessage message={error} />}
         <button
           type="submit"
           disabled={submitting}

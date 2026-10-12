@@ -4,21 +4,21 @@ import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FormField, inputClass } from "@/components/FormField";
-import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
 import { createTask } from "@/lib/data";
+import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 type OptionDraft = { text: string };
 
 export default function NewTaskPage() {
   const router = useRouter();
   const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
-  const { getToken } = useAuth();
   const [title, setTitle] = useState("");
   const [bodyText, setBodyText] = useState("");
   const [difficulty, setDifficulty] = useState("1");
   const [options, setOptions] = useState<OptionDraft[]>([{ text: "" }, { text: "" }]);
   const [correctIndex, setCorrectIndex] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
+  const { submitting, error, submit } = useSubmit();
 
   function updateOption(index: number, text: string) {
     setOptions((prev) => prev.map((o, i) => (i === index ? { text } : o)));
@@ -30,15 +30,15 @@ export default function NewTaskPage() {
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    const token = await getToken();
-    await createTask(token ?? "", Number(subsectionId), {
-      title,
-      bodyText,
-      difficultyLevel: Number(difficulty),
-      options: options.map((o, i) => ({ text: o.text, correct: i === correctIndex })),
-    });
-    router.push(`/sections/${id}/${subsectionId}`);
+    await submit(async (token) => {
+      await createTask(token, Number(subsectionId), {
+        title,
+        bodyText,
+        difficultyLevel: Number(difficulty),
+        options: options.map((o, i) => ({ text: o.text, correct: i === correctIndex })),
+      });
+      router.push(`/sections/${id}/${subsectionId}`);
+    }, SAVE_ERROR);
   }
 
   return (
@@ -123,6 +123,7 @@ export default function NewTaskPage() {
           </p>
         </fieldset>
 
+        {error && <ErrorMessage message={error} />}
         <button
           type="submit"
           disabled={submitting}

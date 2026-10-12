@@ -7,13 +7,9 @@ import { HeaderNav } from "@/components/HeaderNav";
 import { LogoutButton } from "@/components/LogoutButton";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
-  const { initialized, authenticated, keycloak, logout } = useAuth();
+  const { initialized, authenticated, role, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-
-  const isAdmin = authenticated && keycloak?.hasRealmRole("admin");
-  const isTeacher = authenticated && keycloak?.hasRealmRole("ROLE_TEACHER");
-  const role: "admin" | "teacher" | null = isAdmin ? "admin" : isTeacher ? "teacher" : null;
 
   useEffect(() => {
     if (!initialized) return;
@@ -47,7 +43,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  if (authenticated && role === null) {
+  if (role === null) {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-semibold text-red-600">Brak dostępu (403)</h1>
@@ -72,7 +68,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             {role === "admin" ? "Panel administratora" : "Panel nauczyciela"}
           </span>
           <div className="flex items-center gap-8">
-            <HeaderNav role={role as "admin" | "teacher"} />
+            <HeaderNav role={role} />
             <LogoutButton />
           </div>
         </div>

@@ -1,56 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
+import { LoadState } from "@/components/LoadState";
 import { getSection, deleteSection, deleteSubsection } from "@/lib/data";
-import type { SectionDetail } from "@/lib/types";
+import { useApiData } from "@/lib/useApiData";
+import { DELETE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 export default function SectionPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { getToken, keycloak } = useAuth();
-  const isTeacher = Boolean(keycloak?.hasRealmRole("ROLE_TEACHER"));
-  const [section, setSection] = useState<SectionDetail | null | undefined>(null);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const token = await getToken();
-      const data = await getSection(token ?? "", Number(id));
-      if (active) setSection(data ?? undefined);
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  const { role } = useAuth();
+  const { error, submit } = useSubmit();
+  const isTeacher = role === "teacher";
+  const { state, updateData } = useApiData((token) => getSection(token, Number(id)), id);
 
   async function handleDeleteSubsection(subId: number) {
     if (!confirm("Usunąć tę podsekcję razem z jej zadaniami?")) return;
-    const token = await getToken();
-    await deleteSubsection(token ?? "", subId);
-    setSection((prev) =>
-      prev ? { ...prev, subsections: prev.subsections.filter((s) => s.id !== subId) } : prev
-    );
+    await submit(async (token) => {
+      await deleteSubsection(token, subId);
+      updateData((current) =>
+        current && { ...current, subsections: current.subsections.filter((s) => s.id !== subId) }
+      );
+    }, DELETE_ERROR);
   }
 
   async function handleDeleteSection() {
-    if (!confirm("Usunąć tę sekcję razem z podsekcjami, zadaniami i materiałami?")) return;
-    const token = await getToken();
-    await deleteSection(token ?? "", Number(id));
-    router.push("/");
+    if (!confirm("Usunąć tę sekcję razem z podsekcjami i zadaniami?")) return;
+    await submit(async (token) => {
+      await deleteSection(token, Number(id));
+      router.push("/");
+    }, DELETE_ERROR);
   }
 
-  if (section === null) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
-      </div>
-    );
-  }
-  if (section === undefined) notFound();
+  if (state.status !== "ready") return <LoadState state={state} />;
+
+  const section = state.data;
+  if (!section) notFound();
 
   return (
     <div>
@@ -77,6 +65,11 @@ export default function SectionPage() {
         )}
       </div>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{section.description}</p>
+      {error && (
+        <div className="mt-4 max-w-2xl">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Podsekcje</h2>
 

@@ -10,7 +10,7 @@ Setup, environment variables and deployment are described in the [main README](.
 | Path | Contents |
 | --- | --- |
 | `app/routes/` | HTTP endpoints grouped into blueprints |
-| `app/services/` | Business logic: imports and validation, themes, answers, progress, uploads |
+| `app/services/` | Business logic: imports and validation, grading, progress, reports |
 | `app/models/` | SQLAlchemy models |
 | `app/auth.py` | Token verification and role checks |
 | `migrations/` | Flask-Migrate migrations, applied on container start |

@@ -272,9 +272,8 @@ Account creation and role assignment currently happen directly in the Keycloak a
 Course content is loaded through the admin panel (`http://localhost`, **Import treści** tab), which is available to admins only. Every file is validated before anything is saved, and errors are listed in the panel.
 
 1. **Tasks (JSON)** — a single file describing sections → subsections → tasks. Missing sections and subsections are created automatically. Every task needs a unique `content_key`; re-importing a file updates the tasks with matching keys instead of duplicating them. Format: [docs/format-zadan.md](docs/format-zadan.md).
-2. **Images (ZIP, optional)** — a ZIP archive with images used by tasks; the panel returns the uploaded file URLs.
-3. **E-books (ZIP)** — one archive per subsection with an `ebook.json` file and an `images/` folder. The section and subsection must already exist, so import tasks first. Format: [docs/format-ebookow.md](docs/format-ebookow.md).
-4. **Section final test (JSON)** — a separate pool of questions for one section, imported for a section that already exists. Format: [docs/format-testu-koncowego.md](docs/format-testu-koncowego.md).
+2. **E-books (ZIP)** — one archive per subsection with an `ebook.json` file and an `images/` folder. The section and subsection must already exist, so import tasks first. Format: [docs/format-ebookow.md](docs/format-ebookow.md).
+3. **Section final test (JSON)** — a separate pool of questions for one section, imported for a section that already exists. Format: [docs/format-testu-koncowego.md](docs/format-testu-koncowego.md).
 
 ## API Reference
 
@@ -325,7 +324,6 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `POST` | `/api/admin/subsections/:id/tasks` | admin | Create a task |
 | `PATCH`/`DELETE` | `/api/admin/tasks/:id` | admin | Update or delete a task |
 | `POST` | `/api/admin/tasks/import` | admin | Bulk-import tasks from JSON |
-| `POST` | `/api/admin/uploads/images` | admin | Upload a ZIP with images |
 | `POST` | `/api/admin/ebooks/import` | admin | Import an e-book from a ZIP |
 | `POST` | `/api/admin/sections/:id/final-test/import` | admin | Import a section's final test from JSON |
 | `GET` | `/api/admin/teachers` | admin | List teachers |
@@ -345,7 +343,7 @@ infiro/
 │   │   │   ├── admin/             # sections, subsections, tasks, students, imports
 │   │   │   ├── student/           # profile, stats, sections, tasks, timed practice, tests, e-books
 │   │   │   └── health.py          # status check
-│   │   ├── services/              # business logic: imports, grading, progress, reports, uploads
+│   │   ├── services/              # business logic: imports, grading, progress, reports
 │   │   └── static/uploads/        # uploaded task and e-book images (bind-mounted)
 │   ├── migrations/                # Flask-Migrate migrations, applied on startup
 │   ├── seed/                      # sample task import file (tasks_example.json)

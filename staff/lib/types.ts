@@ -8,7 +8,6 @@ export type Section = {
 
 export type SectionDetail = Section & {
   subsections: Subsection[];
-  materials: Material[];
 };
 
 export type Subsection = {
@@ -21,7 +20,6 @@ export type Subsection = {
 
 export type SubsectionDetail = Subsection & {
   tasks: Task[];
-  materials: Material[];
   ebook: { id: number; title: string } | null;
 };
 
@@ -44,16 +42,10 @@ export type Task = {
   options: TaskOption[];
 };
 
-export type MaterialType = "text" | "pdf" | "image";
-
-export type Material = {
+export type Teacher = {
   id: number;
-  sectionId: number | null;
-  subsectionId: number | null;
-  type: MaterialType;
-  title: string;
-  contentText: string | null;
-  fileUrl: string | null;
+  name: string | null;
+  email: string | null;
 };
 
 export type Student = {
