@@ -8,8 +8,8 @@ import { getSections, getStudents } from "@/lib/data";
 import { useApiData } from "@/lib/useApiData";
 
 export default function Home() {
-  const { keycloak } = useAuth();
-  const isTeacher = keycloak?.hasRealmRole("ROLE_TEACHER");
+  const { role } = useAuth();
+  const isTeacher = role === "teacher";
   const { state } = useApiData(async (token) => {
     const [sections, students] = await Promise.all([getSections(token), getStudents(token)]);
     return { sections, studentCount: students.length };

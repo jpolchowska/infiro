@@ -12,8 +12,8 @@ import { useApiData } from "@/lib/useApiData";
 export default function SubsectionPage() {
   const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
   const router = useRouter();
-  const { getToken, keycloak } = useAuth();
-  const isTeacher = Boolean(keycloak?.hasRealmRole("ROLE_TEACHER"));
+  const { getToken, role } = useAuth();
+  const isTeacher = role === "teacher";
   const { state, updateData } = useApiData(async (token) => {
     const [section, subsection] = await Promise.all([
       getSection(token, Number(id)),

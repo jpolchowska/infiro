@@ -10,8 +10,8 @@ import { useApiData } from "@/lib/useApiData";
 export default function SectionPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { getToken, keycloak } = useAuth();
-  const isTeacher = Boolean(keycloak?.hasRealmRole("ROLE_TEACHER"));
+  const { getToken, role } = useAuth();
+  const isTeacher = role === "teacher";
   const { state, updateData } = useApiData((token) => getSection(token, Number(id)), id);
 
   async function handleDeleteSubsection(subId: number) {

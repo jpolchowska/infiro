@@ -3,11 +3,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import Keycloak from "keycloak-js";
 import { keycloak } from "@/lib/keycloak";
+import { REALM_ROLES, type StaffRole } from "@/lib/roles";
 
 interface AuthContextType {
   authenticated: boolean;
   initialized: boolean;
   token: string | undefined;
+  role: StaffRole | null;
   keycloak: Keycloak;
   getToken: () => Promise<string | undefined>;
   logout: () => void;
@@ -26,6 +28,12 @@ function initializeKeycloak() {
     });
   }
   return keycloakInitPromise;
+}
+
+function currentRole(): StaffRole | null {
+  if (keycloak.hasRealmRole(REALM_ROLES.admin)) return "admin";
+  if (keycloak.hasRealmRole(REALM_ROLES.teacher)) return "teacher";
+  return null;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -68,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         })
         .catch(() => {
-          console.error("Nie udało się odświeżyć tokena - wylogowywanie");
+          console.error("Token refresh failed, logging out");
           keycloak.logout();
         });
     };
@@ -82,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         })
         .catch((err) => {
-          console.error("Błąd podczas automatycznego odświeżania tokena:", err);
+          console.error("Automatic token refresh failed:", err);
         });
     }, 20000);
 
@@ -114,6 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         authenticated,
         initialized,
         token,
+        role: authenticated ? currentRole() : null,
         keycloak,
         getToken,
         logout,
@@ -127,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth musi być użyte wewnątrz AuthProvider");
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 }
