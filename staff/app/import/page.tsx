@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type SubmitEvent } from "react";
-import { validateImportPayload, validateSectionTestPayload } from "@/lib/validateImport";
+import { validateFinalTestImport, validateTaskImport } from "@/lib/validateImport";
 import { getSections, importEbook, importSectionTest, importTasks, uploadImagesZip } from "@/lib/data";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/components/AuthContext";
@@ -90,7 +90,7 @@ export default function ImportPage() {
       return;
     }
 
-    const validationErrors = validateImportPayload(data);
+    const validationErrors = validateTaskImport(data);
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       return;
@@ -183,7 +183,7 @@ export default function ImportPage() {
       return;
     }
 
-    const validationErrors = validateSectionTestPayload(data);
+    const validationErrors = validateFinalTestImport(data);
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       return;
