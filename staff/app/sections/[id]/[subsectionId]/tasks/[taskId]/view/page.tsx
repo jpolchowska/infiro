@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
+import { LoadState } from "@/components/LoadState";
 import { Badge } from "@/components/Badge";
 import { difficultyLabel } from "@/lib/difficulty";
 import { getSubsection } from "@/lib/data";
-import type { Task } from "@/lib/types";
+import { useApiData } from "@/lib/useApiData";
 
 export default function ViewTaskPage() {
   const { id, subsectionId, taskId } = useParams<{
@@ -15,30 +14,14 @@ export default function ViewTaskPage() {
     subsectionId: string;
     taskId: string;
   }>();
-  const { getToken } = useAuth();
-  const [task, setTask] = useState<Task | null | undefined>(null);
+  const { state } = useApiData(async (token) => {
+    const subsection = await getSubsection(token, Number(subsectionId));
+    return subsection?.tasks.find((item) => item.id === Number(taskId));
+  }, `${subsectionId}/${taskId}`);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const token = await getToken();
-      const subsection = await getSubsection(token ?? "", Number(subsectionId));
-      const taskData = subsection?.tasks.find((item) => item.id === Number(taskId));
-      if (active) setTask(taskData ?? undefined);
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subsectionId, taskId]);
+  if (state.status !== "ready") return <LoadState state={state} />;
 
-  if (task === null) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
-      </div>
-    );
-  }
+  const task = state.data;
   if (!task) notFound();
 
   const difficulty = difficultyLabel(task.difficulty);

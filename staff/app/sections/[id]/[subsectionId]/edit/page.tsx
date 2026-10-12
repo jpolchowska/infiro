@@ -1,64 +1,43 @@
 "use client";
 
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
-import { FormField, inputClass } from "@/components/FormField";
 import { useAuth } from "@/components/AuthContext";
+import { FormField, inputClass } from "@/components/FormField";
+import { LoadState } from "@/components/LoadState";
 import { getSubsection, updateSubsection } from "@/lib/data";
+import type { Subsection } from "@/lib/types";
+import { useApiData } from "@/lib/useApiData";
 
 export default function EditSubsectionPage() {
-  const router = useRouter();
   const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
-  const { getToken } = useAuth();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [loaded, setLoaded] = useState<boolean | undefined>(undefined);
-  const [submitting, setSubmitting] = useState(false);
+  const { state } = useApiData((token) => getSubsection(token, Number(subsectionId)), subsectionId);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const token = await getToken();
-      const subsection = await getSubsection(token ?? "", Number(subsectionId));
-      if (!active) return;
-      if (!subsection) {
-        setLoaded(false);
-        return;
-      }
-      setTitle(subsection.title);
-      setDescription(subsection.description ?? "");
-      setLoaded(true);
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subsectionId]);
+  if (state.status !== "ready") return <LoadState state={state} />;
+  if (!state.data) notFound();
+
+  return <EditSubsectionForm subsection={state.data} backHref={`/sections/${id}/${subsectionId}`} />;
+}
+
+function EditSubsectionForm({ subsection, backHref }: { subsection: Subsection; backHref: string }) {
+  const router = useRouter();
+  const { getToken } = useAuth();
+  const [title, setTitle] = useState(subsection.title);
+  const [description, setDescription] = useState(subsection.description ?? "");
+  const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     setSubmitting(true);
     const token = await getToken();
-    await updateSubsection(token ?? "", Number(subsectionId), { title, description });
-    router.push(`/sections/${id}/${subsectionId}`);
+    await updateSubsection(token ?? "", subsection.id, { title, description });
+    router.push(backHref);
   }
-
-  if (loaded === undefined) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
-      </div>
-    );
-  }
-  if (loaded === false) notFound();
 
   return (
     <div>
-      <Link
-        href={`/sections/${id}/${subsectionId}`}
-        className="text-sm text-gray-500 hover:text-infiro-navy"
-      >
+      <Link href={backHref} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wróć do podsekcji
       </Link>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Edytuj podsekcję</h1>

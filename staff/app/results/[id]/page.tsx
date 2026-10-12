@@ -1,43 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
+import { LoadState } from "@/components/LoadState";
 import { getStudentDetail } from "@/lib/data";
 import { formatRelativeDate } from "@/lib/format";
+import { useApiData } from "@/lib/useApiData";
 import { StatTile } from "@/components/StatTile";
 import { Badge } from "@/components/Badge";
 import { ProgressBar } from "@/components/ProgressBar";
-import type { StudentDetail } from "@/lib/types";
 
 export default function StudentResultPage() {
   const { id } = useParams<{ id: string }>();
-  const { getToken } = useAuth();
-  const [student, setStudent] = useState<StudentDetail | null | undefined>(null);
+  const { state } = useApiData((token) => getStudentDetail(token, Number(id)), id);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const token = await getToken();
-      const data = await getStudentDetail(token ?? "", Number(id));
-      if (active) setStudent(data ?? undefined);
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  if (state.status !== "ready") return <LoadState state={state} />;
 
-  if (student === undefined) notFound();
-
-  if (student === null) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
-      </div>
-    );
-  }
+  const student = state.data;
+  if (!student) notFound();
 
   return (
     <div>

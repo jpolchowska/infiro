@@ -1,61 +1,43 @@
 "use client";
 
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
-import { FormField, inputClass } from "@/components/FormField";
 import { useAuth } from "@/components/AuthContext";
+import { FormField, inputClass } from "@/components/FormField";
+import { LoadState } from "@/components/LoadState";
 import { getSection, updateSection } from "@/lib/data";
+import type { Section } from "@/lib/types";
+import { useApiData } from "@/lib/useApiData";
 
 export default function EditSectionPage() {
-  const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const { getToken } = useAuth();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [loaded, setLoaded] = useState<boolean | undefined>(undefined);
-  const [submitting, setSubmitting] = useState(false);
+  const { state } = useApiData((token) => getSection(token, Number(id)), id);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const token = await getToken();
-      const section = await getSection(token ?? "", Number(id));
-      if (!active) return;
-      if (!section) {
-        setLoaded(false);
-        return;
-      }
-      setTitle(section.title);
-      setDescription(section.description ?? "");
-      setLoaded(true);
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  if (state.status !== "ready") return <LoadState state={state} />;
+  if (!state.data) notFound();
+
+  return <EditSectionForm section={state.data} />;
+}
+
+function EditSectionForm({ section }: { section: Section }) {
+  const router = useRouter();
+  const { getToken } = useAuth();
+  const [title, setTitle] = useState(section.title);
+  const [description, setDescription] = useState(section.description ?? "");
+  const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     setSubmitting(true);
     const token = await getToken();
-    await updateSection(token ?? "", Number(id), { title, description });
-    router.push(`/sections/${id}`);
+    await updateSection(token ?? "", section.id, { title, description });
+    router.push(`/sections/${section.id}`);
   }
-
-  if (loaded === undefined) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
-      </div>
-    );
-  }
-  if (loaded === false) notFound();
 
   return (
     <div>
-      <Link href={`/sections/${id}`} className="text-sm text-gray-500 hover:text-infiro-navy">
+      <Link href={`/sections/${section.id}`} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wróć do sekcji
       </Link>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Edytuj sekcję</h1>

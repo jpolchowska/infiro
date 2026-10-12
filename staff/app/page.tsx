@@ -1,45 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthContext";
-import { getSections, getStudents } from "@/lib/data";
+import { LoadState } from "@/components/LoadState";
 import { StatTile } from "@/components/StatTile";
-import type { Section } from "@/lib/types";
+import { getSections, getStudents } from "@/lib/data";
+import { useApiData } from "@/lib/useApiData";
 
 export default function Home() {
-  const { getToken, keycloak } = useAuth();
+  const { keycloak } = useAuth();
   const isTeacher = keycloak?.hasRealmRole("ROLE_TEACHER");
-  const [sections, setSections] = useState<Section[] | null>(null);
-  const [studentCount, setStudentCount] = useState(0);
+  const { state } = useApiData(async (token) => {
+    const [sections, students] = await Promise.all([getSections(token), getStudents(token)]);
+    return { sections, studentCount: students.length };
+  });
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const token = await getToken();
-      const [sectionsData, students] = await Promise.all([
-        getSections(token ?? ""),
-        getStudents(token ?? ""),
-      ]);
-      if (active) {
-        setSections(sectionsData);
-        setStudentCount(students.length);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  if (state.status !== "ready") return <LoadState state={state} />;
 
-  if (sections === null) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-infiro-navy/20 border-t-infiro-navy" />
-      </div>
-    );
-  }
-
+  const { sections, studentCount } = state.data;
   const totalSubsections = sections.reduce((sum, s) => sum + s.subsectionCount, 0);
   const totalTasks = sections.reduce((sum, s) => sum + s.taskCount, 0);
 
