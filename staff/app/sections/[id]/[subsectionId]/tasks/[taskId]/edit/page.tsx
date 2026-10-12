@@ -3,12 +3,13 @@
 import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
 import { FormField, inputClass } from "@/components/FormField";
 import { LoadState } from "@/components/LoadState";
 import { getSubsection, updateTask } from "@/lib/data";
 import type { Task } from "@/lib/types";
 import { useApiData } from "@/lib/useApiData";
+import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 type OptionDraft = { text: string };
 
@@ -31,13 +32,12 @@ export default function EditTaskPage() {
 
 function EditTaskForm({ task, backHref }: { task: Task; backHref: string }) {
   const router = useRouter();
-  const { getToken } = useAuth();
   const [title, setTitle] = useState(task.title);
   const [bodyText, setBodyText] = useState(task.bodyText);
   const [difficulty, setDifficulty] = useState(String(task.difficulty));
   const [options, setOptions] = useState<OptionDraft[]>(task.options.map((o) => ({ text: o.optionText })));
   const [correctIndex, setCorrectIndex] = useState(Math.max(0, task.options.findIndex((o) => o.isCorrect)));
-  const [submitting, setSubmitting] = useState(false);
+  const { submitting, error, submit } = useSubmit();
 
   function updateOption(index: number, text: string) {
     setOptions((prev) => prev.map((o, i) => (i === index ? { text } : o)));
@@ -49,15 +49,15 @@ function EditTaskForm({ task, backHref }: { task: Task; backHref: string }) {
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    const token = await getToken();
-    await updateTask(token ?? "", task.id, {
-      title,
-      bodyText,
-      difficultyLevel: Number(difficulty),
-      options: options.map((o, i) => ({ text: o.text, correct: i === correctIndex })),
-    });
-    router.push(backHref);
+    await submit(async (token) => {
+      await updateTask(token, task.id, {
+        title,
+        bodyText,
+        difficultyLevel: Number(difficulty),
+        options: options.map((o, i) => ({ text: o.text, correct: i === correctIndex })),
+      });
+      router.push(backHref);
+    }, SAVE_ERROR);
   }
 
   return (
@@ -135,6 +135,7 @@ function EditTaskForm({ task, backHref }: { task: Task; backHref: string }) {
           </p>
         </fieldset>
 
+        {error && <ErrorMessage message={error} />}
         <button
           type="submit"
           disabled={submitting}

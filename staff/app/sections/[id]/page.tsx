@@ -3,31 +3,36 @@
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
 import { LoadState } from "@/components/LoadState";
 import { getSection, deleteSection, deleteSubsection } from "@/lib/data";
 import { useApiData } from "@/lib/useApiData";
+import { DELETE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 export default function SectionPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { getToken, role } = useAuth();
+  const { role } = useAuth();
+  const { error, submit } = useSubmit();
   const isTeacher = role === "teacher";
   const { state, updateData } = useApiData((token) => getSection(token, Number(id)), id);
 
   async function handleDeleteSubsection(subId: number) {
     if (!confirm("Usunąć tę podsekcję razem z jej zadaniami?")) return;
-    const token = await getToken();
-    await deleteSubsection(token ?? "", subId);
-    updateData((current) =>
-      current && { ...current, subsections: current.subsections.filter((s) => s.id !== subId) }
-    );
+    await submit(async (token) => {
+      await deleteSubsection(token, subId);
+      updateData((current) =>
+        current && { ...current, subsections: current.subsections.filter((s) => s.id !== subId) }
+      );
+    }, DELETE_ERROR);
   }
 
   async function handleDeleteSection() {
     if (!confirm("Usunąć tę sekcję razem z podsekcjami i zadaniami?")) return;
-    const token = await getToken();
-    await deleteSection(token ?? "", Number(id));
-    router.push("/");
+    await submit(async (token) => {
+      await deleteSection(token, Number(id));
+      router.push("/");
+    }, DELETE_ERROR);
   }
 
   if (state.status !== "ready") return <LoadState state={state} />;
@@ -60,6 +65,11 @@ export default function SectionPage() {
         )}
       </div>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{section.description}</p>
+      {error && (
+        <div className="mt-4 max-w-2xl">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Podsekcje</h2>
 

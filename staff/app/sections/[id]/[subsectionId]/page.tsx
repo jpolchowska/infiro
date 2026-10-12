@@ -3,16 +3,19 @@
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
 import { LoadState } from "@/components/LoadState";
 import { getSection, getSubsection, deleteSubsection, deleteTask } from "@/lib/data";
 import { Badge } from "@/components/Badge";
 import { difficultyLabel } from "@/lib/difficulty";
 import { useApiData } from "@/lib/useApiData";
+import { DELETE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 export default function SubsectionPage() {
   const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
   const router = useRouter();
-  const { getToken, role } = useAuth();
+  const { role } = useAuth();
+  const { error, submit } = useSubmit();
   const isTeacher = role === "teacher";
   const { state, updateData } = useApiData(async (token) => {
     const [section, subsection] = await Promise.all([
@@ -24,22 +27,24 @@ export default function SubsectionPage() {
 
   async function handleDeleteTask(taskId: number) {
     if (!confirm("Usunąć to zadanie?")) return;
-    const token = await getToken();
-    await deleteTask(token ?? "", taskId);
-    updateData((current) => ({
-      ...current,
-      subsection: current.subsection && {
-        ...current.subsection,
-        tasks: current.subsection.tasks.filter((t) => t.id !== taskId),
-      },
-    }));
+    await submit(async (token) => {
+      await deleteTask(token, taskId);
+      updateData((current) => ({
+        ...current,
+        subsection: current.subsection && {
+          ...current.subsection,
+          tasks: current.subsection.tasks.filter((t) => t.id !== taskId),
+        },
+      }));
+    }, DELETE_ERROR);
   }
 
   async function handleDeleteSubsection() {
     if (!confirm("Usunąć tę podsekcję razem z jej zadaniami?")) return;
-    const token = await getToken();
-    await deleteSubsection(token ?? "", Number(subsectionId));
-    router.push(`/sections/${id}`);
+    await submit(async (token) => {
+      await deleteSubsection(token, Number(subsectionId));
+      router.push(`/sections/${id}`);
+    }, DELETE_ERROR);
   }
 
   if (state.status !== "ready") return <LoadState state={state} />;
@@ -72,6 +77,11 @@ export default function SubsectionPage() {
         )}
       </div>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{subsection.description}</p>
+      {error && (
+        <div className="mt-4 max-w-2xl">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Teoria</h2>
       {subsection.ebook ? (

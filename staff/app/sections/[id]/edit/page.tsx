@@ -3,12 +3,13 @@
 import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
+import { ErrorMessage } from "@/components/ErrorMessage";
 import { FormField, inputClass } from "@/components/FormField";
 import { LoadState } from "@/components/LoadState";
 import { getSection, updateSection } from "@/lib/data";
 import type { Section } from "@/lib/types";
 import { useApiData } from "@/lib/useApiData";
+import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
 
 export default function EditSectionPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,17 +23,16 @@ export default function EditSectionPage() {
 
 function EditSectionForm({ section }: { section: Section }) {
   const router = useRouter();
-  const { getToken } = useAuth();
   const [title, setTitle] = useState(section.title);
   const [description, setDescription] = useState(section.description ?? "");
-  const [submitting, setSubmitting] = useState(false);
+  const { submitting, error, submit } = useSubmit();
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    const token = await getToken();
-    await updateSection(token ?? "", section.id, { title, description });
-    router.push(`/sections/${section.id}`);
+    await submit(async (token) => {
+      await updateSection(token, section.id, { title, description });
+      router.push(`/sections/${section.id}`);
+    }, SAVE_ERROR);
   }
 
   return (
@@ -61,6 +61,7 @@ function EditSectionForm({ section }: { section: Section }) {
             className={inputClass}
           />
         </FormField>
+        {error && <ErrorMessage message={error} />}
         <button
           type="submit"
           disabled={submitting}
