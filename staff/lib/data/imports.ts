@@ -11,19 +11,6 @@ export async function importTasks(
   });
 }
 
-export async function uploadImagesZip(
-  token: string,
-  file: File
-): Promise<{ file_count: number; files: string[] }> {
-  const form = new FormData();
-  form.set("file", file);
-  return apiFetch<{ file_count: number; files: string[] }>("/api/admin/uploads/images", {
-    token,
-    method: "POST",
-    body: form,
-  });
-}
-
 export async function importEbook(
   token: string,
   file: File

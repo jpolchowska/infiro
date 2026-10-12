@@ -2,7 +2,6 @@ import type { ReactNode, SubmitEvent } from "react";
 
 type ImportCardProps = {
   title: string;
-  description?: string;
   successMessage: string | null;
   submitLabel: string;
   submittingLabel: string;
@@ -14,7 +13,6 @@ type ImportCardProps = {
 
 export function ImportCard({
   title,
-  description,
   successMessage,
   submitLabel,
   submittingLabel,
@@ -41,7 +39,6 @@ export function ImportCard({
         className={`${stretch ? "flex flex-1 flex-col " : ""}rounded-sm border border-gray-200 bg-white p-6`}
       >
         <h2 className="text-sm font-semibold text-infiro-navy">{title}</h2>
-        {description && <p className="mt-1 text-xs text-gray-500">{description}</p>}
         {children}
         <div className="mt-4 flex justify-center">
           <button

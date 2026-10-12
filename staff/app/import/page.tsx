@@ -4,13 +4,10 @@ import { useState } from "react";
 import { useAuth } from "@/components/AuthContext";
 import { EbookImportForm } from "@/components/import/EbookImportForm";
 import { FinalTestImportForm } from "@/components/import/FinalTestImportForm";
-import { ImagesImportForm } from "@/components/import/ImagesImportForm";
 import { ImportErrors } from "@/components/import/ImportErrors";
 import type { ImportControls } from "@/components/import/importControls";
 import { TaskImportForm } from "@/components/import/TaskImportForm";
 import { ApiError } from "@/lib/api";
-
-const SHOW_IMAGES_ZIP_IMPORT = false;
 
 export default function ImportPage() {
   const { getToken } = useAuth();
@@ -46,7 +43,6 @@ export default function ImportPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
           <TaskImportForm controls={controls} />
-          {SHOW_IMAGES_ZIP_IMPORT && <ImagesImportForm controls={controls} />}
           <EbookImportForm controls={controls} />
         </div>
 
