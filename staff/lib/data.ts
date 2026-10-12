@@ -5,7 +5,6 @@ import type {
   SubsectionDetail,
   Task,
   TaskOption,
-  Material,
   Student,
   StudentDetail,
 } from "./types";
@@ -21,7 +20,6 @@ type RawSection = {
 
 type RawSectionDetail = RawSection & {
   subsections: RawSubsection[];
-  materials: RawMaterial[];
 };
 
 type RawSubsection = {
@@ -34,18 +32,7 @@ type RawSubsection = {
 
 type RawSubsectionDetail = RawSubsection & {
   tasks: RawTask[];
-  materials: RawMaterial[];
   ebook: { id: number; title: string } | null;
-};
-
-type RawMaterial = {
-  id: number;
-  section_id: number | null;
-  subsection_id: number | null;
-  type: Material["type"];
-  title: string;
-  content_text: string | null;
-  file_url: string | null;
 };
 
 type RawTaskOption = {
@@ -82,18 +69,6 @@ function mapSubsection(raw: RawSubsection): Subsection {
     title: raw.title,
     description: raw.description,
     taskCount: raw.task_count,
-  };
-}
-
-function mapMaterial(raw: RawMaterial): Material {
-  return {
-    id: raw.id,
-    sectionId: raw.section_id,
-    subsectionId: raw.subsection_id,
-    type: raw.type,
-    title: raw.title,
-    contentText: raw.content_text,
-    fileUrl: raw.file_url,
   };
 }
 
@@ -138,7 +113,6 @@ export async function getSection(token: string, id: number): Promise<SectionDeta
     return {
       ...mapSection(raw),
       subsections: raw.subsections.map(mapSubsection),
-      materials: raw.materials.map(mapMaterial),
     };
   });
 }
@@ -177,7 +151,6 @@ export async function getSubsection(
     return {
       ...mapSubsection(raw),
       tasks: raw.tasks.map(mapTask),
-      materials: raw.materials.map(mapMaterial),
       ebook: raw.ebook,
     };
   });
@@ -261,42 +234,6 @@ export async function updateTask(
 
 export async function deleteTask(token: string, id: number): Promise<void> {
   await apiFetch<void>(`/api/admin/tasks/${id}`, { token, method: "DELETE" });
-}
-
-export async function createMaterial(
-  token: string,
-  target: { sectionId: number } | { subsectionId: number },
-  data: { title: string; contentText?: string; file?: File }
-): Promise<Material> {
-  const form = new FormData();
-  form.set("title", data.title);
-  if (data.contentText) form.set("content_text", data.contentText);
-  if (data.file) form.set("file", data.file);
-
-  const path =
-    "sectionId" in target
-      ? `/api/admin/sections/${target.sectionId}/materials`
-      : `/api/admin/subsections/${target.subsectionId}/materials`;
-
-  const raw = await apiFetch<RawMaterial>(path, { token, method: "POST", body: form });
-  return mapMaterial(raw);
-}
-
-export async function updateMaterial(
-  token: string,
-  id: number,
-  data: { title: string; contentText?: string }
-): Promise<Material> {
-  const raw = await apiFetch<RawMaterial>(`/api/admin/materials/${id}`, {
-    token,
-    method: "PATCH",
-    json: { title: data.title, content_text: data.contentText },
-  });
-  return mapMaterial(raw);
-}
-
-export async function deleteMaterial(token: string, id: number): Promise<void> {
-  await apiFetch<void>(`/api/admin/materials/${id}`, { token, method: "DELETE" });
 }
 
 export async function importTasks(

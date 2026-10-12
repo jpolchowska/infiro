@@ -57,7 +57,6 @@ def get_section(section_id):
 
     payload = section_json(section)
     payload["subsections"] = [subsection_json(s) for s in subsections]
-    payload["materials"] = []
     return jsonify(payload), 200
 
 
