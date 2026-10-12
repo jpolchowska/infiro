@@ -42,6 +42,12 @@ export type Task = {
   options: TaskOption[];
 };
 
+export type Teacher = {
+  id: number;
+  name: string | null;
+  email: string | null;
+};
+
 export type Student = {
   id: number;
   name: string | null;

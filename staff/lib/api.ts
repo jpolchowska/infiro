@@ -43,3 +43,12 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
 
   return data as T;
 }
+
+export async function fetchOrUndefined<T>(request: () => Promise<T>): Promise<T | undefined> {
+  try {
+    return await request();
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}

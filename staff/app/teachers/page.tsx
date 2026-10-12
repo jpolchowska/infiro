@@ -4,14 +4,8 @@ import { useState } from "react";
 import { useAuth } from "@/components/AuthContext";
 import { LoadState } from "@/components/LoadState";
 import { getStudents, getTeachers, updateStudentTeacher } from "@/lib/data";
-import type { Student } from "@/lib/types";
+import type { Student, Teacher } from "@/lib/types";
 import { useApiData } from "@/lib/useApiData";
-
-type Teacher = {
-  id: number;
-  name: string | null;
-  email: string | null;
-};
 
 export default function TeachersPage() {
   const { state } = useApiData(async (token) => {
