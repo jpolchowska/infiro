@@ -87,7 +87,3 @@ export async function getTask(token: string, id: number): Promise<TaskDetail | u
     };
   });
 }
-
-export async function deleteTask(token: string, id: number): Promise<void> {
-  await apiFetch<void>(`/api/admin/tasks/${id}`, { token, method: "DELETE" });
-}

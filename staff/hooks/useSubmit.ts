@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthContext";
 
 export const SAVE_ERROR = "Nie udało się zapisać. Spróbuj ponownie.";
-export const DELETE_ERROR = "Nie udało się usunąć. Spróbuj ponownie.";
 
 export function useSubmit() {
   const { getToken } = useAuth();

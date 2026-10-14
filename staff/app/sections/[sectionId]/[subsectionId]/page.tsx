@@ -1,53 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { notFound, useParams, useRouter } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthContext";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { LoadState } from "@/components/ui/LoadState";
-import { getSection, getSubsection, deleteSubsection, deleteTask } from "@/lib/data";
+import { getSection, getSubsection } from "@/lib/data";
 import { Badge } from "@/components/ui/Badge";
 import { difficultyLabel, taskTypeLabel } from "@/lib/labels";
 import { formatPercent } from "@/lib/format";
 import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
-import { DELETE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
 export default function SubsectionPage() {
   const { sectionId, subsectionId } = useParams<{ sectionId: string; subsectionId: string }>();
-  const router = useRouter();
   const { role } = useAuth();
-  const { error, submit } = useSubmit();
   const isTeacher = role === "teacher";
-  const { state, updateData } = useApiData(async (token) => {
+  const { state } = useApiData(async (token) => {
     const [section, subsection] = await Promise.all([
       getSection(token, Number(sectionId)),
       getSubsection(token, Number(subsectionId)),
     ]);
     return { section, subsection };
   }, `${sectionId}/${subsectionId}`);
-
-  async function handleDeleteTask(taskId: number) {
-    if (!confirm("Usunąć to zadanie?")) return;
-    await submit(async (token) => {
-      await deleteTask(token, taskId);
-      updateData((current) => ({
-        ...current,
-        subsection: current.subsection && {
-          ...current.subsection,
-          tasks: current.subsection.tasks.filter((t) => t.id !== taskId),
-        },
-      }));
-    }, DELETE_ERROR);
-  }
-
-  async function handleDeleteSubsection() {
-    if (!confirm("Usunąć tę podsekcję razem z jej zadaniami?")) return;
-    await submit(async (token) => {
-      await deleteSubsection(token, Number(subsectionId));
-      router.push(`/sections/${sectionId}`);
-    }, DELETE_ERROR);
-  }
 
   if (state.status !== "ready") return <LoadState state={state} />;
 
@@ -59,31 +33,8 @@ export default function SubsectionPage() {
       <Link href={`/sections/${section.id}`} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; {section.title}
       </Link>
-      <div className="mt-3 flex items-start justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-infiro-navy">{subsection.title}</h1>
-        {!isTeacher && (
-          <div className="flex shrink-0 gap-4 text-sm">
-            <Link
-              href={`/sections/${section.id}/${subsection.id}/edit`}
-              className="font-medium text-infiro-navy hover:underline"
-            >
-              Edytuj
-            </Link>
-            <button
-              onClick={handleDeleteSubsection}
-              className="font-medium text-red-600 hover:underline"
-            >
-              Usuń podsekcję
-            </button>
-          </div>
-        )}
-      </div>
+      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{subsection.title}</h1>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{subsection.description}</p>
-      {error && (
-        <div className="mt-4 max-w-2xl">
-          <ErrorMessage message={error} />
-        </div>
-      )}
 
       <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Teoria</h2>
       {subsection.ebook ? (
@@ -141,22 +92,12 @@ export default function SubsectionPage() {
                     <span className="ml-1 text-xs text-gray-400">({pluralize(task.stats.attempts, WORDS.attempt)})</span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <span className="flex justify-end gap-3">
-                      <Link
-                        href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}`}
-                        className="text-xs font-medium text-infiro-navy hover:underline"
-                      >
-                        Podgląd
-                      </Link>
-                      {!isTeacher && (
-                        <button
-                          onClick={() => handleDeleteTask(task.id)}
-                          className="text-xs font-medium text-red-600 hover:underline"
-                        >
-                          Usuń
-                        </button>
-                      )}
-                    </span>
+                    <Link
+                      href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}`}
+                      className="text-xs font-medium text-infiro-navy hover:underline"
+                    >
+                      Podgląd
+                    </Link>
                   </td>
                 </tr>
               );

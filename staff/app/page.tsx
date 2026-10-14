@@ -28,7 +28,7 @@ export default function Home() {
       <p className="mt-1 max-w-2xl text-sm text-gray-500">
         {isTeacher
           ? "Przeglądaj treść kursu: sekcje, podsekcje i zadania."
-          : "Zarządzaj treścią kursu: sekcjami, podsekcjami i zadaniami."}
+          : "Przeglądaj treść kursu: sekcje, podsekcje i zadania. Nową treść dodasz przez import JSON."}
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -56,7 +56,9 @@ export default function Home() {
       </div>
 
       {sections.length === 0 && (
-        <p className="mt-4 text-sm text-gray-400">Brak sekcji — dodaj pierwszą.</p>
+        <p className="mt-4 text-sm text-gray-400">
+          {isTeacher ? "Brak sekcji." : "Brak sekcji — zaimportuj zadania przez stronę Import."}
+        </p>
       )}
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -81,15 +83,6 @@ export default function Home() {
             </div>
           </Link>
         ))}
-        {!isTeacher && (
-          <Link
-            href="/sections/new"
-            className="flex min-h-41 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
-          >
-            <span className="text-2xl leading-none">+</span>
-            <span className="text-sm font-medium">Dodaj sekcję</span>
-          </Link>
-        )}
       </div>
     </div>
   );

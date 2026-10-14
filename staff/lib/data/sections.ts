@@ -77,28 +77,3 @@ export async function getFinalTestPreview(token: string, sectionId: number): Pro
     };
   });
 }
-
-export async function createSection(
-  token: string,
-  data: { title: string; description: string }
-): Promise<Section> {
-  const raw = await apiFetch<RawSection>("/api/admin/sections", { token, method: "POST", json: data });
-  return mapSection(raw);
-}
-
-export async function updateSection(
-  token: string,
-  id: number,
-  data: { title: string; description: string }
-): Promise<Section> {
-  const raw = await apiFetch<RawSection>(`/api/admin/sections/${id}`, {
-    token,
-    method: "PATCH",
-    json: data,
-  });
-  return mapSection(raw);
-}
-
-export async function deleteSection(token: string, id: number): Promise<void> {
-  await apiFetch<void>(`/api/admin/sections/${id}`, { token, method: "DELETE" });
-}

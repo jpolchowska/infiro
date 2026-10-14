@@ -58,33 +58,3 @@ export async function getEbook(token: string, subsectionId: number): Promise<Ebo
     };
   });
 }
-
-export async function createSubsection(
-  token: string,
-  sectionId: number,
-  data: { title: string; description: string }
-): Promise<Subsection> {
-  const raw = await apiFetch<RawSubsection>(`/api/admin/sections/${sectionId}/subsections`, {
-    token,
-    method: "POST",
-    json: data,
-  });
-  return mapSubsection(raw);
-}
-
-export async function updateSubsection(
-  token: string,
-  id: number,
-  data: { title: string; description: string }
-): Promise<Subsection> {
-  const raw = await apiFetch<RawSubsection>(`/api/admin/subsections/${id}`, {
-    token,
-    method: "PATCH",
-    json: data,
-  });
-  return mapSubsection(raw);
-}
-
-export async function deleteSubsection(token: string, id: number): Promise<void> {
-  await apiFetch<void>(`/api/admin/subsections/${id}`, { token, method: "DELETE" });
-}

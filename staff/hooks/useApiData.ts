@@ -31,11 +31,5 @@ export function useApiData<T>(load: (token: string) => Promise<T>, key = "") {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  function updateData(change: (data: T) => T) {
-    setState((current) =>
-      current.status === "ready" ? { status: "ready", data: change(current.data) } : current
-    );
-  }
-
-  return { state, updateData };
+  return { state };
 }
