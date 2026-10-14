@@ -55,7 +55,7 @@ export default function SubsectionPage() {
 
       <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Zadania</h2>
 
-      <div className="mt-4 overflow-x-auto rounded-sm border border-gray-200 bg-white">
+      <div className="mt-4 overflow-x-auto rounded-lg border border-infiro-border bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">

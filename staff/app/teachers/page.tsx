@@ -71,7 +71,7 @@ function TeacherAssignments({ initialStudents, teachers }: { initialStudents: St
         </p>
       )}
 
-      <div className="mt-8 overflow-x-auto rounded-sm border border-gray-200 bg-white">
+      <div className="mt-8 overflow-x-auto rounded-lg border border-infiro-border bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">

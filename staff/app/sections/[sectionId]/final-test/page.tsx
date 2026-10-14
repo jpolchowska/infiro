@@ -38,7 +38,7 @@ export default function FinalTestPage() {
       ) : (
         <ol className="mt-8 flex max-w-2xl flex-col gap-4">
           {finalTest.questions.map((question, index) => (
-            <li key={question.id} className="rounded-sm border border-gray-200 bg-white p-5">
+            <li key={question.id} className="rounded-lg border border-infiro-border bg-white p-5">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold text-infiro-navy">Pytanie {index + 1}</span>
                 <Badge>{taskTypeLabel(question.type)}</Badge>

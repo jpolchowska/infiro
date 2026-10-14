@@ -36,7 +36,7 @@ export function ImportCard({
 
       <form
         onSubmit={handleSubmit}
-        className={`${stretch ? "flex flex-1 flex-col " : ""}rounded-sm border border-gray-200 bg-white p-6`}
+        className={`${stretch ? "flex flex-1 flex-col " : ""}rounded-lg border border-infiro-border bg-white p-6`}
       >
         <h2 className="text-sm font-semibold text-infiro-navy">{title}</h2>
         {children}

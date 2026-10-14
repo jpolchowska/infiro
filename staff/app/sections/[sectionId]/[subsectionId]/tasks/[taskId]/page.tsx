@@ -36,7 +36,7 @@ export default function TaskPage() {
       </div>
       {task.contentKey && <p className="mt-1 font-mono text-xs text-gray-400">{task.contentKey}</p>}
 
-      <section className="mt-6 max-w-2xl rounded-sm border border-gray-200 bg-white p-5">
+      <section className="mt-6 max-w-2xl rounded-lg border border-infiro-border bg-white p-5">
         <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500">{themeLabel("default")}</h2>
         <TaskContentView type={task.type} content={task} />
       </section>
@@ -46,7 +46,7 @@ export default function TaskPage() {
           <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Warianty pod zainteresowania</h2>
           <div className="mt-4 flex max-w-2xl flex-col gap-4">
             {task.variants.map((variant) => (
-              <section key={variant.theme} className="rounded-sm border border-gray-200 bg-white p-5">
+              <section key={variant.theme} className="rounded-lg border border-infiro-border bg-white p-5">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                   {themeLabel(variant.theme)}
                 </h3>

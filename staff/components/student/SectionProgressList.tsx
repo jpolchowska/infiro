@@ -13,7 +13,7 @@ export function SectionProgressList({ studentId, sections }: { studentId: number
   return (
     <div className="mt-4 flex flex-col gap-4">
       {sections.map((section) => (
-        <div key={section.sectionId} className="rounded-sm border border-gray-200 bg-white p-5">
+        <div key={section.sectionId} className="rounded-lg border border-infiro-border bg-white p-5">
           <div className="flex items-center justify-between text-sm">
             <span className="font-semibold text-gray-900">{section.sectionTitle}</span>
             <span className="text-gray-500">

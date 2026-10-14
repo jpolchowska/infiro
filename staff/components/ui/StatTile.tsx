@@ -6,7 +6,7 @@ export function StatTile({
   label: string;
 }) {
   return (
-    <div className="rounded-sm border border-gray-200 bg-white px-6 py-5">
+    <div className="rounded-lg border border-infiro-border bg-white px-6 py-5">
       <div className="text-2xl font-semibold text-infiro-navy">{value}</div>
       <div className="mt-1 text-xs font-medium uppercase tracking-wide text-gray-500">
         {label}

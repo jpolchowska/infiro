@@ -68,7 +68,7 @@ export default function EbookPage() {
       <Link href={`/sections/${sectionId}/${subsectionId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wróć do podsekcji
       </Link>
-      <article className="mt-3 max-w-2xl rounded-sm border border-gray-200 bg-white p-8">
+      <article className="mt-3 max-w-2xl rounded-lg border border-infiro-border bg-white p-8">
         <h1 className="text-2xl font-semibold text-infiro-navy">{ebook.title}</h1>
         {ebook.intro && <p className="mt-3 text-gray-600">{ebook.intro}</p>}
         {ebook.blocks.map((block, index) => (

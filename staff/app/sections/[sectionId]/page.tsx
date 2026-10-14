@@ -50,7 +50,7 @@ export default function SectionPage() {
           <Link
             key={sub.id}
             href={`/sections/${section.id}/${sub.id}`}
-            className="flex min-h-41 flex-col rounded-sm border border-gray-200 bg-white p-5 hover:border-infiro-navy"
+            className="flex min-h-41 flex-col rounded-lg border border-infiro-border bg-white p-5 hover:border-infiro-navy"
           >
             <h3 className="text-base font-semibold text-infiro-navy">{sub.title}</h3>
             <p className="mt-1 flex-1 text-sm text-gray-600">{sub.description}</p>
