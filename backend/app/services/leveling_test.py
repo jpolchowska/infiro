@@ -1,29 +1,52 @@
 from app.clock import utc_now
 from app.constants import TaskType
 from app.extensions import db
+from app.models.leveling_test_answers import LevelingTestAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
+from app.models.leveling_test_section_results import LevelingTestSectionResult
 from app.models.sections import Section
-from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.serializers import attempt_json
 from app.services.answers import grade_answer
+from app.services.leveling_test_settings import get_settings
 from app.services.themes import resolve_theme, shuffled_options, task_options
 
 DIFFICULTY_LEVELS = (1, 2, 3)
+QUESTION_TYPES = (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)
 
 
-def _pick_random_task(section_id, difficulty_level):
-    return (
-        Task.query.join(Subsection, Task.subsection_id == Subsection.id)
-        .filter(
-            Subsection.section_id == section_id,
-            Task.difficulty_level == difficulty_level,
-            Task.type.in_((TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)),
+def _levels_by_preference(level):
+    return sorted(DIFFICULTY_LEVELS, key=lambda candidate: (abs(candidate - level), candidate))
+
+
+def _pick_random_task(section_id, level, excluded_ids):
+    for candidate_level in _levels_by_preference(level):
+        query = (
+            Task.query.join(Subsection, Task.subsection_id == Subsection.id)
+            .filter(
+                Subsection.section_id == section_id,
+                Task.difficulty_level == candidate_level,
+                Task.type.in_(QUESTION_TYPES),
+            )
         )
-        .order_by(db.func.random())
-        .first()
-    )
+        if excluded_ids:
+            query = query.filter(Task.id.notin_(excluded_ids))
+        task = query.order_by(db.func.random()).first()
+        if task is not None:
+            return task
+    return None
+
+
+def _pick_section_tasks(section_id, per_level):
+    picked = []
+    for level in DIFFICULTY_LEVELS:
+        for _ in range(per_level):
+            task = _pick_random_task(section_id, level, [task.id for task in picked])
+            if task is None:
+                return sorted(picked, key=lambda task: task.difficulty_level)
+            picked.append(task)
+    return sorted(picked, key=lambda task: task.difficulty_level)
 
 
 def _question_json(task, interest):
@@ -40,15 +63,15 @@ def _question_json(task, interest):
 
 
 def build_leveling_test(interest):
+    per_level = get_settings().questions_per_section // len(DIFFICULTY_LEVELS)
     sections = []
     for section in Section.query.order_by(Section.order_index).all():
-        tasks = (_pick_random_task(section.id, level) for level in DIFFICULTY_LEVELS)
-        questions = [_question_json(task, interest) for task in tasks if task is not None]
-        if questions:
+        tasks = _pick_section_tasks(section.id, per_level)
+        if tasks:
             sections.append({
                 "section_id": section.id,
                 "section_title": section.title,
-                "questions": questions,
+                "questions": [_question_json(task, interest) for task in tasks],
             })
     return {"sections": sections}
 
@@ -100,24 +123,6 @@ def _score_per_section(graded):
     ]
 
 
-def _save_answers(student, graded, submitted_at):
-    for result in graded:
-        last_attempt = (
-            StudentAnswer.query.filter_by(task_id=result.item.id, student_id=student.id)
-            .order_by(StudentAnswer.attempt_number.desc())
-            .first()
-        )
-        db.session.add(StudentAnswer(
-            task_id=result.item.id,
-            student_id=student.id,
-            selected_option_id=result.selected_option_id,
-            answer_text=result.answer_text,
-            is_correct=result.is_correct,
-            attempt_number=last_attempt.attempt_number + 1 if last_attempt else 1,
-            submitted_at=submitted_at,
-        ))
-
-
 def submit_leveling_test(student, answers):
     graded, error = _grade(answers, student.interest)
     if error:
@@ -127,22 +132,53 @@ def submit_leveling_test(student, answers):
     per_section = _score_per_section(graded)
     now = utc_now()
 
-    _save_answers(student, graded, now)
-    db.session.add(LevelingTestAttempt(
+    attempt = LevelingTestAttempt(
         student_id=student.id,
         score=score,
         max_score=len(graded),
         completed_at=now,
-    ))
+    )
+    db.session.add(attempt)
+    db.session.flush()
+
+    for result in graded:
+        db.session.add(LevelingTestAnswer(
+            attempt_id=attempt.id,
+            task_id=result.item.id,
+            selected_option_id=result.selected_option_id,
+            answer_text=result.answer_text,
+            is_correct=result.is_correct,
+        ))
+    for section_result in per_section:
+        db.session.add(LevelingTestSectionResult(attempt_id=attempt.id, **section_result))
+
     student.leveling_test_completed_at = now
     db.session.commit()
 
     return {
+        "attempt_id": attempt.id,
         "saved": len(graded),
         "score": score,
         "max_score": len(graded),
         "per_section": per_section,
     }, None
+
+
+def section_results_json(attempt_id):
+    results = (
+        LevelingTestSectionResult.query.filter_by(attempt_id=attempt_id)
+        .order_by(LevelingTestSectionResult.id)
+        .all()
+    )
+    return [
+        {
+            "section_id": result.section_id,
+            "section_title": result.section_title,
+            "score": result.score,
+            "total": result.total,
+        }
+        for result in results
+    ]
 
 
 def leveling_test_history(student):
@@ -151,4 +187,11 @@ def leveling_test_history(student):
         .order_by(LevelingTestAttempt.completed_at.desc())
         .all()
     )
-    return [attempt_json(attempt) for attempt in attempts]
+    return [
+        {
+            "id": attempt.id,
+            **attempt_json(attempt),
+            "per_section": section_results_json(attempt.id),
+        }
+        for attempt in attempts
+    ]

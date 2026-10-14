@@ -1,5 +1,7 @@
 from app.extensions import db
 from app.models.ebooks import Ebook
+from app.models.leveling_test_answers import LevelingTestAnswer
+from app.models.leveling_test_section_results import LevelingTestSectionResult
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.section_test_questions import SectionTestQuestion
@@ -14,6 +16,7 @@ def _delete_tasks(task_ids):
         return
 
     StudentAnswer.query.filter(StudentAnswer.task_id.in_(task_ids)).delete(synchronize_session=False)
+    LevelingTestAnswer.query.filter(LevelingTestAnswer.task_id.in_(task_ids)).delete(synchronize_session=False)
     TaskAnswerOption.query.filter(TaskAnswerOption.task_id.in_(task_ids)).delete(synchronize_session=False)
     Task.query.filter(Task.id.in_(task_ids)).delete(synchronize_session=False)
 
@@ -58,4 +61,7 @@ def delete_section(section):
     ]
     _delete_subsections(subsection_ids)
     _delete_section_test(section.id)
+    LevelingTestSectionResult.query.filter_by(section_id=section.id).update(
+        {"section_id": None}, synchronize_session=False
+    )
     db.session.delete(section)

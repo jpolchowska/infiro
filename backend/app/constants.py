@@ -14,5 +14,12 @@ class RealmRole:
     TEACHER = "ROLE_TEACHER"
 
 
+class LevelingTestStatus:
+    NOT_TAKEN = "not_taken"
+    UP_TO_DATE = "up_to_date"
+    DUE = "due"
+    OVERDUE = "overdue"
+
+
 DEFAULT_THEME = "default"
 INTERESTS = ("sport", "gry", "lego", "zwierzeta", "rysowanie", "muzyka", "jedzenie")

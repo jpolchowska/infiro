@@ -291,7 +291,7 @@ Available to any authenticated user; the local student record is resolved from t
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/student/me` | Current student's profile (interest, leveling test status) |
+| `GET` | `/api/student/me` | Current student's profile: interest and leveling test status (`not_taken`, `up_to_date`, `due`, `overdue`) with due dates |
 | `PATCH` | `/api/student/interest` | Set the student's interest (theme) |
 | `GET` | `/api/student/stats` | Solved tasks, accuracy, current subsection, recent sections |
 | `GET` | `/api/student/sections` | List sections with progress |
@@ -306,7 +306,7 @@ Available to any authenticated user; the local student record is resolved from t
 | `GET` | `/api/student/sections/:id/final-test/history` | List past final test attempts |
 | `GET` | `/api/student/leveling-test` | Get a leveling test |
 | `POST` | `/api/student/leveling-test/submit` | Submit a leveling test; returns score with per-section breakdown |
-| `GET` | `/api/student/leveling-test/history` | List past leveling test attempts |
+| `GET` | `/api/student/leveling-test/history` | List past leveling test attempts with per-section results |
 
 ### Staff panel (admin & teacher)
 
@@ -326,6 +326,7 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `POST` | `/api/admin/tasks/import` | admin | Bulk-import tasks from JSON |
 | `POST` | `/api/admin/ebooks/import` | admin | Import an e-book from a ZIP |
 | `POST` | `/api/admin/sections/:id/final-test/import` | admin | Import a section's final test from JSON |
+| `GET`/`PATCH` | `/api/admin/settings/leveling-test` | admin | Read or change leveling test settings (questions per section, interval, completion window) |
 | `GET` | `/api/admin/teachers` | admin | List teachers |
 | `GET` | `/api/admin/students` | admin, teacher | List students |
 | `GET` | `/api/admin/students/:id` | admin, teacher | Get a student's progress details |
