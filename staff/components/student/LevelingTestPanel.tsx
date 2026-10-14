@@ -53,7 +53,7 @@ export function LevelingTestPanel({ studentId, state, attempts }: LevelingTestPa
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Link
-                      href={`/results/${studentId}/leveling-tests/${attempt.id}`}
+                      href={`/students/${studentId}/leveling-tests/${attempt.id}`}
                       className="text-xs font-medium text-infiro-navy hover:underline"
                     >
                       Odpowiedzi

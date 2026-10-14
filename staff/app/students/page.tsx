@@ -7,7 +7,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { LoadState } from "@/components/LoadState";
 import { formatRelativeDate, ratioPercent } from "@/lib/format";
 import { levelingTestStatusLabel } from "@/lib/labels";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 function accuracyBadgeVariant(accuracy: number | null): "easy" | "mid" | "hard" | "neutral" {
   if (accuracy === null) return "neutral";
@@ -59,7 +59,7 @@ export default function ResultsPage() {
               return (
                 <tr key={student.id} className="border-b border-gray-100 last:border-0">
                   <td className="px-4 py-3">
-                    <Link href={`/results/${student.id}`} className="font-medium text-infiro-navy hover:underline">
+                    <Link href={`/students/${student.id}`} className="font-medium text-infiro-navy hover:underline">
                       {student.name ?? "Uczeń bez imienia"}
                     </Link>
                     <div className="mt-0.5 text-xs text-gray-500">{student.email ?? "—"}</div>
@@ -92,7 +92,7 @@ export default function ResultsPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{formatRelativeDate(student.lastActivity)}</td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/results/${student.id}`} className="text-infiro-navy hover:underline">
+                    <Link href={`/students/${student.id}`} className="text-infiro-navy hover:underline">
                       Zobacz
                     </Link>
                   </td>

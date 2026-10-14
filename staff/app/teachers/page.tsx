@@ -5,7 +5,7 @@ import { useAuth } from "@/components/AuthContext";
 import { LoadState } from "@/components/LoadState";
 import { getStudents, getTeachers, updateStudentTeacher } from "@/lib/data";
 import type { Student, Teacher } from "@/lib/types";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function TeachersPage() {
   const { state } = useApiData(async (token) => {

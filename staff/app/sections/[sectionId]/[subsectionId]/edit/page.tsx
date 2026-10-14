@@ -8,17 +8,17 @@ import { FormField, inputClass } from "@/components/FormField";
 import { LoadState } from "@/components/LoadState";
 import { getSubsection, updateSubsection } from "@/lib/data";
 import type { Subsection } from "@/lib/types";
-import { useApiData } from "@/lib/useApiData";
-import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
+import { useApiData } from "@/hooks/useApiData";
+import { SAVE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
 export default function EditSubsectionPage() {
-  const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
+  const { sectionId, subsectionId } = useParams<{ sectionId: string; subsectionId: string }>();
   const { state } = useApiData((token) => getSubsection(token, Number(subsectionId)), subsectionId);
 
   if (state.status !== "ready") return <LoadState state={state} />;
   if (!state.data) notFound();
 
-  return <EditSubsectionForm subsection={state.data} backHref={`/sections/${id}/${subsectionId}`} />;
+  return <EditSubsectionForm subsection={state.data} backHref={`/sections/${sectionId}/${subsectionId}`} />;
 }
 
 function EditSubsectionForm({ subsection, backHref }: { subsection: Subsection; backHref: string }) {

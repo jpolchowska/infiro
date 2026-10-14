@@ -9,7 +9,7 @@ import { TaskStatsTiles } from "@/components/TaskStatsTiles";
 import { getTask } from "@/lib/data";
 import { difficultyLabel } from "@/lib/difficulty";
 import { taskTypeLabel, themeLabel } from "@/lib/labels";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function TaskPage() {
   const { taskId } = useParams<{ taskId: string }>();

@@ -5,7 +5,7 @@ import { useAuth } from "@/components/AuthContext";
 import { EbookImportForm } from "@/components/import/EbookImportForm";
 import { FinalTestImportForm } from "@/components/import/FinalTestImportForm";
 import { ImportErrors } from "@/components/import/ImportErrors";
-import type { ImportControls } from "@/components/import/importControls";
+import type { ImportControls } from "@/lib/importControls";
 import { TaskImportForm } from "@/components/import/TaskImportForm";
 import { ApiError } from "@/lib/api";
 

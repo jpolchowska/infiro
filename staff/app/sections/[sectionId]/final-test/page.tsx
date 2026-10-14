@@ -8,11 +8,11 @@ import { StatTile } from "@/components/StatTile";
 import { TaskContentView } from "@/components/TaskContentView";
 import { getFinalTestPreview } from "@/lib/data";
 import { taskTypeLabel, themeLabel } from "@/lib/labels";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function FinalTestPage() {
-  const { id } = useParams<{ id: string }>();
-  const { state } = useApiData((token) => getFinalTestPreview(token, Number(id)), id);
+  const { sectionId } = useParams<{ sectionId: string }>();
+  const { state } = useApiData((token) => getFinalTestPreview(token, Number(sectionId)), sectionId);
 
   if (state.status !== "ready") return <LoadState state={state} />;
 
@@ -21,7 +21,7 @@ export default function FinalTestPage() {
 
   return (
     <div>
-      <Link href={`/sections/${id}`} className="text-sm text-gray-500 hover:text-infiro-navy">
+      <Link href={`/sections/${sectionId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; {finalTest.sectionTitle}
       </Link>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Test końcowy działu</h1>

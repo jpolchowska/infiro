@@ -7,8 +7,8 @@ import { FormField, inputClass } from "@/components/FormField";
 import { LoadState } from "@/components/LoadState";
 import { getLevelingTestSettings, updateLevelingTestSettings } from "@/lib/data";
 import type { LevelingTestSettings } from "@/lib/types";
-import { useApiData } from "@/lib/useApiData";
-import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
+import { useApiData } from "@/hooks/useApiData";
+import { SAVE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
 const INTERVAL_LABELS: Record<number, string> = {
   14: "co 2 tygodnie",

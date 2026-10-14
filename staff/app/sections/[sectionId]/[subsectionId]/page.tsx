@@ -10,22 +10,22 @@ import { Badge } from "@/components/Badge";
 import { difficultyLabel } from "@/lib/difficulty";
 import { formatPercent } from "@/lib/format";
 import { taskTypeLabel } from "@/lib/labels";
-import { useApiData } from "@/lib/useApiData";
-import { DELETE_ERROR, useSubmit } from "@/lib/useSubmit";
+import { useApiData } from "@/hooks/useApiData";
+import { DELETE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
 export default function SubsectionPage() {
-  const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
+  const { sectionId, subsectionId } = useParams<{ sectionId: string; subsectionId: string }>();
   const router = useRouter();
   const { role } = useAuth();
   const { error, submit } = useSubmit();
   const isTeacher = role === "teacher";
   const { state, updateData } = useApiData(async (token) => {
     const [section, subsection] = await Promise.all([
-      getSection(token, Number(id)),
+      getSection(token, Number(sectionId)),
       getSubsection(token, Number(subsectionId)),
     ]);
     return { section, subsection };
-  }, `${id}/${subsectionId}`);
+  }, `${sectionId}/${subsectionId}`);
 
   async function handleDeleteTask(taskId: number) {
     if (!confirm("Usunąć to zadanie?")) return;
@@ -45,7 +45,7 @@ export default function SubsectionPage() {
     if (!confirm("Usunąć tę podsekcję razem z jej zadaniami?")) return;
     await submit(async (token) => {
       await deleteSubsection(token, Number(subsectionId));
-      router.push(`/sections/${id}`);
+      router.push(`/sections/${sectionId}`);
     }, DELETE_ERROR);
   }
 
@@ -143,7 +143,7 @@ export default function SubsectionPage() {
                   <td className="px-4 py-3 text-right">
                     <span className="flex justify-end gap-3">
                       <Link
-                        href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}/view`}
+                        href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}`}
                         className="text-xs font-medium text-infiro-navy hover:underline"
                       >
                         Podgląd

@@ -10,11 +10,11 @@ import { NeedsPracticeList, RecentActivityTable } from "@/components/student/Tas
 import { getStudentDetail } from "@/lib/data";
 import { formatDate, formatPercent } from "@/lib/format";
 import { themeLabel } from "@/lib/labels";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function StudentPage() {
-  const { id } = useParams<{ id: string }>();
-  const { state } = useApiData((token) => getStudentDetail(token, Number(id)), id);
+  const { studentId } = useParams<{ studentId: string }>();
+  const { state } = useApiData((token) => getStudentDetail(token, Number(studentId)), studentId);
 
   if (state.status !== "ready") return <LoadState state={state} />;
 
@@ -23,7 +23,7 @@ export default function StudentPage() {
 
   return (
     <div>
-      <Link href="/results" className="text-sm text-gray-500 hover:text-infiro-navy">
+      <Link href="/students" className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wszyscy uczniowie
       </Link>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{student.name ?? "Uczeń bez imienia"}</h1>

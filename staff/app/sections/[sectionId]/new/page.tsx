@@ -2,45 +2,33 @@
 
 import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
-import { notFound, useParams, useRouter } from "next/navigation";
-import { ErrorMessage } from "@/components/ErrorMessage";
+import { useParams, useRouter } from "next/navigation";
 import { FormField, inputClass } from "@/components/FormField";
-import { LoadState } from "@/components/LoadState";
-import { getSection, updateSection } from "@/lib/data";
-import type { Section } from "@/lib/types";
-import { useApiData } from "@/lib/useApiData";
-import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
+import { ErrorMessage } from "@/components/ErrorMessage";
+import { createSubsection } from "@/lib/data";
+import { SAVE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
-export default function EditSectionPage() {
-  const { id } = useParams<{ id: string }>();
-  const { state } = useApiData((token) => getSection(token, Number(id)), id);
-
-  if (state.status !== "ready") return <LoadState state={state} />;
-  if (!state.data) notFound();
-
-  return <EditSectionForm section={state.data} />;
-}
-
-function EditSectionForm({ section }: { section: Section }) {
+export default function NewSubsectionPage() {
   const router = useRouter();
-  const [title, setTitle] = useState(section.title);
-  const [description, setDescription] = useState(section.description ?? "");
+  const { sectionId } = useParams<{ sectionId: string }>();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const { submitting, error, submit } = useSubmit();
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     await submit(async (token) => {
-      await updateSection(token, section.id, { title, description });
-      router.push(`/sections/${section.id}`);
+      await createSubsection(token, Number(sectionId), { title, description });
+      router.push(`/sections/${sectionId}`);
     }, SAVE_ERROR);
   }
 
   return (
     <div>
-      <Link href={`/sections/${section.id}`} className="text-sm text-gray-500 hover:text-infiro-navy">
+      <Link href={`/sections/${sectionId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wróć do sekcji
       </Link>
-      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Edytuj sekcję</h1>
+      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Nowa podsekcja</h1>
 
       <form onSubmit={handleSubmit} className="mt-6 flex max-w-lg flex-col gap-4">
         <FormField label="Tytuł">
@@ -67,7 +55,7 @@ function EditSectionForm({ section }: { section: Section }) {
           disabled={submitting}
           className="mt-2 self-start rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
         >
-          {submitting ? "Zapisywanie…" : "Zapisz zmiany"}
+          {submitting ? "Tworzenie…" : "Utwórz podsekcję"}
         </button>
       </form>
     </div>

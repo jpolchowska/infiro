@@ -6,7 +6,7 @@ import { notFound, useParams } from "next/navigation";
 import { LoadState } from "@/components/LoadState";
 import { getEbook } from "@/lib/data";
 import type { CalloutStyle, EbookBlock } from "@/lib/types";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 const CALLOUT_LABELS: Record<CalloutStyle, string> = {
   zapamietaj: "Zapamiętaj",
@@ -55,7 +55,7 @@ function EbookBlockView({ block }: { block: EbookBlock }) {
 }
 
 export default function EbookPage() {
-  const { id, subsectionId } = useParams<{ id: string; subsectionId: string }>();
+  const { sectionId, subsectionId } = useParams<{ sectionId: string; subsectionId: string }>();
   const { state } = useApiData((token) => getEbook(token, Number(subsectionId)), subsectionId);
 
   if (state.status !== "ready") return <LoadState state={state} />;
@@ -65,7 +65,7 @@ export default function EbookPage() {
 
   return (
     <div>
-      <Link href={`/sections/${id}/${subsectionId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
+      <Link href={`/sections/${sectionId}/${subsectionId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wróć do podsekcji
       </Link>
       <article className="mt-3 max-w-2xl rounded-sm border border-gray-200 bg-white p-8">

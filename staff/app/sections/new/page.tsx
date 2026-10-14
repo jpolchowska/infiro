@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { FormField, inputClass } from "@/components/FormField";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { createSection } from "@/lib/data";
-import { SAVE_ERROR, useSubmit } from "@/lib/useSubmit";
+import { SAVE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
 export default function NewSectionPage() {
   const router = useRouter();

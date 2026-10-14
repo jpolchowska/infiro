@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ImportCard } from "@/components/import/ImportCard";
-import { readValidatedJson, type ImportControls } from "@/components/import/importControls";
+import { readValidatedJson, type ImportControls } from "@/lib/importControls";
 import { UploadField } from "@/components/import/UploadField";
 import { importTasks } from "@/lib/data";
 import { validateTaskImport } from "@/lib/validateImport";

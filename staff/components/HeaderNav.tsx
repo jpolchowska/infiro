@@ -12,9 +12,9 @@ const NAV_ITEMS = [
     roles: ["admin", "teacher"] as const,
   },
   {
-    href: "/results",
+    href: "/students",
     label: "Uczniowie",
-    isActive: (path: string) => path.startsWith("/results"),
+    isActive: (path: string) => path.startsWith("/students"),
     roles: ["admin", "teacher"] as const,
   },
   {

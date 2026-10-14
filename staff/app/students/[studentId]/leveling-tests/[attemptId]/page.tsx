@@ -6,13 +6,13 @@ import { AnsweredQuestionList } from "@/components/AnsweredQuestionList";
 import { LoadState } from "@/components/LoadState";
 import { getLevelingTestAttempt } from "@/lib/data";
 import { formatDate } from "@/lib/format";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function LevelingTestAttemptPage() {
-  const { id, attemptId } = useParams<{ id: string; attemptId: string }>();
+  const { studentId, attemptId } = useParams<{ studentId: string; attemptId: string }>();
   const { state } = useApiData(
-    (token) => getLevelingTestAttempt(token, Number(id), Number(attemptId)),
-    `${id}/${attemptId}`
+    (token) => getLevelingTestAttempt(token, Number(studentId), Number(attemptId)),
+    `${studentId}/${attemptId}`
   );
 
   if (state.status !== "ready") return <LoadState state={state} />;
@@ -22,7 +22,7 @@ export default function LevelingTestAttemptPage() {
 
   return (
     <div>
-      <Link href={`/results/${id}`} className="text-sm text-gray-500 hover:text-infiro-navy">
+      <Link href={`/students/${studentId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wróć do ucznia
       </Link>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Test poziomujący</h1>

@@ -6,16 +6,16 @@ import { useAuth } from "@/components/AuthContext";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { LoadState } from "@/components/LoadState";
 import { getSection, deleteSection, deleteSubsection } from "@/lib/data";
-import { useApiData } from "@/lib/useApiData";
-import { DELETE_ERROR, useSubmit } from "@/lib/useSubmit";
+import { useApiData } from "@/hooks/useApiData";
+import { DELETE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
 export default function SectionPage() {
-  const { id } = useParams<{ id: string }>();
+  const { sectionId } = useParams<{ sectionId: string }>();
   const router = useRouter();
   const { role } = useAuth();
   const { error, submit } = useSubmit();
   const isTeacher = role === "teacher";
-  const { state, updateData } = useApiData((token) => getSection(token, Number(id)), id);
+  const { state, updateData } = useApiData((token) => getSection(token, Number(sectionId)), sectionId);
 
   async function handleDeleteSubsection(subId: number) {
     if (!confirm("Usunąć tę podsekcję razem z jej zadaniami?")) return;
@@ -30,7 +30,7 @@ export default function SectionPage() {
   async function handleDeleteSection() {
     if (!confirm("Usunąć tę sekcję razem z podsekcjami i zadaniami?")) return;
     await submit(async (token) => {
-      await deleteSection(token, Number(id));
+      await deleteSection(token, Number(sectionId));
       router.push("/");
     }, DELETE_ERROR);
   }
@@ -120,7 +120,7 @@ export default function SectionPage() {
         ))}
         {!isTeacher && (
           <Link
-            href={`/sections/${section.id}/new-subsection`}
+            href={`/sections/${section.id}/new`}
             className="flex min-h-41 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
           >
             <span className="text-2xl leading-none">+</span>

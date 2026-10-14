@@ -5,7 +5,7 @@ import { useAuth } from "@/components/AuthContext";
 import { LoadState } from "@/components/LoadState";
 import { StatTile } from "@/components/StatTile";
 import { getSections, getStudents } from "@/lib/data";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function Home() {
   const { role } = useAuth();

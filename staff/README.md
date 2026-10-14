@@ -10,11 +10,11 @@ Setup, environment variables and deployment are described in the [main README](.
 
 | Path | Contents |
 | --- | --- |
-| `app/` | Pages (App Router): course sections, student results, teachers, content import, login |
-| `components/` | Shared UI, authentication context and gate, import forms |
+| `app/` | Pages (App Router): course, students, teachers, content import, settings, login |
+| `components/` | Shared UI, authentication context and gate, import forms, student report parts |
 | `lib/api.ts` | Fetch wrapper with token handling and error mapping |
 | `lib/data/` | Typed API calls grouped by resource |
-| `lib/useApiData.ts` | Hook that loads page data with loading and error states |
+| `hooks/` | `useApiData` loads page data with loading and error states, `useSubmit` runs saves and deletions |
 | `lib/validateImport.ts` | Client-side validation of import files, mirroring the backend rules |
 
 ## Running

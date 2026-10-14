@@ -58,7 +58,7 @@ export function SectionProgressList({ studentId, sections }: { studentId: number
                     {section.finalTest.history.map((attempt) => (
                       <Link
                         key={attempt.id}
-                        href={`/results/${studentId}/final-tests/${attempt.id}`}
+                        href={`/students/${studentId}/final-tests/${attempt.id}`}
                         className="text-xs font-medium text-infiro-navy hover:underline"
                       >
                         {formatDate(attempt.completedAt)}: {attempt.score}/{attempt.total}
