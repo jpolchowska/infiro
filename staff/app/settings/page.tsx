@@ -7,6 +7,7 @@ import { FormField, inputClass } from "@/components/ui/FormField";
 import { LoadState } from "@/components/ui/LoadState";
 import { getLevelingTestSettings, updateLevelingTestSettings } from "@/lib/data";
 import type { LevelingTestSettings } from "@/lib/types";
+import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 import { SAVE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
@@ -87,7 +88,7 @@ function LevelingTestSettingsForm({ initial }: { initial: LevelingTestSettings }
           </select>
         </FormField>
         <p className="-mt-2 text-xs text-gray-500">
-          Łącznie {questionsPerSection * settings.sectionCount} pytań ({settings.sectionCount} działów).
+          Łącznie {pluralize(questionsPerSection * settings.sectionCount, WORDS.question)} ({pluralize(settings.sectionCount, WORDS.section)}).
         </p>
 
         <FormField label="Test wraca">

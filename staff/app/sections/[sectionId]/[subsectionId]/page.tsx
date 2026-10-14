@@ -9,6 +9,7 @@ import { getSection, getSubsection, deleteSubsection, deleteTask } from "@/lib/d
 import { Badge } from "@/components/ui/Badge";
 import { difficultyLabel, taskTypeLabel } from "@/lib/labels";
 import { formatPercent } from "@/lib/format";
+import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 import { DELETE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
@@ -137,7 +138,7 @@ export default function SubsectionPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">
                     {formatPercent(task.stats.accuracy)}
-                    <span className="ml-1 text-xs text-gray-400">({task.stats.attempts} prób)</span>
+                    <span className="ml-1 text-xs text-gray-400">({pluralize(task.stats.attempts, WORDS.attempt)})</span>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="flex justify-end gap-3">

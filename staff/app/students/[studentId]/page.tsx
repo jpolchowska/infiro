@@ -10,6 +10,7 @@ import { NeedsPracticeList, RecentActivityTable } from "@/components/student/Tas
 import { getStudentDetail } from "@/lib/data";
 import { formatDate, formatPercent } from "@/lib/format";
 import { themeLabel } from "@/lib/labels";
+import { pluralForm } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 
 export default function StudentPage() {
@@ -39,7 +40,10 @@ export default function StudentPage() {
           value={`${student.activity.answersLast7Days} / ${student.activity.answersLast30Days}`}
           label="Odpowiedzi: 7 / 30 dni"
         />
-        <StatTile value={student.activity.activeDaysLast30Days} label="Aktywne dni (30 dni)" />
+        <StatTile
+          value={student.activity.activeDaysLast30Days}
+          label={`${pluralForm(student.activity.activeDaysLast30Days, ["Aktywny dzień", "Aktywne dni", "Aktywnych dni"])} (30 dni)`}
+        />
       </div>
 
       {student.currentSubsection && (

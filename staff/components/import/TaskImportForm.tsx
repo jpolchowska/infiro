@@ -6,6 +6,7 @@ import { readValidatedJson, type ImportControls } from "@/lib/importControls";
 import { UploadField } from "@/components/import/UploadField";
 import { importTasks } from "@/lib/data";
 import { validateTaskImport } from "@/lib/validateImport";
+import { pluralize, WORDS } from "@/lib/pluralize";
 
 export function TaskImportForm({ controls }: { controls: ImportControls }) {
   const [file, setFile] = useState<File | null>(null);
@@ -33,7 +34,7 @@ export function TaskImportForm({ controls }: { controls: ImportControls }) {
   return (
     <ImportCard
       title="Plik z zadaniami (JSON)"
-      successMessage={taskCount !== null ? `Zaimportowano ${taskCount} zadań.` : null}
+      successMessage={taskCount !== null ? `Zaimportowano ${pluralize(taskCount, WORDS.task)}.` : null}
       submitLabel="Importuj zadania"
       submittingLabel="Importowanie…"
       submitting={controls.submitting}

@@ -5,6 +5,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { LoadState } from "@/components/ui/LoadState";
 import { StatTile } from "@/components/ui/StatTile";
 import { getSections, getStudents } from "@/lib/data";
+import { pluralForm, pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 
 export default function Home() {
@@ -31,18 +32,26 @@ export default function Home() {
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={sections.length} label="Sekcje kursu" />
-        <StatTile value={totalSubsections} label="Podsekcje" />
-        <StatTile value={totalTasks} label="Zadania" />
-        <StatTile value={studentCount} label="Uczniowie z dostępem" />
+        <StatTile value={sections.length} label={pluralForm(sections.length, ["Sekcja kursu", "Sekcje kursu", "Sekcji kursu"])} />
+        <StatTile value={totalSubsections} label={pluralForm(totalSubsections, WORDS.subsection)} />
+        <StatTile value={totalTasks} label={pluralForm(totalTasks, WORDS.task)} />
+        <StatTile
+          value={studentCount}
+          label={pluralForm(studentCount, [
+            "Uczeń z dostępem",
+            "Uczniowie z dostępem",
+            "Uczniów z dostępem",
+            "Uczniów z dostępem",
+          ])}
+        />
       </div>
 
       <div className="mt-10 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold text-infiro-navy">Sekcje kursu</h2>
         <span className="flex items-center gap-3 text-sm text-gray-500">
-          <span>{totalSubsections} podsekcji</span>
+          <span>{pluralize(totalSubsections, WORDS.subsection)}</span>
           <span className="text-gray-300">|</span>
-          <span>{totalTasks} zadań</span>
+          <span>{pluralize(totalTasks, WORDS.task)}</span>
         </span>
       </div>
 
@@ -66,7 +75,7 @@ export default function Home() {
             <p className="mt-1 line-clamp-2 min-h-10 text-sm text-gray-600">{section.description}</p>
             <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 text-xs text-gray-500">
               <span>
-                {section.subsectionCount} podsekcji &middot; {section.taskCount} zadań
+                {pluralize(section.subsectionCount, WORDS.subsection)} &middot; {pluralize(section.taskCount, WORDS.task)}
               </span>
               <span className="font-medium text-infiro-navy">Otwórz &rarr;</span>
             </div>

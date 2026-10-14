@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { LoadState } from "@/components/ui/LoadState";
 import { getSection, deleteSection, deleteSubsection } from "@/lib/data";
+import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 import { DELETE_ERROR, useSubmit } from "@/hooks/useSubmit";
 
@@ -69,7 +70,7 @@ export default function SectionPage() {
         Test końcowy:{" "}
         {section.finalTestQuestionCount > 0 ? (
           <Link href={`/sections/${section.id}/final-test`} className="font-medium text-infiro-navy hover:underline">
-            {section.finalTestQuestionCount} pytań
+            {pluralize(section.finalTestQuestionCount, WORDS.question)}
           </Link>
         ) : (
           <span className="text-gray-400">brak</span>
@@ -98,7 +99,7 @@ export default function SectionPage() {
             <Link href={`/sections/${section.id}/${sub.id}`} className="flex-1">
               <h3 className="text-base font-semibold text-infiro-navy">{sub.title}</h3>
               <p className="mt-1 text-sm text-gray-600">{sub.description}</p>
-              <div className="mt-4 text-xs text-gray-500">{sub.taskCount} zadań</div>
+              <div className="mt-4 text-xs text-gray-500">{pluralize(sub.taskCount, WORDS.task)}</div>
             </Link>
             {!isTeacher && (
               <>

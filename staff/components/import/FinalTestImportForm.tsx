@@ -7,6 +7,7 @@ import { UploadField } from "@/components/import/UploadField";
 import { getSections, importFinalTest } from "@/lib/data";
 import { useApiData } from "@/hooks/useApiData";
 import { validateFinalTestImport } from "@/lib/validateImport";
+import { pluralize, WORDS } from "@/lib/pluralize";
 
 export function FinalTestImportForm({ controls }: { controls: ImportControls }) {
   const { state } = useApiData(getSections);
@@ -43,7 +44,7 @@ export function FinalTestImportForm({ controls }: { controls: ImportControls }) 
   return (
     <ImportCard
       title="Test końcowy działu (JSON)"
-      successMessage={questionCount !== null ? `Zaimportowano ${questionCount} pytań testu końcowego.` : null}
+      successMessage={questionCount !== null ? `Zaimportowano ${pluralize(questionCount, WORDS.question)} testu końcowego.` : null}
       submitLabel="Importuj test końcowy"
       submittingLabel="Importowanie…"
       submitting={controls.submitting}

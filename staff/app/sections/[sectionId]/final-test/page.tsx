@@ -8,6 +8,7 @@ import { StatTile } from "@/components/ui/StatTile";
 import { TaskContentView } from "@/components/tasks/TaskContentView";
 import { getFinalTestPreview } from "@/lib/data";
 import { taskTypeLabel, themeLabel } from "@/lib/labels";
+import { pluralForm, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 
 export default function FinalTestPage() {
@@ -27,9 +28,9 @@ export default function FinalTestPage() {
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Test końcowy działu</h1>
 
       <div className="mt-6 grid max-w-xl grid-cols-3 gap-3">
-        <StatTile value={finalTest.questions.length} label="Pytania" />
-        <StatTile value={finalTest.attempts} label="Podejścia" />
-        <StatTile value={finalTest.studentsAttempted} label="Uczniowie" />
+        <StatTile value={finalTest.questions.length} label={pluralForm(finalTest.questions.length, WORDS.question)} />
+        <StatTile value={finalTest.attempts} label={pluralForm(finalTest.attempts, WORDS.testAttempt)} />
+        <StatTile value={finalTest.studentsAttempted} label={pluralForm(finalTest.studentsAttempted, WORDS.student)} />
       </div>
 
       {finalTest.questions.length === 0 ? (

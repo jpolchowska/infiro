@@ -3,6 +3,7 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { difficultyLabel } from "@/lib/labels";
 import { formatDate, ratioPercent } from "@/lib/format";
 import type { SectionProgress, TaskDifficulty } from "@/lib/types";
+import { pluralize, WORDS } from "@/lib/pluralize";
 
 export function SectionProgressList({ studentId, sections }: { studentId: number; sections: SectionProgress[] }) {
   if (sections.length === 0) {
@@ -46,14 +47,14 @@ export function SectionProgressList({ studentId, sections }: { studentId: number
             <div className="mt-4 border-t border-gray-100 pt-3 text-sm">
               <span className="text-gray-500">Test końcowy: </span>
               {section.finalTest.attempts === 0 ? (
-                <span className="text-gray-400">nie podchodził ({section.finalTest.questionCount} pytań)</span>
+                <span className="text-gray-400">nie podchodził ({pluralize(section.finalTest.questionCount, WORDS.question)})</span>
               ) : (
                 <>
                   <span className="text-gray-900">
                     ostatni {section.finalTest.lastScore}/{section.finalTest.maxScore}, najlepszy{" "}
                     {section.finalTest.bestScore}/{section.finalTest.maxScore}
                   </span>
-                  <span className="text-gray-500"> · podejść: {section.finalTest.attempts}</span>
+                  <span className="text-gray-500"> · {pluralize(section.finalTest.attempts, WORDS.testAttempt)}</span>
                   <div className="mt-2 flex flex-wrap gap-3">
                     {section.finalTest.history.map((attempt) => (
                       <Link
