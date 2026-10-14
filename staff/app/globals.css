@@ -9,13 +9,13 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
 
   --color-infiro-navy: #142284;
   --color-infiro-coral: #ff5f55;
   --color-infiro-peach: #f0b67e;
   --color-infiro-purple: #c873d9;
   --color-infiro-white: #fefefe;
+  --color-infiro-border: #dfe2ee;
 }
 
 body {

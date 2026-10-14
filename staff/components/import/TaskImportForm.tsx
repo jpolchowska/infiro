@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { ImportCard } from "@/components/import/ImportCard";
-import { readValidatedJson, type ImportControls } from "@/components/import/importControls";
+import { readValidatedJson, type ImportControls } from "@/lib/importControls";
 import { UploadField } from "@/components/import/UploadField";
 import { importTasks } from "@/lib/data";
 import { validateTaskImport } from "@/lib/validateImport";
+import { pluralize, WORDS } from "@/lib/pluralize";
 
 export function TaskImportForm({ controls }: { controls: ImportControls }) {
   const [file, setFile] = useState<File | null>(null);
@@ -26,14 +27,14 @@ export function TaskImportForm({ controls }: { controls: ImportControls }) {
 
     await controls.run(async (token) => {
       const result = await importTasks(token, data);
-      setTaskCount(result.task_count);
+      setTaskCount(result.taskCount);
     }, "Import się nie powiódł. Spróbuj ponownie.");
   }
 
   return (
     <ImportCard
       title="Plik z zadaniami (JSON)"
-      successMessage={taskCount !== null ? `Zaimportowano ${taskCount} zadań.` : null}
+      successMessage={taskCount !== null ? `Zaimportowano ${pluralize(taskCount, WORDS.task)}.` : null}
       submitLabel="Importuj zadania"
       submittingLabel="Importowanie…"
       submitting={controls.submitting}

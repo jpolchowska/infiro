@@ -354,8 +354,9 @@ infiro/
 │   ├── seed/                      # sample task import file (tasks_example.json)
 │   └── tests/                     # pytest suite
 ├── staff/                         # Next.js panel (admin + teacher)
-│   ├── app/                       # pages: sections, results, teachers, import, login
+│   ├── app/                       # pages: course, students, teachers, import, settings, login
 │   ├── components/                # AuthGate, header nav, shared UI
+│   ├── hooks/                     # data loading and submit hooks
 │   └── lib/                       # API client, Keycloak setup, import validation
 ├── mobile/                        # Expo app (student), Expo Router
 │   ├── app/(student)/             # home, sections, tasks, timed practice, e-books, leveling test

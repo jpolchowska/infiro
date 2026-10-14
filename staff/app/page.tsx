@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/components/AuthContext";
-import { LoadState } from "@/components/LoadState";
-import { StatTile } from "@/components/StatTile";
+import { useAuth } from "@/components/auth/AuthContext";
+import { LoadState } from "@/components/ui/LoadState";
+import { StatTile } from "@/components/ui/StatTile";
 import { getSections, getStudents } from "@/lib/data";
-import { useApiData } from "@/lib/useApiData";
+import { pluralForm, pluralize, WORDS } from "@/lib/pluralize";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function Home() {
   const { role } = useAuth();
@@ -27,27 +28,37 @@ export default function Home() {
       <p className="mt-1 max-w-2xl text-sm text-gray-500">
         {isTeacher
           ? "Przeglądaj treść kursu: sekcje, podsekcje i zadania."
-          : "Zarządzaj treścią kursu: sekcjami, podsekcjami i zadaniami."}
+          : "Przeglądaj treść kursu: sekcje, podsekcje i zadania. Nową treść dodasz przez import JSON."}
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile value={sections.length} label="Sekcje kursu" />
-        <StatTile value={totalSubsections} label="Podsekcje" />
-        <StatTile value={totalTasks} label="Zadania" />
-        <StatTile value={studentCount} label="Uczniowie z dostępem" />
+        <StatTile value={sections.length} label={pluralForm(sections.length, ["Sekcja kursu", "Sekcje kursu", "Sekcji kursu"])} />
+        <StatTile value={totalSubsections} label={pluralForm(totalSubsections, WORDS.subsection)} />
+        <StatTile value={totalTasks} label={pluralForm(totalTasks, WORDS.task)} />
+        <StatTile
+          value={studentCount}
+          label={pluralForm(studentCount, [
+            "Uczeń z dostępem",
+            "Uczniowie z dostępem",
+            "Uczniów z dostępem",
+            "Uczniów z dostępem",
+          ])}
+        />
       </div>
 
       <div className="mt-10 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold text-infiro-navy">Sekcje kursu</h2>
         <span className="flex items-center gap-3 text-sm text-gray-500">
-          <span>{totalSubsections} podsekcji</span>
+          <span>{pluralize(totalSubsections, WORDS.subsection)}</span>
           <span className="text-gray-300">|</span>
-          <span>{totalTasks} zadań</span>
+          <span>{pluralize(totalTasks, WORDS.task)}</span>
         </span>
       </div>
 
       {sections.length === 0 && (
-        <p className="mt-4 text-sm text-gray-400">Brak sekcji — dodaj pierwszą.</p>
+        <p className="mt-4 text-sm text-gray-400">
+          {isTeacher ? "Brak sekcji." : "Brak sekcji — zaimportuj zadania przez stronę Import."}
+        </p>
       )}
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -55,7 +66,7 @@ export default function Home() {
           <Link
             key={section.id}
             href={`/sections/${section.id}`}
-            className="flex min-h-41 flex-col rounded-sm border border-gray-200 bg-white p-5 hover:border-infiro-navy"
+            className="flex min-h-41 flex-col rounded-lg border border-infiro-border bg-white p-5 hover:border-infiro-navy"
           >
             <span className="text-xs font-medium text-gray-400">
               {String(index + 1).padStart(2, "0")}
@@ -66,21 +77,12 @@ export default function Home() {
             <p className="mt-1 line-clamp-2 min-h-10 text-sm text-gray-600">{section.description}</p>
             <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 text-xs text-gray-500">
               <span>
-                {section.subsectionCount} podsekcji &middot; {section.taskCount} zadań
+                {pluralize(section.subsectionCount, WORDS.subsection)} &middot; {pluralize(section.taskCount, WORDS.task)}
               </span>
               <span className="font-medium text-infiro-navy">Otwórz &rarr;</span>
             </div>
           </Link>
         ))}
-        {!isTeacher && (
-          <Link
-            href="/sections/new"
-            className="flex min-h-41 flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-gray-300 p-5 text-gray-500 hover:border-infiro-navy hover:text-infiro-navy"
-          >
-            <span className="text-2xl leading-none">+</span>
-            <span className="text-sm font-medium">Dodaj sekcję</span>
-          </Link>
-        )}
       </div>
     </div>
   );

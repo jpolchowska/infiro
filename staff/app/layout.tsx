@@ -1,36 +1,28 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
-import { AuthGate } from "@/components/AuthGate";
+import type { ReactNode } from "react";
+import { Inter } from "next/font/google";
+import { AuthProvider } from "@/components/auth/AuthContext";
+import { AuthGate } from "@/components/auth/AuthGate";
 import "./globals.css";
-import { AuthProvider } from "@/components/AuthContext";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "latin-ext"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Panel zarządzania",
-  description: "Panel zarządzania",
+  title: "Infiro — panel",
+  description: "Panel administratora i nauczyciela aplikacji Infiro",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="pl">
-      <AuthProvider>
-      <body className={`${inter.variable} ${geistMono.variable} antialiased`}>
-        <AuthGate>{children}</AuthGate>
+      <body className={`${inter.variable} antialiased`}>
+        <AuthProvider>
+          <AuthGate>{children}</AuthGate>
+        </AuthProvider>
       </body>
-      </AuthProvider>
     </html>
   );
 }

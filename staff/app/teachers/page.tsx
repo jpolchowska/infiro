@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/components/AuthContext";
-import { LoadState } from "@/components/LoadState";
+import { useAuth } from "@/components/auth/AuthContext";
+import { LoadState } from "@/components/ui/LoadState";
 import { getStudents, getTeachers, updateStudentTeacher } from "@/lib/data";
 import type { Student, Teacher } from "@/lib/types";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 
 export default function TeachersPage() {
   const { state } = useApiData(async (token) => {
@@ -71,7 +71,7 @@ function TeacherAssignments({ initialStudents, teachers }: { initialStudents: St
         </p>
       )}
 
-      <div className="mt-8 overflow-x-auto rounded-sm border border-gray-200 bg-white">
+      <div className="mt-8 overflow-x-auto rounded-lg border border-infiro-border bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">

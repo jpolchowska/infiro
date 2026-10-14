@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ImportCard } from "@/components/import/ImportCard";
-import type { ImportControls } from "@/components/import/importControls";
+import type { ImportControls } from "@/lib/importControls";
 import { UploadField } from "@/components/import/UploadField";
 import { importEbook } from "@/lib/data";
 

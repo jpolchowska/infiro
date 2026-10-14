@@ -9,3 +9,15 @@ export function formatRelativeDate(iso: string | null): string {
   if (diffDays < 7) return `${diffDays} dni temu`;
   return date.toLocaleDateString("pl-PL");
 }
+
+export function formatDate(iso: string | null): string {
+  return iso ? new Date(iso).toLocaleDateString("pl-PL") : "—";
+}
+
+export function formatPercent(value: number | null): string {
+  return value === null ? "—" : `${value}%`;
+}
+
+export function ratioPercent(part: number, total: number): number {
+  return total > 0 ? (part / total) * 100 : 0;
+}

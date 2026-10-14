@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { ImportCard } from "@/components/import/ImportCard";
-import { readValidatedJson, type ImportControls } from "@/components/import/importControls";
+import { readValidatedJson, type ImportControls } from "@/lib/importControls";
 import { UploadField } from "@/components/import/UploadField";
 import { getSections, importFinalTest } from "@/lib/data";
-import { useApiData } from "@/lib/useApiData";
+import { useApiData } from "@/hooks/useApiData";
 import { validateFinalTestImport } from "@/lib/validateImport";
+import { pluralize, WORDS } from "@/lib/pluralize";
 
 export function FinalTestImportForm({ controls }: { controls: ImportControls }) {
   const { state } = useApiData(getSections);
@@ -36,14 +37,14 @@ export function FinalTestImportForm({ controls }: { controls: ImportControls }) 
 
     await controls.run(async (token) => {
       const result = await importFinalTest(token, sectionId, data);
-      setQuestionCount(result.question_count);
+      setQuestionCount(result.questionCount);
     }, "Import testu końcowego się nie powiódł. Spróbuj ponownie.");
   }
 
   return (
     <ImportCard
       title="Test końcowy działu (JSON)"
-      successMessage={questionCount !== null ? `Zaimportowano ${questionCount} pytań testu końcowego.` : null}
+      successMessage={questionCount !== null ? `Zaimportowano ${pluralize(questionCount, WORDS.question)} testu końcowego.` : null}
       submitLabel="Importuj test końcowy"
       submittingLabel="Importowanie…"
       submitting={controls.submitting}
