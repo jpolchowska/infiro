@@ -143,14 +143,16 @@ def test_report_shows_progress_per_section_and_subsection(client, report_data):
         "Łatwe mnożenie", 1, 3, 2,
     )
     assert (hard["solved_tasks"], hard["total_tasks"]) == (1, 1)
-    assert multiplication["final_test"] == {
+    final_test = multiplication["final_test"]
+    summary_keys = ("question_count", "attempts", "best_score", "last_score", "max_score")
+    assert {key: final_test[key] for key in summary_keys} == {
         "question_count": 1,
         "attempts": 1,
         "best_score": 1,
         "last_score": 1,
         "max_score": 1,
-        "last_completed_at": multiplication["final_test"]["last_completed_at"],
     }
+    assert final_test["history"][0]["score"] == 1
     assert sections["Ułamki"]["final_test"] is None
 
 
@@ -227,3 +229,54 @@ def test_attempt_of_another_student_is_not_found(client, report_data):
 
     assert response.status_code == 404
     assert response.json == {"error": "Leveling test not found"}
+
+
+def test_final_test_detail_shows_given_and_correct_answers(client, report_data):
+    student_id = report_data["student"].id
+    report = _report(client, student_id)
+    attempt_id = report["sections"][0]["final_test"]["history"][0]["id"]
+
+    response = client.get(f"/api/admin/students/{student_id}/final-tests/{attempt_id}", headers=HEADERS)
+
+    assert response.status_code == 200
+    assert response.json["answers"] == [{
+        "question_id": 1,
+        "content_key": "final-1",
+        "type": "short_answer",
+        "prompt": "Ile to 2 · 3?",
+        "is_correct": True,
+        "given_answer": "6",
+        "correct_answer": "6",
+    }]
+
+
+def test_final_test_of_another_student_is_not_found(client, report_data):
+    other = User(keycloak_sub="other-student", role="student")
+    db.session.add(other)
+    db.session.commit()
+
+    response = client.get(f"/api/admin/students/{other.id}/final-tests/1", headers=HEADERS)
+
+    assert response.status_code == 404
+    assert response.json == {"error": "Final test not found"}
+
+
+def test_deleting_a_section_removes_its_final_test_answers(client, report_data):
+    response = client.delete("/api/admin/sections/1", headers=HEADERS)
+
+    assert response.status_code == 204
+    assert _report(client, report_data["student"].id)["sections"][0]["section_title"] == "Ułamki"
+
+
+def test_subsection_tasks_include_answer_statistics(client, report_data):
+    subsection = client.get("/api/admin/subsections/1", headers=HEADERS).json
+    tasks = {task["content_key"]: task for task in subsection["tasks"]}
+
+    assert tasks["m-2"]["stats"] == {
+        "attempts": 2,
+        "correct_attempts": 0,
+        "students_attempted": 1,
+        "students_solved": 0,
+        "accuracy": 0,
+    }
+    assert tasks["m-3"]["stats"]["accuracy"] is None

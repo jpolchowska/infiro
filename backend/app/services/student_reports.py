@@ -10,7 +10,7 @@ from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.models.users import User
-from app.serializers import iso_utc
+from app.serializers import attempt_json, iso_utc
 from app.services.content_preview import task_reference
 from app.services.leveling_test_history import leveling_test_history
 from app.services.leveling_test_settings import get_settings, leveling_test_state
@@ -106,6 +106,7 @@ def _final_test_summary(student_id, section_id):
     return {
         "question_count": question_count,
         "attempts": len(attempts),
+        "history": [{"id": attempt.id, **attempt_json(attempt)} for attempt in attempts],
         "best_score": max((attempt.score for attempt in attempts), default=None),
         "last_score": last.score if last else None,
         "max_score": last.max_score if last else None,

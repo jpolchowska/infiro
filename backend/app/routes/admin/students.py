@@ -4,8 +4,10 @@ from app.auth import authenticate_token, require_realm_role
 from app.constants import RealmRole, UserRole
 from app.extensions import db
 from app.models.leveling_test_attempts import LevelingTestAttempt
+from app.models.section_test_attempts import SectionTestAttempt
 from app.models.users import User
 from app.payload import json_object
+from app.services.final_test import final_test_attempt_detail
 from app.services.leveling_test_history import attempt_detail
 from app.services.student_reports import student_report, student_summaries, student_summary, teacher_json
 from app.services.users import get_or_create_user
@@ -117,3 +119,17 @@ def update_student(student_id):
     db.session.commit()
 
     return jsonify(student_summary(student)), 200
+
+
+@bp.route("/students/<int:student_id>/final-tests/<int:attempt_id>", methods=["GET"])
+@authenticate_token
+def get_student_final_test(student_id, attempt_id):
+    student, error = _visible_student(student_id)
+    if error:
+        return error
+
+    attempt = SectionTestAttempt.query.filter_by(id=attempt_id, student_id=student.id).first()
+    if attempt is None:
+        return jsonify({"error": "Final test not found"}), 404
+
+    return jsonify(final_test_attempt_detail(attempt)), 200

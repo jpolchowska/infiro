@@ -3,6 +3,7 @@ from app.models.ebooks import Ebook
 from app.models.leveling_test_answers import LevelingTestAnswer
 from app.models.leveling_test_section_results import LevelingTestSectionResult
 from app.models.section_test_answer_options import SectionTestAnswerOption
+from app.models.section_test_answers import SectionTestAnswer
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.section_test_questions import SectionTestQuestion
 from app.models.student_answers import StudentAnswer
@@ -34,6 +35,13 @@ def _delete_subsections(subsection_ids):
 
 
 def _delete_section_test(section_id):
+    attempt_ids = [
+        attempt.id for attempt in SectionTestAttempt.query.filter_by(section_id=section_id).all()
+    ]
+    if attempt_ids:
+        SectionTestAnswer.query.filter(
+            SectionTestAnswer.attempt_id.in_(attempt_ids)
+        ).delete(synchronize_session=False)
     question_ids = [
         question.id for question in SectionTestQuestion.query.filter_by(section_id=section_id).all()
     ]
