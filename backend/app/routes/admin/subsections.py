@@ -8,7 +8,8 @@ from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.payload import json_object
-from app.serializers import subsection_json, task_json
+from app.serializers import subsection_json
+from app.services.content_preview import task_summary
 from app.services import content_deletion
 
 bp = Blueprint("admin_subsections", __name__, url_prefix="/api/admin")
@@ -62,9 +63,26 @@ def get_subsection(subsection_id):
     ebook = Ebook.query.filter_by(subsection_id=subsection_id).first()
 
     payload = subsection_json(subsection)
-    payload["tasks"] = [task_json(t) for t in tasks]
+    payload["tasks"] = [task_summary(t) for t in tasks]
     payload["ebook"] = {"id": ebook.id, "title": ebook.title} if ebook else None
     return jsonify(payload), 200
+
+
+@bp.route("/subsections/<int:subsection_id>/ebook", methods=["GET"])
+@authenticate_token
+@require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
+def get_subsection_ebook(subsection_id):
+    ebook = Ebook.query.filter_by(subsection_id=subsection_id).first()
+    if ebook is None:
+        return jsonify({"error": "Ebook not found"}), 404
+
+    return jsonify({
+        "id": ebook.id,
+        "subsection_id": ebook.subsection_id,
+        "title": ebook.title,
+        "intro": ebook.intro,
+        "blocks": ebook.content,
+    }), 200
 
 
 @bp.route("/subsections/<int:subsection_id>", methods=["PATCH"])

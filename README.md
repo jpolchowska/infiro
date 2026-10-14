@@ -291,7 +291,7 @@ Available to any authenticated user; the local student record is resolved from t
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/student/me` | Current student's profile (interest, leveling test status) |
+| `GET` | `/api/student/me` | Current student's profile: interest and leveling test status (`not_taken`, `up_to_date`, `due`, `overdue`) with due dates |
 | `PATCH` | `/api/student/interest` | Set the student's interest (theme) |
 | `GET` | `/api/student/stats` | Solved tasks, accuracy, current subsection, recent sections |
 | `GET` | `/api/student/sections` | List sections with progress |
@@ -306,7 +306,7 @@ Available to any authenticated user; the local student record is resolved from t
 | `GET` | `/api/student/sections/:id/final-test/history` | List past final test attempts |
 | `GET` | `/api/student/leveling-test` | Get a leveling test |
 | `POST` | `/api/student/leveling-test/submit` | Submit a leveling test; returns score with per-section breakdown |
-| `GET` | `/api/student/leveling-test/history` | List past leveling test attempts |
+| `GET` | `/api/student/leveling-test/history` | List past leveling test attempts with per-section results |
 
 ### Staff panel (admin & teacher)
 
@@ -317,18 +317,23 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `GET` | `/api/admin/sections` | admin, teacher | List sections |
 | `POST` | `/api/admin/sections` | admin | Create a section |
 | `GET` | `/api/admin/sections/:id` | admin, teacher | Get a section |
+| `GET` | `/api/admin/sections/:id/final-test` | admin, teacher | Preview the section's final test questions |
 | `PATCH`/`DELETE` | `/api/admin/sections/:id` | admin | Update or delete a section |
 | `POST` | `/api/admin/sections/:id/subsections` | admin | Create a subsection |
-| `GET` | `/api/admin/subsections/:id` | admin, teacher | Get a subsection |
+| `GET` | `/api/admin/subsections/:id` | admin, teacher | Get a subsection with its tasks (type, content, answers and answer statistics) |
+| `GET` | `/api/admin/subsections/:id/ebook` | admin, teacher | Preview the subsection's e-book |
 | `PATCH`/`DELETE` | `/api/admin/subsections/:id` | admin | Update or delete a subsection |
-| `POST` | `/api/admin/subsections/:id/tasks` | admin | Create a task |
-| `PATCH`/`DELETE` | `/api/admin/tasks/:id` | admin | Update or delete a task |
+| `GET` | `/api/admin/tasks/:id` | admin, teacher | Task preview: content of every theme variant and answer statistics |
+| `DELETE` | `/api/admin/tasks/:id` | admin | Delete a task (tasks are created and edited through the JSON import) |
 | `POST` | `/api/admin/tasks/import` | admin | Bulk-import tasks from JSON |
 | `POST` | `/api/admin/ebooks/import` | admin | Import an e-book from a ZIP |
 | `POST` | `/api/admin/sections/:id/final-test/import` | admin | Import a section's final test from JSON |
+| `GET`/`PATCH` | `/api/admin/settings/leveling-test` | admin | Read or change leveling test settings (questions per section, interval, completion window) |
 | `GET` | `/api/admin/teachers` | admin | List teachers |
-| `GET` | `/api/admin/students` | admin, teacher | List students |
-| `GET` | `/api/admin/students/:id` | admin, teacher | Get a student's progress details |
+| `GET` | `/api/admin/students` | admin, teacher | List students with learning results and leveling test status |
+| `GET` | `/api/admin/students/:id` | admin, teacher | Student report: progress per section and subsection, activity, final tests, leveling test history |
+| `GET` | `/api/admin/students/:id/leveling-tests/:attemptId` | admin, teacher | One leveling test attempt with every question and answer |
+| `GET` | `/api/admin/students/:id/final-tests/:attemptId` | admin, teacher | One final test attempt with every question and answer |
 | `PATCH` | `/api/admin/students/:id` | admin | Update a student (e.g. assign a teacher) |
 
 ## Project Structure

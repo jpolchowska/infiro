@@ -21,6 +21,7 @@ def client(tmp_path):
         yield app.test_client()
         db.session.remove()
         db.drop_all()
+        db.engine.dispose()
 
 
 @pytest.fixture

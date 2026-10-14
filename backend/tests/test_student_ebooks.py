@@ -85,3 +85,33 @@ def test_get_student_ebooks_nonexisting_ebook(client, login):
     )
 
     assert response.status_code == 404
+
+
+def test_staff_can_preview_an_ebook(client, login):
+    login("admin-sub", ["admin"])
+    section = Section(title="Ułamki proste", order_index=0)
+    db.session.add(section)
+    db.session.flush()
+    subsection = Subsection(section_id=section.id, title="Kawałki całości", order_index=0)
+    db.session.add(subsection)
+    db.session.commit()
+    import_ebook(client, build_ebook_zip())
+
+    login("teacher-sub", ["ROLE_TEACHER"])
+    response = client.get(
+        f"/api/admin/subsections/{subsection.id}/ebook",
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["title"] == "Kawałki całości"
+    assert response.json["blocks"][0]["type"] == "heading"
+
+
+def test_staff_ebook_preview_returns_404_without_ebook(client, login):
+    login("admin-sub", ["admin"])
+
+    response = client.get("/api/admin/subsections/999/ebook", headers={"Authorization": "Bearer test-token"})
+
+    assert response.status_code == 404
+    assert response.json == {"error": "Ebook not found"}
