@@ -26,7 +26,7 @@ export function TaskImportForm({ controls }: { controls: ImportControls }) {
 
     await controls.run(async (token) => {
       const result = await importTasks(token, data);
-      setTaskCount(result.task_count);
+      setTaskCount(result.taskCount);
     }, "Import się nie powiódł. Spróbuj ponownie.");
   }
 

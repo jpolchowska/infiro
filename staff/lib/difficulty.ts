@@ -1,7 +1,13 @@
 import type { TaskDifficulty } from "./types";
 
-export function difficultyLabel(level: TaskDifficulty): { label: string; variant: "easy" | "mid" | "hard" } {
-  if (level <= 2) return { label: "Łatwy", variant: "easy" };
-  if (level === 3) return { label: "Średni", variant: "mid" };
-  return { label: "Trudny", variant: "hard" };
+type DifficultyLabel = { label: string; variant: "easy" | "mid" | "hard" | "neutral" };
+
+const LABELS: Record<TaskDifficulty, DifficultyLabel> = {
+  1: { label: "Łatwy", variant: "easy" },
+  2: { label: "Średni", variant: "mid" },
+  3: { label: "Trudny", variant: "hard" },
+};
+
+export function difficultyLabel(level: TaskDifficulty | null): DifficultyLabel {
+  return level === null ? { label: "—", variant: "neutral" } : LABELS[level];
 }

@@ -2,22 +2,18 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { LoadState } from "@/components/LoadState";
 import { Badge } from "@/components/Badge";
+import { LoadState } from "@/components/LoadState";
+import { TaskContentView } from "@/components/TaskContentView";
+import { TaskStatsTiles } from "@/components/TaskStatsTiles";
+import { getTask } from "@/lib/data";
 import { difficultyLabel } from "@/lib/difficulty";
-import { getSubsection } from "@/lib/data";
+import { taskTypeLabel, themeLabel } from "@/lib/labels";
 import { useApiData } from "@/lib/useApiData";
 
-export default function ViewTaskPage() {
-  const { id, subsectionId, taskId } = useParams<{
-    id: string;
-    subsectionId: string;
-    taskId: string;
-  }>();
-  const { state } = useApiData(async (token) => {
-    const subsection = await getSubsection(token, Number(subsectionId));
-    return subsection?.tasks.find((item) => item.id === Number(taskId));
-  }, `${subsectionId}/${taskId}`);
+export default function TaskPage() {
+  const { taskId } = useParams<{ taskId: string }>();
+  const { state } = useApiData((token) => getTask(token, Number(taskId)), taskId);
 
   if (state.status !== "ready") return <LoadState state={state} />;
 
@@ -29,41 +25,44 @@ export default function ViewTaskPage() {
   return (
     <div>
       <Link
-        href={`/sections/${id}/${subsectionId}`}
+        href={`/sections/${task.sectionId}/${task.subsectionId}`}
         className="text-sm text-gray-500 hover:text-infiro-navy"
       >
-        &larr; Wróć do podsekcji
+        &larr; {task.sectionTitle} / {task.subsectionTitle}
       </Link>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-infiro-navy">{task.title}</h1>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <h1 className="text-2xl font-semibold text-infiro-navy">Zadanie {task.orderIndex}</h1>
+        <Badge>{taskTypeLabel(task.type)}</Badge>
         <Badge variant={difficulty.variant}>{difficulty.label}</Badge>
       </div>
+      {task.contentKey && <p className="mt-1 font-mono text-xs text-gray-400">{task.contentKey}</p>}
 
       <section className="mt-6 max-w-2xl rounded-sm border border-gray-200 bg-white p-5">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-gray-500">Treść pytania</h2>
-        <p className="mt-3 whitespace-pre-wrap text-gray-900">{task.bodyText}</p>
-
-        <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-gray-500">
-          Opcje odpowiedzi
-        </h2>
-        <ol className="mt-3 flex flex-col gap-2">
-          {task.options.map((option) => (
-            <li
-              key={option.id}
-              className={`rounded-sm border px-3 py-2 ${
-                option.isCorrect
-                  ? "border-green-300 bg-green-50 text-green-900"
-                  : "border-gray-200 text-gray-700"
-              }`}
-            >
-              {option.optionText}
-              {option.isCorrect && (
-                <span className="ml-2 text-xs font-medium text-green-700">Poprawna odpowiedź</span>
-              )}
-            </li>
-          ))}
-        </ol>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500">{themeLabel("default")}</h2>
+        <TaskContentView type={task.type} content={task} />
       </section>
+
+      {task.variants.length > 0 && (
+        <>
+          <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Warianty pod zainteresowania</h2>
+          <div className="mt-4 flex max-w-2xl flex-col gap-4">
+            {task.variants.map((variant) => (
+              <section key={variant.theme} className="rounded-sm border border-gray-200 bg-white p-5">
+                <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  {themeLabel(variant.theme)}
+                </h3>
+                <TaskContentView type={task.type} content={variant} />
+              </section>
+            ))}
+          </div>
+        </>
+      )}
+
+      <h2 className="mt-10 text-sm font-semibold text-infiro-navy">Statystyki</h2>
+      <p className="mt-1 text-xs text-gray-500">Tylko odpowiedzi z nauki, bez testu poziomującego.</p>
+      <div className="mt-4">
+        <TaskStatsTiles stats={task.stats} />
+      </div>
     </div>
   );
 }

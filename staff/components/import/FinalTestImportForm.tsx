@@ -36,7 +36,7 @@ export function FinalTestImportForm({ controls }: { controls: ImportControls }) 
 
     await controls.run(async (token) => {
       const result = await importFinalTest(token, sectionId, data);
-      setQuestionCount(result.question_count);
+      setQuestionCount(result.questionCount);
     }, "Import testu końcowego się nie powiódł. Spróbuj ponownie.");
   }
 

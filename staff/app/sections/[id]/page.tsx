@@ -65,6 +65,16 @@ export default function SectionPage() {
         )}
       </div>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{section.description}</p>
+      <p className="mt-3 text-sm text-gray-700">
+        Test końcowy:{" "}
+        {section.finalTestQuestionCount > 0 ? (
+          <Link href={`/sections/${section.id}/final-test`} className="font-medium text-infiro-navy hover:underline">
+            {section.finalTestQuestionCount} pytań
+          </Link>
+        ) : (
+          <span className="text-gray-400">brak</span>
+        )}
+      </p>
       {error && (
         <div className="mt-4 max-w-2xl">
           <ErrorMessage message={error} />

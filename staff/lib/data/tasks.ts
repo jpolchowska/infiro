@@ -1,88 +1,91 @@
-import { apiFetch } from "@/lib/api";
-import type { Task, TaskOption } from "@/lib/types";
+import { apiFetch, fetchOrUndefined } from "@/lib/api";
+import type {
+  AnswerOption,
+  MemoryPair,
+  TaskContent,
+  TaskDetail,
+  TaskDifficulty,
+  TaskSummary,
+  TaskType,
+} from "@/lib/types";
 
-type RawTaskOption = {
-  id: number;
-  option_text: string;
-  is_correct: boolean;
-  order_index: number;
+export type RawContent = {
+  prompt: string;
+  options?: { id: number; text: string; is_correct: boolean }[];
+  accepted_answers?: string[];
+  memory_pairs?: MemoryPair[];
 };
 
-export type RawTask = {
+type RawTaskStats = {
+  attempts: number;
+  correct_attempts: number;
+  students_attempted: number;
+  students_solved: number;
+  accuracy: number | null;
+};
+
+export type RawTaskSummary = RawContent & {
   id: number;
   subsection_id: number;
-  title: string;
-  body_text: string;
-  image_url: string | null;
-  difficulty_level: number;
-  options: RawTaskOption[];
+  content_key: string | null;
+  type: TaskType;
+  difficulty_level: TaskDifficulty | null;
+  order_index: number;
+  themes: string[];
+  stats: RawTaskStats;
 };
 
-function mapTaskOption(raw: RawTaskOption): TaskOption {
+type RawTaskDetail = RawTaskSummary & {
+  section_id: number;
+  section_title: string;
+  subsection_title: string;
+  variants: (RawContent & { theme: string })[];
+};
+
+function mapOption(raw: { id: number; text: string; is_correct: boolean }): AnswerOption {
+  return { id: raw.id, text: raw.text, isCorrect: raw.is_correct };
+}
+
+export function mapContent(raw: RawContent): TaskContent {
   return {
-    id: raw.id,
-    optionText: raw.option_text,
-    isCorrect: raw.is_correct,
-    orderIndex: raw.order_index,
+    prompt: raw.prompt,
+    options: (raw.options ?? []).map(mapOption),
+    acceptedAnswers: raw.accepted_answers ?? [],
+    memoryPairs: raw.memory_pairs ?? [],
   };
 }
 
-export function mapTask(raw: RawTask): Task {
+export function mapTaskSummary(raw: RawTaskSummary): TaskSummary {
   return {
+    ...mapContent(raw),
     id: raw.id,
     subsectionId: raw.subsection_id,
-    title: raw.title,
-    bodyText: raw.body_text,
-    imageUrl: raw.image_url,
-    difficulty: raw.difficulty_level as Task["difficulty"],
-    options: (raw.options ?? []).map(mapTaskOption),
+    contentKey: raw.content_key,
+    type: raw.type,
+    difficulty: raw.difficulty_level,
+    orderIndex: raw.order_index,
+    themes: raw.themes,
+    stats: {
+      attempts: raw.stats.attempts,
+      correctAttempts: raw.stats.correct_attempts,
+      studentsAttempted: raw.stats.students_attempted,
+      studentsSolved: raw.stats.students_solved,
+      accuracy: raw.stats.accuracy,
+    },
   };
 }
 
-export async function createTask(
-  token: string,
-  subsectionId: number,
-  data: {
-    title: string;
-    bodyText: string;
-    difficultyLevel: number;
-    options: { text: string; correct: boolean }[];
-  }
-): Promise<Task> {
-  const raw = await apiFetch<RawTask>(`/api/admin/subsections/${subsectionId}/tasks`, {
-    token,
-    method: "POST",
-    json: {
-      title: data.title,
-      body_text: data.bodyText,
-      difficulty_level: data.difficultyLevel,
-      options: data.options,
-    },
+export async function getTask(token: string, id: number): Promise<TaskDetail | undefined> {
+  return fetchOrUndefined(async () => {
+    const raw = await apiFetch<RawTaskDetail>(`/api/admin/tasks/${id}`, { token });
+    return {
+      ...mapTaskSummary(raw),
+      sectionId: raw.section_id,
+      sectionTitle: raw.section_title,
+      subsectionTitle: raw.subsection_title,
+      variants: raw.variants.map((variant) => ({ ...mapContent(variant), theme: variant.theme })),
+    };
   });
-  return mapTask(raw);
-}
-
-export async function updateTask(
-  token: string,
-  id: number,
-  data: {
-    title: string;
-    bodyText: string;
-    difficultyLevel: number;
-    options: { text: string; correct: boolean }[];
-  }
-): Promise<Task> {
-  const raw = await apiFetch<RawTask>(`/api/admin/tasks/${id}`, {
-    token,
-    method: "PATCH",
-    json: {
-      title: data.title,
-      body_text: data.bodyText,
-      difficulty_level: data.difficultyLevel,
-      options: data.options,
-    },
-  });
-  return mapTask(raw);
 }
 
 export async function deleteTask(token: string, id: number): Promise<void> {

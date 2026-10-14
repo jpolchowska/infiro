@@ -8,6 +8,8 @@ import { LoadState } from "@/components/LoadState";
 import { getSection, getSubsection, deleteSubsection, deleteTask } from "@/lib/data";
 import { Badge } from "@/components/Badge";
 import { difficultyLabel } from "@/lib/difficulty";
+import { formatPercent } from "@/lib/format";
+import { taskTypeLabel } from "@/lib/labels";
 import { useApiData } from "@/lib/useApiData";
 import { DELETE_ERROR, useSubmit } from "@/lib/useSubmit";
 
@@ -86,7 +88,13 @@ export default function SubsectionPage() {
       <h2 className="mt-8 text-sm font-semibold text-infiro-navy">Teoria</h2>
       {subsection.ebook ? (
         <p className="mt-2 text-sm text-gray-700">
-          Zaimportowano e-book: <span className="font-medium">{subsection.ebook.title}</span>
+          E-book: <span className="font-medium">{subsection.ebook.title}</span>{" "}
+          <Link
+            href={`/sections/${section.id}/${subsection.id}/ebook`}
+            className="ml-2 text-xs font-medium text-infiro-navy hover:underline"
+          >
+            Podgląd
+          </Link>
         </p>
       ) : (
         <p className="mt-2 text-sm text-gray-400">
@@ -100,54 +108,55 @@ export default function SubsectionPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
-              <th className="px-4 py-3 font-medium">Tytuł</th>
+              <th className="px-4 py-3 font-medium">#</th>
+              <th className="px-4 py-3 font-medium">Treść</th>
+              <th className="px-4 py-3 font-medium">Typ</th>
               <th className="px-4 py-3 font-medium">Poziom</th>
-              <th className="px-4 py-3 font-medium">Poprawna odpowiedź</th>
+              <th className="px-4 py-3 font-medium">Celność</th>
               <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
           <tbody>
             {subsection.tasks.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
-                  {isTeacher ? "Brak zadań." : "Brak zadań — dodaj pierwsze poniżej."}
+                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">
+                  {isTeacher ? "Brak zadań." : "Brak zadań — zaimportuj je przez stronę Import."}
                 </td>
               </tr>
             )}
-            {subsection.tasks.map((task) => {
-              const diff = difficultyLabel(task.difficulty);
-              const correctOption = task.options.find((o) => o.isCorrect);
+            {subsection.tasks.map((task, index) => {
+              const difficulty = difficultyLabel(task.difficulty);
               return (
                 <tr key={task.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3 font-medium text-gray-900">{task.title}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={diff.variant}>{diff.label}</Badge>
+                  <td className="px-4 py-3 text-gray-400">{index + 1}</td>
+                  <td className="max-w-md px-4 py-3 text-gray-900">
+                    <span className="line-clamp-2">{task.prompt}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{correctOption?.optionText ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600">{taskTypeLabel(task.type)}</td>
+                  <td className="px-4 py-3">
+                    <Badge variant={difficulty.variant}>{difficulty.label}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {formatPercent(task.stats.accuracy)}
+                    <span className="ml-1 text-xs text-gray-400">({task.stats.attempts} prób)</span>
+                  </td>
                   <td className="px-4 py-3 text-right">
-                    {isTeacher ? (
+                    <span className="flex justify-end gap-3">
                       <Link
                         href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}/view`}
                         className="text-xs font-medium text-infiro-navy hover:underline"
                       >
-                        Wyświetl
+                        Podgląd
                       </Link>
-                    ) : (
-                      <span className="flex justify-end gap-3">
-                        <Link
-                          href={`/sections/${section.id}/${subsection.id}/tasks/${task.id}/edit`}
-                          className="text-xs font-medium text-infiro-navy hover:underline"
-                        >
-                          Edytuj
-                        </Link>
+                      {!isTeacher && (
                         <button
                           onClick={() => handleDeleteTask(task.id)}
                           className="text-xs font-medium text-red-600 hover:underline"
                         >
                           Usuń
                         </button>
-                      </span>
-                    )}
+                      )}
+                    </span>
                   </td>
                 </tr>
               );
@@ -157,13 +166,7 @@ export default function SubsectionPage() {
       </div>
 
       {!isTeacher && (
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link
-            href={`/sections/${section.id}/${subsection.id}/new-task`}
-            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            Dodaj zadanie
-          </Link>
+        <div className="mt-4">
           <Link
             href="/import"
             className="rounded-sm border border-gray-300 px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
