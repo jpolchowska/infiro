@@ -1,12 +1,14 @@
 "use client";
 
-import { keycloak } from "@/lib/keycloak";
+import { useAuth } from "@/components/AuthContext";
 
 export function LogoutButton() {
+  const { logout } = useAuth();
+
   return (
     <button
       type="button"
-      onClick={() => keycloak.logout({ redirectUri: `${window.location.origin}/login` })}
+      onClick={logout}
       className="flex items-center gap-2 rounded-sm border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-infiro-navy hover:text-infiro-navy"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

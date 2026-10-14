@@ -1,21 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import Keycloak from "keycloak-js";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { keycloak } from "@/lib/keycloak";
 import { REALM_ROLES, type StaffRole } from "@/lib/roles";
 
-interface AuthContextType {
+const TOKEN_MIN_VALIDITY_SECONDS = 30;
+
+type AuthContextValue = {
   authenticated: boolean;
   initialized: boolean;
-  token: string | undefined;
   role: StaffRole | null;
-  keycloak: Keycloak;
   getToken: () => Promise<string | undefined>;
   logout: () => void;
-}
+};
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 let keycloakInitPromise: Promise<boolean> | undefined;
 
@@ -36,27 +35,38 @@ function currentRole(): StaffRole | null {
   return null;
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+function logout() {
+  keycloak.logout({ redirectUri: `${window.location.origin}/login` });
+}
+
+async function getToken(): Promise<string | undefined> {
+  if (!keycloak.authenticated) return undefined;
+  try {
+    await keycloak.updateToken(TOKEN_MIN_VALIDITY_SECONDS);
+    return keycloak.token;
+  } catch {
+    logout();
+    return undefined;
+  }
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
-  const [token, setToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     let mounted = true;
 
     initializeKeycloak()
-      .then((isAuth) => {
+      .then((isAuthenticated) => {
         if (mounted) {
-          setAuthenticated(isAuth);
-          setToken(keycloak.token);
+          setAuthenticated(isAuthenticated);
           setInitialized(true);
         }
       })
-      .catch((err) => {
-        console.error("Keycloak init error:", err);
-        if (mounted) {
-          setInitialized(true);
-        }
+      .catch((error) => {
+        console.error("Keycloak initialization failed:", error);
+        if (mounted) setInitialized(true);
       });
 
     return () => {
@@ -68,62 +78,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!authenticated) return;
 
     keycloak.onTokenExpired = () => {
-      keycloak
-        .updateToken(30)
-        .then((refreshed) => {
-          if (refreshed) {
-            setToken(keycloak.token);
-          }
-        })
-        .catch(() => {
-          console.error("Token refresh failed, logging out");
-          keycloak.logout();
-        });
+      keycloak.updateToken(TOKEN_MIN_VALIDITY_SECONDS).catch(() => {
+        console.error("Token refresh failed, logging out");
+        logout();
+      });
     };
 
-    const interval = setInterval(() => {
-      keycloak
-        .updateToken(70)
-        .then((refreshed) => {
-          if (refreshed) {
-            setToken(keycloak.token);
-          }
-        })
-        .catch((err) => {
-          console.error("Automatic token refresh failed:", err);
-        });
-    }, 20000);
-
     return () => {
-      clearInterval(interval);
       keycloak.onTokenExpired = undefined;
     };
   }, [authenticated]);
-
-  const getToken = async (): Promise<string | undefined> => {
-    if (!keycloak.authenticated) return undefined;
-    try {
-      await keycloak.updateToken(30);
-      setToken(keycloak.token);
-      return keycloak.token;
-    } catch {
-      keycloak.logout();
-      return undefined;
-    }
-  };
-
-  const logout = () => {
-    keycloak.logout({ redirectUri: window.location.origin + "/login" });
-  };
 
   return (
     <AuthContext.Provider
       value={{
         authenticated,
         initialized,
-        token,
         role: authenticated ? currentRole() : null,
-        keycloak,
         getToken,
         logout,
       }}
