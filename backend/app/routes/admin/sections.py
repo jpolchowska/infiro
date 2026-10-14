@@ -7,6 +7,7 @@ from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.payload import json_object
 from app.serializers import section_json, subsection_json
+from app.services.content_preview import final_test_preview
 from app.services import content_deletion
 
 bp = Blueprint("admin_sections", __name__, url_prefix="/api/admin")
@@ -58,6 +59,17 @@ def get_section(section_id):
     payload = section_json(section)
     payload["subsections"] = [subsection_json(s) for s in subsections]
     return jsonify(payload), 200
+
+
+@bp.route("/sections/<int:section_id>/final-test", methods=["GET"])
+@authenticate_token
+@require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
+def get_final_test(section_id):
+    section = db.session.get(Section, section_id)
+    if section is None:
+        return jsonify({"error": "Section not found"}), 404
+
+    return jsonify(final_test_preview(section)), 200
 
 
 @bp.route("/sections/<int:section_id>", methods=["PATCH"])

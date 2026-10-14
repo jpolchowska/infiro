@@ -13,8 +13,6 @@ ENDPOINTS = [
     ("patch", "/api/admin/sections/1"),
     ("post", "/api/admin/sections/1/subsections"),
     ("patch", "/api/admin/subsections/1"),
-    ("post", "/api/admin/subsections/1/tasks"),
-    ("patch", "/api/admin/tasks/1"),
     ("patch", "/api/admin/students/1"),
     ("post", "/api/student/tasks/1/answers"),
     ("post", "/api/student/subsections/1/timed/submit"),

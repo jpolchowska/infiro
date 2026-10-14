@@ -8,7 +8,8 @@ from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
 from app.payload import json_object
-from app.serializers import subsection_json, task_json
+from app.serializers import subsection_json
+from app.services.content_preview import task_summary
 from app.services import content_deletion
 
 bp = Blueprint("admin_subsections", __name__, url_prefix="/api/admin")
@@ -62,7 +63,7 @@ def get_subsection(subsection_id):
     ebook = Ebook.query.filter_by(subsection_id=subsection_id).first()
 
     payload = subsection_json(subsection)
-    payload["tasks"] = [task_json(t) for t in tasks]
+    payload["tasks"] = [task_summary(t) for t in tasks]
     payload["ebook"] = {"id": ebook.id, "title": ebook.title} if ebook else None
     return jsonify(payload), 200
 

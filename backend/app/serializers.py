@@ -1,5 +1,5 @@
+from app.models.section_test_questions import SectionTestQuestion
 from app.models.subsections import Subsection
-from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
 
 
@@ -25,6 +25,7 @@ def section_json(section):
         "task_count": (
             Task.query.join(Subsection).filter(Subsection.section_id == section.id).count()
         ),
+        "final_test_question_count": SectionTestQuestion.query.filter_by(section_id=section.id).count(),
     }
 
 
@@ -36,27 +37,4 @@ def subsection_json(subsection):
         "description": subsection.description,
         "order_index": subsection.order_index,
         "task_count": Task.query.filter_by(subsection_id=subsection.id).count(),
-    }
-
-
-def task_json(task):
-    options = TaskAnswerOption.query.filter_by(task_id=task.id).order_by(
-        TaskAnswerOption.order_index
-    ).all()
-    return {
-        "id": task.id,
-        "subsection_id": task.subsection_id,
-        "title": task.title,
-        "body_text": task.body_text,
-        "image_url": task.image_url,
-        "difficulty_level": task.difficulty_level,
-        "options": [
-            {
-                "id": option.id,
-                "option_text": option.option_text,
-                "is_correct": option.is_correct,
-                "order_index": option.order_index,
-            }
-            for option in options
-        ],
     }

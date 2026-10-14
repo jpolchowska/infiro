@@ -317,12 +317,13 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `GET` | `/api/admin/sections` | admin, teacher | List sections |
 | `POST` | `/api/admin/sections` | admin | Create a section |
 | `GET` | `/api/admin/sections/:id` | admin, teacher | Get a section |
+| `GET` | `/api/admin/sections/:id/final-test` | admin, teacher | Preview the section's final test questions |
 | `PATCH`/`DELETE` | `/api/admin/sections/:id` | admin | Update or delete a section |
 | `POST` | `/api/admin/sections/:id/subsections` | admin | Create a subsection |
-| `GET` | `/api/admin/subsections/:id` | admin, teacher | Get a subsection |
+| `GET` | `/api/admin/subsections/:id` | admin, teacher | Get a subsection with its tasks (type, content and answers) |
 | `PATCH`/`DELETE` | `/api/admin/subsections/:id` | admin | Update or delete a subsection |
-| `POST` | `/api/admin/subsections/:id/tasks` | admin | Create a task |
-| `PATCH`/`DELETE` | `/api/admin/tasks/:id` | admin | Update or delete a task |
+| `GET` | `/api/admin/tasks/:id` | admin, teacher | Task preview: content of every theme variant and answer statistics |
+| `DELETE` | `/api/admin/tasks/:id` | admin | Delete a task (tasks are created and edited through the JSON import) |
 | `POST` | `/api/admin/tasks/import` | admin | Bulk-import tasks from JSON |
 | `POST` | `/api/admin/ebooks/import` | admin | Import an e-book from a ZIP |
 | `POST` | `/api/admin/sections/:id/final-test/import` | admin | Import a section's final test from JSON |
