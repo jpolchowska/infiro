@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { AnsweredQuestionList } from "@/components/AnsweredQuestionList";
-import { LoadState } from "@/components/LoadState";
+import { AnsweredQuestionList } from "@/components/tasks/AnsweredQuestionList";
+import { LoadState } from "@/components/ui/LoadState";
 import { getFinalTestAttempt } from "@/lib/data";
 import { formatDate } from "@/lib/format";
 import { useApiData } from "@/hooks/useApiData";

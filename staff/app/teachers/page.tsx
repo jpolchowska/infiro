@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/components/AuthContext";
-import { LoadState } from "@/components/LoadState";
+import { useAuth } from "@/components/auth/AuthContext";
+import { LoadState } from "@/components/ui/LoadState";
 import { getStudents, getTeachers, updateStudentTeacher } from "@/lib/data";
 import type { Student, Teacher } from "@/lib/types";
 import { useApiData } from "@/hooks/useApiData";

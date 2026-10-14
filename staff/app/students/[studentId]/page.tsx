@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { LoadState } from "@/components/LoadState";
-import { StatTile } from "@/components/StatTile";
+import { LoadState } from "@/components/ui/LoadState";
+import { StatTile } from "@/components/ui/StatTile";
 import { LevelingTestPanel } from "@/components/student/LevelingTestPanel";
 import { SectionProgressList } from "@/components/student/SectionProgressList";
 import { NeedsPracticeList, RecentActivityTable } from "@/components/student/TaskActivity";

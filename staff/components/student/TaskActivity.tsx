@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { formatRelativeDate } from "@/lib/format";
 import { taskTypeLabel } from "@/lib/labels";
 import type { ActivityItem, PracticeItem } from "@/lib/types";

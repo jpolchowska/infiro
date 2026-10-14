@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ProgressBar } from "@/components/ProgressBar";
-import { difficultyLabel } from "@/lib/difficulty";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { difficultyLabel } from "@/lib/labels";
 import { formatDate, ratioPercent } from "@/lib/format";
 import type { SectionProgress, TaskDifficulty } from "@/lib/types";
 

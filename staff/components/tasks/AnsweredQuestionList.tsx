@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { taskTypeLabel } from "@/lib/labels";
 import type { AnsweredQuestion } from "@/lib/types";
 

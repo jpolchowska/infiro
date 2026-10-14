@@ -1,5 +1,5 @@
-import { ErrorMessage } from "@/components/ErrorMessage";
-import { Spinner } from "@/components/Spinner";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { Spinner } from "@/components/ui/Spinner";
 
 type PendingState = { status: "loading" } | { status: "error"; message: string };
 

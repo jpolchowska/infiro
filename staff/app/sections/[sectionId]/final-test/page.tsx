@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { Badge } from "@/components/Badge";
-import { LoadState } from "@/components/LoadState";
-import { StatTile } from "@/components/StatTile";
-import { TaskContentView } from "@/components/TaskContentView";
+import { Badge } from "@/components/ui/Badge";
+import { LoadState } from "@/components/ui/LoadState";
+import { StatTile } from "@/components/ui/StatTile";
+import { TaskContentView } from "@/components/tasks/TaskContentView";
 import { getFinalTestPreview } from "@/lib/data";
 import { taskTypeLabel, themeLabel } from "@/lib/labels";
 import { useApiData } from "@/hooks/useApiData";

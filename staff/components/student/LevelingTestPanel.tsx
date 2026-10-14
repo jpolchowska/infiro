@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Badge } from "@/components/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/format";
 import { levelingTestStatusLabel } from "@/lib/labels";
 import type { LevelingTestAttempt, LevelingTestState } from "@/lib/types";

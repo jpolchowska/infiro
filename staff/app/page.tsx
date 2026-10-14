@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/components/AuthContext";
-import { LoadState } from "@/components/LoadState";
-import { StatTile } from "@/components/StatTile";
+import { useAuth } from "@/components/auth/AuthContext";
+import { LoadState } from "@/components/ui/LoadState";
+import { StatTile } from "@/components/ui/StatTile";
 import { getSections, getStudents } from "@/lib/data";
 import { useApiData } from "@/hooks/useApiData";
 

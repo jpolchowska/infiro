@@ -1,4 +1,4 @@
-import type { LevelingTestStatus, TaskType } from "./types";
+import type { LevelingTestStatus, TaskDifficulty, TaskType } from "./types";
 
 const TASK_TYPES: Record<TaskType, string> = {
   single_choice: "Zamknięte",
@@ -38,4 +38,16 @@ export function themeLabel(theme: string | null): string {
 
 export function levelingTestStatusLabel(status: LevelingTestStatus) {
   return LEVELING_TEST_STATUSES[status];
+}
+
+type DifficultyLabel = { label: string; variant: "easy" | "mid" | "hard" | "neutral" };
+
+const DIFFICULTIES: Record<TaskDifficulty, DifficultyLabel> = {
+  1: { label: "Łatwy", variant: "easy" },
+  2: { label: "Średni", variant: "mid" },
+  3: { label: "Trudny", variant: "hard" },
+};
+
+export function difficultyLabel(level: TaskDifficulty | null): DifficultyLabel {
+  return level === null ? { label: "—", variant: "neutral" } : DIFFICULTIES[level];
 }

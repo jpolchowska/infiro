@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/components/AuthContext";
+import { useAuth } from "@/components/auth/AuthContext";
 import { EbookImportForm } from "@/components/import/EbookImportForm";
 import { FinalTestImportForm } from "@/components/import/FinalTestImportForm";
 import { ImportErrors } from "@/components/import/ImportErrors";

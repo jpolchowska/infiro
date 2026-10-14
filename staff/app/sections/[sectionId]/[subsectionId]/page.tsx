@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
-import { ErrorMessage } from "@/components/ErrorMessage";
-import { LoadState } from "@/components/LoadState";
+import { useAuth } from "@/components/auth/AuthContext";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { LoadState } from "@/components/ui/LoadState";
 import { getSection, getSubsection, deleteSubsection, deleteTask } from "@/lib/data";
-import { Badge } from "@/components/Badge";
-import { difficultyLabel } from "@/lib/difficulty";
+import { Badge } from "@/components/ui/Badge";
+import { difficultyLabel, taskTypeLabel } from "@/lib/labels";
 import { formatPercent } from "@/lib/format";
-import { taskTypeLabel } from "@/lib/labels";
 import { useApiData } from "@/hooks/useApiData";
 import { DELETE_ERROR, useSubmit } from "@/hooks/useSubmit";
 

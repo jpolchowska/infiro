@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { LoadState } from "@/components/LoadState";
+import { LoadState } from "@/components/ui/LoadState";
 import { getEbook } from "@/lib/data";
 import type { CalloutStyle, EbookBlock } from "@/lib/types";
 import { useApiData } from "@/hooks/useApiData";

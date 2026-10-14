@@ -3,9 +3,9 @@
 import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
-import { ErrorMessage } from "@/components/ErrorMessage";
-import { FormField, inputClass } from "@/components/FormField";
-import { LoadState } from "@/components/LoadState";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { FormField, inputClass } from "@/components/ui/FormField";
+import { LoadState } from "@/components/ui/LoadState";
 import { getSubsection, updateSubsection } from "@/lib/data";
 import type { Subsection } from "@/lib/types";
 import { useApiData } from "@/hooks/useApiData";

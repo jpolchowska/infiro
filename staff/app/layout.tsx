@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
-import { AuthProvider } from "@/components/AuthContext";
-import { AuthGate } from "@/components/AuthGate";
+import { AuthProvider } from "@/components/auth/AuthContext";
+import { AuthGate } from "@/components/auth/AuthGate";
 import "./globals.css";
 
 const inter = Inter({

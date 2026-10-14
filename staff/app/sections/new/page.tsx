@@ -3,8 +3,8 @@
 import { useState, type SubmitEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormField, inputClass } from "@/components/FormField";
-import { ErrorMessage } from "@/components/ErrorMessage";
+import { FormField, inputClass } from "@/components/ui/FormField";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { createSection } from "@/lib/data";
 import { SAVE_ERROR, useSubmit } from "@/hooks/useSubmit";
 

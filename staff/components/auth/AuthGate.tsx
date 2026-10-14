@@ -2,9 +2,9 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useAuth } from "@/components/AuthContext";
-import { HeaderNav } from "@/components/HeaderNav";
-import { LogoutButton } from "@/components/LogoutButton";
+import { useAuth } from "@/components/auth/AuthContext";
+import { HeaderNav } from "@/components/layout/HeaderNav";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { initialized, authenticated, role, logout } = useAuth();

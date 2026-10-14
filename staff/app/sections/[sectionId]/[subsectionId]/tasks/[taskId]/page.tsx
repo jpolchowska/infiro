@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { Badge } from "@/components/Badge";
-import { LoadState } from "@/components/LoadState";
-import { TaskContentView } from "@/components/TaskContentView";
-import { TaskStatsTiles } from "@/components/TaskStatsTiles";
+import { Badge } from "@/components/ui/Badge";
+import { LoadState } from "@/components/ui/LoadState";
+import { TaskContentView } from "@/components/tasks/TaskContentView";
+import { TaskStatsTiles } from "@/components/tasks/TaskStatsTiles";
 import { getTask } from "@/lib/data";
-import { difficultyLabel } from "@/lib/difficulty";
-import { taskTypeLabel, themeLabel } from "@/lib/labels";
+import { difficultyLabel, taskTypeLabel, themeLabel } from "@/lib/labels";
 import { useApiData } from "@/hooks/useApiData";
 
 export default function TaskPage() {

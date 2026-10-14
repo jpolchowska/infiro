@@ -1,4 +1,4 @@
-import { StatTile } from "@/components/StatTile";
+import { StatTile } from "@/components/ui/StatTile";
 import { formatPercent } from "@/lib/format";
 import type { TaskStats } from "@/lib/types";
 

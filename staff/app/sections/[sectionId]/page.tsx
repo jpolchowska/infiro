@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
-import { ErrorMessage } from "@/components/ErrorMessage";
-import { LoadState } from "@/components/LoadState";
+import { useAuth } from "@/components/auth/AuthContext";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { LoadState } from "@/components/ui/LoadState";
 import { getSection, deleteSection, deleteSubsection } from "@/lib/data";
 import { useApiData } from "@/hooks/useApiData";
 import { DELETE_ERROR, useSubmit } from "@/hooks/useSubmit";

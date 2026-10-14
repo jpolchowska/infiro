@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, type SubmitEvent } from "react";
-import { useAuth } from "@/components/AuthContext";
-import { ErrorMessage } from "@/components/ErrorMessage";
-import { FormField, inputClass } from "@/components/FormField";
-import { LoadState } from "@/components/LoadState";
+import { useAuth } from "@/components/auth/AuthContext";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { FormField, inputClass } from "@/components/ui/FormField";
+import { LoadState } from "@/components/ui/LoadState";
 import { getLevelingTestSettings, updateLevelingTestSettings } from "@/lib/data";
 import type { LevelingTestSettings } from "@/lib/types";
 import { useApiData } from "@/hooks/useApiData";

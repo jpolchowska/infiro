@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { getStudents } from "@/lib/data";
-import { Badge } from "@/components/Badge";
-import { ProgressBar } from "@/components/ProgressBar";
-import { LoadState } from "@/components/LoadState";
+import { Badge } from "@/components/ui/Badge";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { LoadState } from "@/components/ui/LoadState";
 import { formatRelativeDate, ratioPercent } from "@/lib/format";
 import { levelingTestStatusLabel } from "@/lib/labels";
 import { useApiData } from "@/hooks/useApiData";

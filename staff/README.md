@@ -11,7 +11,7 @@ Setup, environment variables and deployment are described in the [main README](.
 | Path | Contents |
 | --- | --- |
 | `app/` | Pages (App Router): course, students, teachers, content import, settings, login |
-| `components/` | Shared UI, authentication context and gate, import forms, student report parts |
+| `components/` | `ui/` shared building blocks, `auth/` Keycloak context and gate, `layout/` navigation, `tasks/`, `student/` and `import/` feature components |
 | `lib/api.ts` | Fetch wrapper with token handling and error mapping |
 | `lib/data/` | Typed API calls grouped by resource |
 | `hooks/` | `useApiData` loads page data with loading and error states, `useSubmit` runs saves and deletions |
