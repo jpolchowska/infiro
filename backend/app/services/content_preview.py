@@ -44,6 +44,18 @@ def _question_content(question, interest):
     )
 
 
+def _task_stats(task):
+    answers = StudentAnswer.query.filter_by(task_id=task.id).all()
+    correct = sum(1 for answer in answers if answer.is_correct)
+    return {
+        "attempts": len(answers),
+        "correct_attempts": correct,
+        "students_attempted": len({answer.student_id for answer in answers}),
+        "students_solved": len({answer.student_id for answer in answers if answer.is_correct}),
+        "accuracy": round(100 * correct / len(answers)) if answers else None,
+    }
+
+
 def task_reference(task):
     subsection = db.session.get(Subsection, task.subsection_id)
     section = db.session.get(Section, subsection.section_id) if subsection else None
@@ -67,18 +79,7 @@ def task_summary(task):
         "order_index": task.order_index,
         "themes": _theme_keys(task),
         **_task_content(task, None),
-    }
-
-
-def _task_stats(task):
-    answers = StudentAnswer.query.filter_by(task_id=task.id).all()
-    correct = sum(1 for answer in answers if answer.is_correct)
-    return {
-        "attempts": len(answers),
-        "correct_attempts": correct,
-        "students_attempted": len({answer.student_id for answer in answers}),
-        "students_solved": len({answer.student_id for answer in answers if answer.is_correct}),
-        "accuracy": round(100 * correct / len(answers)) if answers else None,
+        "stats": _task_stats(task),
     }
 
 
@@ -94,7 +95,6 @@ def task_detail(task):
             {"theme": key, **_task_content(task, key)}
             for key in _theme_keys(task)
         ],
-        "stats": _task_stats(task),
     }
 
 

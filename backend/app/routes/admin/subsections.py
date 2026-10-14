@@ -68,6 +68,23 @@ def get_subsection(subsection_id):
     return jsonify(payload), 200
 
 
+@bp.route("/subsections/<int:subsection_id>/ebook", methods=["GET"])
+@authenticate_token
+@require_any_realm_role(RealmRole.ADMIN, RealmRole.TEACHER)
+def get_subsection_ebook(subsection_id):
+    ebook = Ebook.query.filter_by(subsection_id=subsection_id).first()
+    if ebook is None:
+        return jsonify({"error": "Ebook not found"}), 404
+
+    return jsonify({
+        "id": ebook.id,
+        "subsection_id": ebook.subsection_id,
+        "title": ebook.title,
+        "intro": ebook.intro,
+        "blocks": ebook.content,
+    }), 200
+
+
 @bp.route("/subsections/<int:subsection_id>", methods=["PATCH"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)

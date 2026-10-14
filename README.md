@@ -320,7 +320,8 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `GET` | `/api/admin/sections/:id/final-test` | admin, teacher | Preview the section's final test questions |
 | `PATCH`/`DELETE` | `/api/admin/sections/:id` | admin | Update or delete a section |
 | `POST` | `/api/admin/sections/:id/subsections` | admin | Create a subsection |
-| `GET` | `/api/admin/subsections/:id` | admin, teacher | Get a subsection with its tasks (type, content and answers) |
+| `GET` | `/api/admin/subsections/:id` | admin, teacher | Get a subsection with its tasks (type, content, answers and answer statistics) |
+| `GET` | `/api/admin/subsections/:id/ebook` | admin, teacher | Preview the subsection's e-book |
 | `PATCH`/`DELETE` | `/api/admin/subsections/:id` | admin | Update or delete a subsection |
 | `GET` | `/api/admin/tasks/:id` | admin, teacher | Task preview: content of every theme variant and answer statistics |
 | `DELETE` | `/api/admin/tasks/:id` | admin | Delete a task (tasks are created and edited through the JSON import) |
@@ -332,6 +333,7 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `GET` | `/api/admin/students` | admin, teacher | List students with learning results and leveling test status |
 | `GET` | `/api/admin/students/:id` | admin, teacher | Student report: progress per section and subsection, activity, final tests, leveling test history |
 | `GET` | `/api/admin/students/:id/leveling-tests/:attemptId` | admin, teacher | One leveling test attempt with every question and answer |
+| `GET` | `/api/admin/students/:id/final-tests/:attemptId` | admin, teacher | One final test attempt with every question and answer |
 | `PATCH` | `/api/admin/students/:id` | admin | Update a student (e.g. assign a teacher) |
 
 ## Project Structure
