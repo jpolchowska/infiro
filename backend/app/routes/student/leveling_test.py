@@ -10,7 +10,7 @@ bp = Blueprint("student_leveling_test", __name__, url_prefix="/api/student")
 @bp.route("/leveling-test", methods=["GET"])
 @require_student
 def get_leveling_test(student):
-    return jsonify(build_leveling_test(student.interest)), 200
+    return jsonify(build_leveling_test(student)), 200
 
 
 @bp.route("/leveling-test/submit", methods=["POST"])

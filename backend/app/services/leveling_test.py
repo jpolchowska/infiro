@@ -1,8 +1,11 @@
+from datetime import timedelta
+
 from app.clock import utc_now
 from app.constants import TaskType
 from app.extensions import db
 from app.models.leveling_test_answers import LevelingTestAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
+from app.models.leveling_test_question_sets import LevelingTestQuestionSet
 from app.models.leveling_test_section_results import LevelingTestSectionResult
 from app.models.sections import Section
 from app.models.subsections import Subsection
@@ -14,6 +17,8 @@ from app.services.themes import resolve_theme, shuffled_options, task_options
 
 DIFFICULTY_LEVELS = (1, 2, 3)
 QUESTION_TYPES = (TaskType.SINGLE_CHOICE, TaskType.SHORT_ANSWER)
+REUSE_QUESTION_SET_FOR = timedelta(hours=24)
+MATCHED_QUESTION_SETS_LIMIT = 10
 
 
 def _levels_by_preference(level):
@@ -62,18 +67,82 @@ def _question_json(task, interest):
     return payload
 
 
-def build_leveling_test(interest):
+def _open_question_sets(student_id):
+    return (
+        LevelingTestQuestionSet.query
+        .filter(
+            LevelingTestQuestionSet.student_id == student_id,
+            LevelingTestQuestionSet.attempt_id.is_(None),
+        )
+        .order_by(LevelingTestQuestionSet.created_at.desc(), LevelingTestQuestionSet.id.desc())
+    )
+
+
+def _reusable_tasks(student_id):
+    question_set = _open_question_sets(student_id).first()
+    if question_set is None or question_set.created_at < utc_now() - REUSE_QUESTION_SET_FOR:
+        return None
+
+    tasks = [db.session.get(Task, task_id) for task_id in question_set.task_ids]
+    if any(task is None for task in tasks):
+        return None
+    return tasks
+
+
+def _draw_question_set(student_id):
     per_level = get_settings().questions_per_section // len(DIFFICULTY_LEVELS)
-    sections = []
+    tasks = []
     for section in Section.query.order_by(Section.order_index).all():
-        tasks = _pick_section_tasks(section.id, per_level)
-        if tasks:
-            sections.append({
-                "section_id": section.id,
-                "section_title": section.title,
-                "questions": [_question_json(task, interest) for task in tasks],
-            })
-    return {"sections": sections}
+        tasks.extend(_pick_section_tasks(section.id, per_level))
+
+    db.session.add(LevelingTestQuestionSet(student_id=student_id, task_ids=[task.id for task in tasks]))
+    db.session.commit()
+    return tasks
+
+
+def _group_by_section(tasks, interest):
+    sections = {}
+    for task in tasks:
+        subsection = db.session.get(Subsection, task.subsection_id)
+        section = db.session.get(Section, subsection.section_id)
+        entry = sections.setdefault(section.id, {
+            "section_id": section.id,
+            "section_title": section.title,
+            "questions": [],
+        })
+        entry["questions"].append(_question_json(task, interest))
+    return list(sections.values())
+
+
+def build_leveling_test(student):
+    tasks = _reusable_tasks(student.id)
+    if tasks is None:
+        tasks = _draw_question_set(student.id)
+    return {"sections": _group_by_section(tasks, student.interest)}
+
+
+def _matching_question_set(student_id, answered_task_ids):
+    expected = sorted(answered_task_ids)
+    for question_set in _open_question_sets(student_id).limit(MATCHED_QUESTION_SETS_LIMIT):
+        if sorted(question_set.task_ids) == expected:
+            return question_set
+    return None
+
+
+def _check_answered_tasks(student_id, answers):
+    if not all(isinstance(answer, dict) for answer in answers):
+        return None, "Each answer must be an object"
+
+    task_ids = [answer.get("task_id") for answer in answers]
+    if not all(isinstance(task_id, int) and not isinstance(task_id, bool) for task_id in task_ids):
+        return None, "Each answer must have an integer task_id"
+    if len(set(task_ids)) != len(task_ids):
+        return None, "Each task can be answered only once"
+
+    question_set = _matching_question_set(student_id, task_ids)
+    if question_set is None:
+        return None, "Answers do not match the current leveling test"
+    return question_set, None
 
 
 def _grade(answers, interest):
@@ -124,6 +193,10 @@ def _score_per_section(graded):
 
 
 def submit_leveling_test(student, answers):
+    question_set, error = _check_answered_tasks(student.id, answers)
+    if error:
+        return None, error
+
     graded, error = _grade(answers, student.interest)
     if error:
         return None, error
@@ -140,6 +213,7 @@ def submit_leveling_test(student, answers):
     )
     db.session.add(attempt)
     db.session.flush()
+    question_set.attempt_id = attempt.id
 
     for result in graded:
         db.session.add(LevelingTestAnswer(

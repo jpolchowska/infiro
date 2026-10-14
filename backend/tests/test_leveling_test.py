@@ -6,6 +6,7 @@ from app.clock import utc_now
 from app.extensions import db
 from app.models.leveling_test_answers import LevelingTestAnswer
 from app.models.leveling_test_attempts import LevelingTestAttempt
+from app.models.leveling_test_question_sets import LevelingTestQuestionSet
 from app.models.leveling_test_section_results import LevelingTestSectionResult
 from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
@@ -256,3 +257,101 @@ def test_deleting_content_keeps_leveling_history(client, login, course, student)
     assert LevelingTestAnswer.query.count() == 3
     orphaned = LevelingTestSectionResult.query.filter_by(section_title="Ułamki").one()
     assert orphaned.section_id is None
+
+
+def _task_ids(test):
+    return [q["task_id"] for section in test["sections"] for q in section["questions"]]
+
+
+def _get_test(client):
+    return client.get("/api/student/leveling-test", headers=HEADERS).json
+
+
+def _submit(client, answers):
+    return client.post("/api/student/leveling-test/submit", json={"answers": answers}, headers=HEADERS)
+
+
+def test_reopening_the_test_returns_the_same_questions(client, course, student):
+    first = _task_ids(_get_test(client))
+    second = _task_ids(_get_test(client))
+
+    assert first == second
+    assert LevelingTestQuestionSet.query.count() == 1
+
+
+def test_new_questions_are_drawn_after_submitting(client, course, student):
+    _submit(client, _correct_answers(client))
+
+    _get_test(client)
+
+    assert LevelingTestQuestionSet.query.count() == 2
+    assert LevelingTestQuestionSet.query.filter(LevelingTestQuestionSet.attempt_id.is_(None)).count() == 1
+
+
+def test_expired_question_set_is_replaced(client, course, student):
+    _get_test(client)
+    question_set = LevelingTestQuestionSet.query.one()
+    question_set.created_at = utc_now() - timedelta(hours=25)
+    db.session.commit()
+
+    _get_test(client)
+
+    assert LevelingTestQuestionSet.query.count() == 2
+
+
+def test_question_set_with_deleted_task_is_replaced(client, login, course, student):
+    task_id = _task_ids(_get_test(client))[0]
+    login("admin-sub", ["admin"])
+    client.delete(f"/api/admin/tasks/{task_id}", headers=HEADERS)
+    login("student-sub", ["student"])
+
+    assert task_id not in _task_ids(_get_test(client))
+
+
+def test_answers_to_an_older_open_test_are_accepted(client, course, student):
+    answers = _correct_answers(client)
+    question_set = LevelingTestQuestionSet.query.one()
+    question_set.created_at = utc_now() - timedelta(hours=25)
+    db.session.commit()
+    _get_test(client)
+
+    response = _submit(client, answers)
+
+    assert response.status_code == 201
+    assert db.session.get(LevelingTestQuestionSet, question_set.id).attempt_id is not None
+
+
+@pytest.mark.parametrize("change,error", [
+    (lambda answers: answers[:-1], "Answers do not match the current leveling test"),
+    (lambda answers: answers[:1], "Answers do not match the current leveling test"),
+    (lambda answers: answers + [answers[0]], "Each task can be answered only once"),
+    (lambda answers: answers[:-1] + [{"task_id": 99999}], "Answers do not match the current leveling test"),
+    (lambda answers: answers[:-1] + [{"task_id": "1"}], "Each answer must have an integer task_id"),
+])
+def test_incomplete_or_foreign_answers_are_rejected(client, course, student, change, error):
+    answers = _correct_answers(client)
+
+    response = _submit(client, change(answers))
+
+    assert response.status_code == 400
+    assert response.json == {"error": error}
+    assert LevelingTestAttempt.query.count() == 0
+
+
+def test_test_cannot_be_submitted_without_opening_it(client, course, student):
+    task = Task.query.filter_by(type="single_choice").first()
+
+    response = _submit(client, [{"task_id": task.id}])
+
+    assert response.status_code == 400
+    assert response.json == {"error": "Answers do not match the current leveling test"}
+
+
+def test_submitted_test_cannot_be_submitted_again(client, course, student):
+    answers = _correct_answers(client)
+    _submit(client, answers)
+
+    response = _submit(client, answers)
+
+    assert response.status_code == 400
+    assert LevelingTestAttempt.query.count() == 1
