@@ -329,8 +329,9 @@ Used by the Next.js panel and served under `/api/admin/`. Access is enforced by 
 | `POST` | `/api/admin/sections/:id/final-test/import` | admin | Import a section's final test from JSON |
 | `GET`/`PATCH` | `/api/admin/settings/leveling-test` | admin | Read or change leveling test settings (questions per section, interval, completion window) |
 | `GET` | `/api/admin/teachers` | admin | List teachers |
-| `GET` | `/api/admin/students` | admin, teacher | List students |
-| `GET` | `/api/admin/students/:id` | admin, teacher | Get a student's progress details |
+| `GET` | `/api/admin/students` | admin, teacher | List students with learning results and leveling test status |
+| `GET` | `/api/admin/students/:id` | admin, teacher | Student report: progress per section and subsection, activity, final tests, leveling test history |
+| `GET` | `/api/admin/students/:id/leveling-tests/:attemptId` | admin, teacher | One leveling test attempt with every question and answer |
 | `PATCH` | `/api/admin/students/:id` | admin | Update a student (e.g. assign a teacher) |
 
 ## Project Structure

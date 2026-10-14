@@ -10,7 +10,6 @@ from app.models.leveling_test_section_results import LevelingTestSectionResult
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.tasks import Task
-from app.serializers import attempt_json
 from app.services.answers import grade_answer
 from app.services.leveling_test_settings import get_settings
 from app.services.themes import resolve_theme, shuffled_options, task_options
@@ -236,36 +235,3 @@ def submit_leveling_test(student, answers):
         "max_score": len(graded),
         "per_section": per_section,
     }, None
-
-
-def section_results_json(attempt_id):
-    results = (
-        LevelingTestSectionResult.query.filter_by(attempt_id=attempt_id)
-        .order_by(LevelingTestSectionResult.id)
-        .all()
-    )
-    return [
-        {
-            "section_id": result.section_id,
-            "section_title": result.section_title,
-            "score": result.score,
-            "total": result.total,
-        }
-        for result in results
-    ]
-
-
-def leveling_test_history(student):
-    attempts = (
-        LevelingTestAttempt.query.filter_by(student_id=student.id)
-        .order_by(LevelingTestAttempt.completed_at.desc())
-        .all()
-    )
-    return [
-        {
-            "id": attempt.id,
-            **attempt_json(attempt),
-            "per_section": section_results_json(attempt.id),
-        }
-        for attempt in attempts
-    ]

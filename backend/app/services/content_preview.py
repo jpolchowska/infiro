@@ -44,6 +44,19 @@ def _question_content(question, interest):
     )
 
 
+def task_reference(task):
+    subsection = db.session.get(Subsection, task.subsection_id)
+    section = db.session.get(Section, subsection.section_id) if subsection else None
+    return {
+        "task_id": task.id,
+        "content_key": task.content_key,
+        "type": task.type,
+        "prompt": resolve_theme(task, None).get("prompt", task.body_text),
+        "subsection_title": subsection.title if subsection else None,
+        "section_title": section.title if section else None,
+    }
+
+
 def task_summary(task):
     return {
         "id": task.id,

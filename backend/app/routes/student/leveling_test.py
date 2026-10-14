@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify
 
 from app.auth import require_student
 from app.payload import json_object
-from app.services.leveling_test import build_leveling_test, leveling_test_history, submit_leveling_test
+from app.services.leveling_test import build_leveling_test, submit_leveling_test
+from app.services.leveling_test_history import leveling_test_history
 
 bp = Blueprint("student_leveling_test", __name__, url_prefix="/api/student")
 
