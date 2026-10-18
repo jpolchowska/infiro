@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/Badge";
+import { RichText } from "@/components/ui/RichText";
 import type { TaskContent, TaskType } from "@/lib/types";
 
 const LETTERS = ["A", "B", "C", "D", "E", "F"];
@@ -6,7 +7,9 @@ const LETTERS = ["A", "B", "C", "D", "E", "F"];
 export function TaskContentView({ type, content }: { type: TaskType; content: TaskContent }) {
   return (
     <div>
-      <p className="whitespace-pre-wrap text-base text-gray-900">{content.prompt}</p>
+      <p className="whitespace-pre-wrap text-base text-gray-900">
+        <RichText text={content.prompt} />
+      </p>
 
       {type === "single_choice" && (
         <ol className="mt-5 flex flex-col gap-2">
@@ -26,7 +29,9 @@ export function TaskContentView({ type, content }: { type: TaskType; content: Ta
               >
                 {LETTERS[index] ?? index + 1}
               </span>
-              <span className="flex-1">{option.text}</span>
+              <span className="flex-1">
+                <RichText text={option.text} />
+              </span>
               {option.isCorrect && <Badge variant="easy">Poprawna</Badge>}
             </li>
           ))}
