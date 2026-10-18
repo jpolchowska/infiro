@@ -9,7 +9,7 @@ import { pluralForm, pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 
 export default function Home() {
-  const { role } = useAuth();
+  const { role, firstName } = useAuth();
   const isTeacher = role === "teacher";
   const { state } = useApiData(async (token) => {
     const [sections, students] = await Promise.all([getSections(token), getStudents(token)]);
@@ -24,7 +24,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-infiro-navy">Witaj!</h1>
+      <h1 className="text-2xl font-semibold text-infiro-navy">{firstName ? `Witaj, ${firstName}!` : "Witaj!"}</h1>
       <p className="mt-1 max-w-2xl text-sm text-gray-500">
         {isTeacher
           ? "Przeglądaj treść kursu: sekcje, podsekcje i zadania."
