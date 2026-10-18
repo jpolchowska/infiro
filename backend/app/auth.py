@@ -7,8 +7,8 @@ from jwt import PyJWKClient
 from app.constants import RealmRole
 from app.models.users import User
 
-KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/matematyka-app/protocol/openid-connect/certs"
-KEYCLOAK_ISSUER_PATH = "/realms/matematyka-app"
+KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/infiro/protocol/openid-connect/certs"
+KEYCLOAK_ISSUER_PATH = "/realms/infiro"
 
 jwks_client = PyJWKClient(KEYCLOAK_JWKS_URI)
 

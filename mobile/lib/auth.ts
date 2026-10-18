@@ -2,8 +2,8 @@ import * as AuthSession from "expo-auth-session";
 import * as SecureStore from "expo-secure-store";
 
 export const KEYCLOAK_URL = process.env.EXPO_PUBLIC_KEYCLOAK_URL;
-export const REALM = "matematyka-app";
-export const CLIENT_ID = "matematyka-mobile";
+export const REALM = "infiro";
+export const CLIENT_ID = "infiro-mobile";
 
 const OPENID_URL = `${KEYCLOAK_URL}/realms/${REALM}/protocol/openid-connect`;
 

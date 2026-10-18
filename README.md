@@ -76,13 +76,13 @@ The project organizes course content into sections → subsections → tasks, wi
 ```mermaid
 graph LR
   subgraph Clients
-    MOBILE["mobile\nExpo / React Native\nStudent\nclient: matematyka-mobile"]
-    STAFF["staff\nNext.js panel\nAdmin + Teacher\nclient: nextjs-app"]
+    MOBILE["mobile\nExpo / React Native\nStudent\nclient: infiro-mobile"]
+    STAFF["staff\nNext.js panel\nAdmin + Teacher\nclient: infiro-staff"]
   end
 
   subgraph "Docker network"
     NGINX["nginx :80\nsingle entrypoint"]
-    KC["Keycloak\nmatematyka-app realm"]
+    KC["Keycloak\ninfiro realm"]
     API["backend :5000\nFlask REST API + JWKS validation"]
     DB[("PostgreSQL")]
     UPLOADS[("static/uploads\nvolume")]
@@ -229,7 +229,7 @@ docker compose exec backend python -m pytest tests -q
    docker compose -f compose.yaml -f compose.prod.yaml ps
 ```
 
-5. Log into Keycloak as admin (`https://mathiro.test/admin/` or the tunnel address), switch to the `matematyka-app` realm, open the `nextjs-app` client, and add the tunnel URL from step 2 with `/*` appended to **Valid Redirect URIs** (e.g. `https://xxxx.trycloudflare.com/*`). Add it alongside the existing entries — don't replace them.
+5. Log into Keycloak as admin (`https://mathiro.test/admin/` or the tunnel address), switch to the `infiro` realm, open the `infiro-staff` client, and add the tunnel URL from step 2 with `/*` appended to **Valid Redirect URIs** (e.g. `https://xxxx.trycloudflare.com/*`). Add it alongside the existing entries — don't replace them.
 
 6. Open the app:
    - Browser, this machine: `https://mathiro.test`
@@ -255,7 +255,7 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 
 ## Creating Accounts
 
-Accounts are created in the Keycloak admin console, under the `matematyka-app` realm. Every account is set up the same way — a username, a password, and one group that grants its role:
+Accounts are created in the Keycloak admin console, under the `infiro` realm. Every account is set up the same way — a username, a password, and one group that grants its role:
 
 | Group | Role | For |
 |---|---|---|
@@ -263,7 +263,7 @@ Accounts are created in the Keycloak admin console, under the `matematyka-app` r
 | `nauczyciele` | `teacher` | teachers |
 | `administratorzy` | `admin` | admins |
 
-1. Log in to the Keycloak admin console and open the `matematyka-app` realm → **Users** → **Create new user**.
+1. Log in to the Keycloak admin console and open the `infiro` realm → **Users** → **Create new user**.
 2. Enter a username — for students a code such as `uczen-0142`. Leave the email and name fields empty; for teachers and admins the **First name** is optional and is shown in the panel next to the username.
 3. Click **Join Groups**, select the group for the account, and create the user.
 4. Open **Credentials** and set a password with **Temporary** turned off.
