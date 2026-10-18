@@ -44,7 +44,7 @@ def _option(task_id, is_correct):
     return TaskAnswerOption.query.filter_by(task_id=task_id, is_correct=is_correct).first().id
 
 
-def test_timed_practice_draws_at_most_twenty_choice_questions(client, subsection):
+def test_timed_practice_draws_at_most_twenty_questions(client, subsection):
     response = client.get(f"/api/student/subsections/{subsection}/timed", headers=HEADERS)
 
     assert response.status_code == 200
@@ -52,9 +52,67 @@ def test_timed_practice_draws_at_most_twenty_choice_questions(client, subsection
     questions = response.json["questions"]
     assert len(questions) == 20
     assert len({question["task_id"] for question in questions}) == 20
+    for question in questions:
+        if question["type"] == "single_choice":
+            assert all(set(option) == {"id", "text"} for option in question["options"])
+        else:
+            assert question["type"] == "short_answer"
+            assert "options" not in question
+
+
+def test_timed_practice_offers_choice_and_short_answer_tasks_but_not_memory(client, login):
+    login("admin-sub", ["admin"])
+    client.post(
+        "/api/admin/tasks/import",
+        json=[{"section": "Dodawanie", "subsections": [{"subsection": "Mieszane", "tasks": [
+            _choice("mixed"),
+            {
+                "content_key": "mixed-short",
+                "type": "short_answer",
+                "difficulty": 1,
+                "themes": {"default": {"prompt": "Ile to 2 + 2?", "answers": ["4"]}},
+            },
+            {
+                "content_key": "mixed-memory",
+                "type": "memory",
+                "themes": {"default": {"prompt": "Połącz.", "pairs": [
+                    {"a": "1 + 1", "b": "2"}, {"a": "2 + 2", "b": "4"}, {"a": "3 + 3", "b": "6"},
+                ]}},
+            },
+        ]}]}],
+        headers=HEADERS,
+    )
+    login("student-sub", ["student"])
+    client.get("/api/student/me", headers=HEADERS)
+
+    questions = client.get("/api/student/subsections/1/timed", headers=HEADERS).json["questions"]
+
+    by_type = {question["type"]: question for question in questions}
+    assert by_type.keys() == {"single_choice", "short_answer"}
+    assert by_type["short_answer"]["prompt"] == "Ile to 2 + 2?"
+
+
+def test_timed_practice_scores_short_answers(client, subsection):
     short_answer_id = Task.query.filter_by(content_key="timed-short").one().id
-    assert short_answer_id not in {question["task_id"] for question in questions}
-    assert all(set(option) == {"id", "text"} for question in questions for option in question["options"])
+    choice_id = Task.query.filter_by(content_key="timed-0").one().id
+
+    def submit(answer_text):
+        answers = [{"task_id": short_answer_id, "answer_text": answer_text}]
+        return client.post(
+            f"/api/student/subsections/{subsection}/timed/submit",
+            json={"answers": answers, "elapsed_seconds": 5},
+            headers=HEADERS,
+        ).json
+
+    assert submit(" 4 ") == {"correct": 1, "answered": 1, "total": 20}
+    assert submit("5") == {"correct": 0, "answered": 1, "total": 20}
+    assert submit("") == {"correct": 0, "answered": 0, "total": 20}
+    mixed = client.post(
+        f"/api/student/subsections/{subsection}/timed/submit",
+        json={"answers": [{"task_id": choice_id, "answer_text": "1"}], "elapsed_seconds": 5},
+        headers=HEADERS,
+    ).json
+    assert mixed["answered"] == 0
 
 
 def test_timed_practice_scores_only_valid_first_answers(client, subsection):

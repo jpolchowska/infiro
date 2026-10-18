@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MathText } from '../../../components/MathText';
 import { Text } from '../../../components/Text';
 import { ErrorState } from '../../../components/student/ErrorState';
+import { TimedShortAnswer } from '../../../components/student/TimedShortAnswer';
 import { TimedAnswer, TimedResult, TimedSet, getTimedSet, submitTimedSet } from '../../../lib/timed';
 import { useTheme, withAlpha } from '../../../lib/theme';
 
@@ -87,10 +88,10 @@ export default function TimedScreen() {
     setPhase('running');
   };
 
-  const pick = (optionId: number) => {
+  const answer = (partial: { selectedOptionId: number } | { answerText: string }) => {
     if (!set) return;
     const q = set.questions[index];
-    answersRef.current = [...answersRef.current, { taskId: q.taskId, selectedOptionId: optionId }];
+    answersRef.current = [...answersRef.current, { taskId: q.taskId, ...partial }];
     if (index + 1 >= set.questions.length) finish();
     else setIndex((i) => i + 1);
   };
@@ -131,12 +132,12 @@ export default function TimedScreen() {
               Ćwicz na czas
             </Text>
             <Text style={{ color: 'rgba(255,255,255,0.7)' }} className="text-base mb-8">
-              Masz {set.durationSeconds} sekund na jak najwięcej zadań ABC z tej podsekcji. Bez
-              podpowiedzi — wybierasz i lecisz dalej.
+              Masz {set.durationSeconds} sekund na jak najwięcej zadań z tej podsekcji. Bez
+              podpowiedzi — odpowiadasz i lecisz dalej.
             </Text>
             {empty && (
               <Text style={{ color: 'rgba(255,255,255,0.7)' }} className="text-sm mb-4">
-                Brak zadań ABC w tej podsekcji.
+                Brak zadań w tej podsekcji.
               </Text>
             )}
             <Pressable
@@ -199,44 +200,50 @@ export default function TimedScreen() {
               {q.prompt}
             </MathText>
 
-            <View style={{ gap: 10, marginTop: 24 }}>
-              {q.options.map((opt, i) => (
-                <Pressable
-                  key={opt.id}
-                  onPress={() => pick(opt.id)}
-                  className="flex-row items-center"
-                  style={{
-                    borderRadius: 16,
-                    borderWidth: 1.5,
-                    borderColor: theme.surfaceBorder,
-                    backgroundColor: theme.surface,
-                    paddingVertical: 15,
-                    paddingHorizontal: 15,
-                    gap: 13,
-                  }}
-                >
-                  <View
-                    className="items-center justify-center"
+            {q.type === 'short_answer' ? (
+              <View style={{ marginTop: 24 }}>
+                <TimedShortAnswer key={q.taskId} theme={theme} onAnswer={(answerText) => answer({ answerText })} />
+              </View>
+            ) : (
+              <View style={{ gap: 10, marginTop: 24 }}>
+                {q.options.map((opt, i) => (
+                  <Pressable
+                    key={opt.id}
+                    onPress={() => answer({ selectedOptionId: opt.id })}
+                    className="flex-row items-center"
                     style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 100,
-                      backgroundColor: withAlpha(theme.textPrimary, 0.06),
+                      borderRadius: 16,
+                      borderWidth: 1.5,
+                      borderColor: theme.surfaceBorder,
+                      backgroundColor: theme.surface,
+                      paddingVertical: 15,
+                      paddingHorizontal: 15,
+                      gap: 13,
                     }}
                   >
-                    <Text className="font-manrope-bold text-[13px]" style={{ color: theme.textPrimary }}>
-                      {LETTERS[i]}
-                    </Text>
-                  </View>
-                  <MathText
-                    className={`${textClass} font-manrope-semibold text-[15px] flex-1`}
-                    color={theme.textPrimary}
-                  >
-                    {opt.text}
-                  </MathText>
-                </Pressable>
-              ))}
-            </View>
+                    <View
+                      className="items-center justify-center"
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 100,
+                        backgroundColor: withAlpha(theme.textPrimary, 0.06),
+                      }}
+                    >
+                      <Text className="font-manrope-bold text-[13px]" style={{ color: theme.textPrimary }}>
+                        {LETTERS[i]}
+                      </Text>
+                    </View>
+                    <MathText
+                      className={`${textClass} font-manrope-semibold text-[15px] flex-1`}
+                      color={theme.textPrimary}
+                    >
+                      {opt.text}
+                    </MathText>
+                  </Pressable>
+                ))}
+              </View>
+            )}
           </ScrollView>
         </SafeAreaView>
       </View>
