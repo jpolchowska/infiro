@@ -52,9 +52,9 @@ useEffect(() => {
         console.log('Logged in successfully!');
         const accountType = getAccountType(tokenResult.accessToken);
 
-        if (accountType === "Nauczyciel") {
-          router.replace('/(teacher)/home');
-        } else if (accountType === "Uczeń") {
+        if (accountType === 'staff') {
+          router.replace('/(staff)/home');
+        } else {
           let nextRoute: '/(student)/interests' | '/(student)/leveling-test' | '/(student)/home' = '/(student)/home';
           try {
             const me = await getMe();
