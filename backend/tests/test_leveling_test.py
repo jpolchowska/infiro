@@ -151,6 +151,7 @@ def test_submit_saves_results_without_counting_towards_progress(client, course, 
 
     history = client.get("/api/student/leveling-test/history", headers=HEADERS).json
     assert history[0]["score"] == 5
+    assert history[0]["completed_at"] == stats["last_leveling_test"]["completed_at"]
     assert history[0]["per_section"][1]["section_title"] == "Ułamki"
 
 

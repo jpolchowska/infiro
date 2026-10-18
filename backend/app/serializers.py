@@ -11,7 +11,7 @@ def attempt_json(attempt):
     return {
         "score": attempt.score,
         "total": attempt.max_score,
-        "completedAt": iso_utc(attempt.completed_at),
+        "completed_at": iso_utc(attempt.completed_at),
     }
 
 

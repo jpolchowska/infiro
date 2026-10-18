@@ -242,6 +242,7 @@ def test_history_lists_past_attempts_newest_first(client, login):
     assert len(response.json) == 2
     assert response.json[0]["score"] == 2
     assert response.json[1]["score"] == 1
+    assert response.json[0].keys() == {"score", "total", "completed_at"}
 
 
 def test_sections_list_surfaces_latest_final_test_score(client, login):

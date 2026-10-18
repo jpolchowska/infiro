@@ -253,6 +253,13 @@ export async function getSubsectionTasks(subsectionId: number): Promise<Subsecti
   };
 }
 
+type RawTestAttempt = { score: number; total: number; completed_at: string };
+
 export async function getLevelingTestHistory(): Promise<LastLevelingTest[]> {
-  return apiFetch<LastLevelingTest[]>("/api/student/leveling-test/history");
+  const raw = await apiFetch<RawTestAttempt[]>("/api/student/leveling-test/history");
+  return raw.map((attempt) => ({
+    completedAt: attempt.completed_at,
+    score: attempt.score,
+    total: attempt.total,
+  }));
 }
