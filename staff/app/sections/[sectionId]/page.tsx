@@ -7,6 +7,7 @@ import { LoadState } from "@/components/ui/LoadState";
 import { getSection } from "@/lib/data";
 import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
+import { BackLink } from "@/components/ui/BackLink";
 
 export default function SectionPage() {
   const { sectionId } = useParams<{ sectionId: string }>();
@@ -21,9 +22,7 @@ export default function SectionPage() {
 
   return (
     <div>
-      <Link href="/" className="text-sm text-gray-500 hover:text-infiro-navy">
-        &larr; Wszystkie sekcje
-      </Link>
+      <BackLink href="/">Wszystkie sekcje</BackLink>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{section.title}</h1>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">{section.description}</p>
       <p className="mt-3 text-sm text-gray-700">
@@ -50,7 +49,7 @@ export default function SectionPage() {
           <Link
             key={sub.id}
             href={`/sections/${section.id}/${sub.id}`}
-            className="flex min-h-41 flex-col rounded-lg border border-infiro-border bg-white p-5 hover:border-infiro-navy"
+            className="flex min-h-41 flex-col rounded-sm border border-infiro-border bg-white p-5 hover:border-infiro-navy"
           >
             <h3 className="text-base font-semibold text-infiro-navy">{sub.title}</h3>
             <p className="mt-1 flex-1 text-sm text-gray-600">{sub.description}</p>

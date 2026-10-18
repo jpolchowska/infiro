@@ -66,7 +66,7 @@ export default function Home() {
           <Link
             key={section.id}
             href={`/sections/${section.id}`}
-            className="flex min-h-41 flex-col rounded-lg border border-infiro-border bg-white p-5 hover:border-infiro-navy"
+            className="flex min-h-41 flex-col rounded-sm border border-infiro-border bg-white p-5 hover:border-infiro-navy"
           >
             <span className="text-xs font-medium text-gray-400">
               {String(index + 1).padStart(2, "0")}

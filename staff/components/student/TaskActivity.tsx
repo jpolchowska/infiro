@@ -11,7 +11,7 @@ export function NeedsPracticeList({ items }: { items: PracticeItem[] }) {
   return (
     <ul className="mt-3 flex flex-col gap-2">
       {items.map((item) => (
-        <li key={item.taskId} className="rounded-lg border border-infiro-border bg-white px-4 py-2.5 text-sm">
+        <li key={item.taskId} className="rounded-sm border border-infiro-border bg-white px-4 py-2.5 text-sm">
           <p className="line-clamp-2 text-gray-900">{item.prompt}</p>
           <p className="mt-1 text-xs text-gray-500">
             {taskTypeLabel(item.type)} · {item.sectionTitle} / {item.subsectionTitle} · próba #{item.attemptNumber}
@@ -24,7 +24,7 @@ export function NeedsPracticeList({ items }: { items: PracticeItem[] }) {
 
 export function RecentActivityTable({ items }: { items: ActivityItem[] }) {
   return (
-    <div className="mt-4 overflow-x-auto rounded-lg border border-infiro-border bg-white">
+    <div className="mt-4 overflow-x-auto rounded-sm border border-infiro-border bg-white">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">

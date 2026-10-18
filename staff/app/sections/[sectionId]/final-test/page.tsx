@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { LoadState } from "@/components/ui/LoadState";
@@ -10,6 +9,7 @@ import { getFinalTestPreview } from "@/lib/data";
 import { taskTypeLabel, themeLabel } from "@/lib/labels";
 import { pluralForm, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
+import { BackLink } from "@/components/ui/BackLink";
 
 export default function FinalTestPage() {
   const { sectionId } = useParams<{ sectionId: string }>();
@@ -22,9 +22,7 @@ export default function FinalTestPage() {
 
   return (
     <div>
-      <Link href={`/sections/${sectionId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
-        &larr; {finalTest.sectionTitle}
-      </Link>
+      <BackLink href={`/sections/${sectionId}`}>{finalTest.sectionTitle}</BackLink>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Test końcowy działu</h1>
 
       <div className="mt-6 grid max-w-xl grid-cols-3 gap-3">
@@ -38,7 +36,7 @@ export default function FinalTestPage() {
       ) : (
         <ol className="mt-8 flex max-w-2xl flex-col gap-4">
           {finalTest.questions.map((question, index) => (
-            <li key={question.id} className="rounded-lg border border-infiro-border bg-white p-5">
+            <li key={question.id} className="rounded-sm border border-infiro-border bg-white p-5">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold text-infiro-navy">Pytanie {index + 1}</span>
                 <Badge>{taskTypeLabel(question.type)}</Badge>

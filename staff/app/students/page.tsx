@@ -6,15 +6,9 @@ import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { LoadState } from "@/components/ui/LoadState";
 import { formatAccount, formatRelativeDate, ratioPercent, studentLabel } from "@/lib/format";
-import { levelingTestStatusLabel } from "@/lib/labels";
+import { accuracyTone, levelingTestStatusLabel } from "@/lib/labels";
 import { useApiData } from "@/hooks/useApiData";
-
-function accuracyBadgeVariant(accuracy: number | null): "easy" | "mid" | "hard" | "neutral" {
-  if (accuracy === null) return "neutral";
-  if (accuracy >= 70) return "easy";
-  if (accuracy >= 40) return "mid";
-  return "hard";
-}
+import { BackLink } from "@/components/ui/BackLink";
 
 export default function ResultsPage() {
   const { state } = useApiData(getStudents);
@@ -25,15 +19,13 @@ export default function ResultsPage() {
 
   return (
     <div>
-      <Link href="/" className="text-sm text-gray-500 hover:text-infiro-navy">
-        &larr; Panel główny
-      </Link>
+      <BackLink href="/">Panel główny</BackLink>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Uczniowie</h1>
       <p className="mt-2 max-w-2xl text-sm text-gray-600">
         Lista uczniów i ich postępów. Kliknij ucznia, aby zobaczyć szczegóły.
       </p>
 
-      <div className="mt-6 overflow-x-auto rounded-lg border border-infiro-border bg-white">
+      <div className="mt-6 overflow-x-auto rounded-sm border border-infiro-border bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
@@ -67,7 +59,7 @@ export default function ResultsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-24">
-                        <ProgressBar percent={ratioPercent(student.solvedTasks, student.totalTasks)} />
+                        <ProgressBar percent={ratioPercent(student.solvedTasks, student.totalTasks)} tone={accuracyTone(student.accuracy)} />
                       </div>
                       <span className="text-xs text-gray-500">
                         {student.solvedTasks}/{student.totalTasks}
@@ -76,7 +68,7 @@ export default function ResultsPage() {
                   </td>
                   <td className="px-4 py-3">
                     {student.accuracy !== null ? (
-                      <Badge variant={accuracyBadgeVariant(student.accuracy)}>{student.accuracy}%</Badge>
+                      <Badge variant={accuracyTone(student.accuracy)}>{student.accuracy}%</Badge>
                     ) : (
                       <span className="text-gray-400">—</span>
                     )}

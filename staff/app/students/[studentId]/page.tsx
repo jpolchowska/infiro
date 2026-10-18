@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { LoadState } from "@/components/ui/LoadState";
 import { StatTile } from "@/components/ui/StatTile";
@@ -12,6 +11,7 @@ import { formatAccount, formatDate, formatPercent, studentLabel } from "@/lib/fo
 import { themeLabel } from "@/lib/labels";
 import { pluralForm } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
+import { BackLink } from "@/components/ui/BackLink";
 
 export default function StudentPage() {
   const { studentId } = useParams<{ studentId: string }>();
@@ -24,9 +24,7 @@ export default function StudentPage() {
 
   return (
     <div>
-      <Link href="/students" className="text-sm text-gray-500 hover:text-infiro-navy">
-        &larr; Wszyscy uczniowie
-      </Link>
+      <BackLink href="/students">Wszyscy uczniowie</BackLink>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{studentLabel(student)}</h1>
       <p className="mt-1 text-sm text-gray-500">
         zainteresowanie: {themeLabel(student.interest)} · dołączył(a) {formatDate(student.joinedAt)} · nauczyciel:{" "}

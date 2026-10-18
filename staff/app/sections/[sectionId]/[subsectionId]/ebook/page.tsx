@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { LoadState } from "@/components/ui/LoadState";
 import { getEbook } from "@/lib/data";
 import type { CalloutStyle, EbookBlock } from "@/lib/types";
 import { useApiData } from "@/hooks/useApiData";
+import { BackLink } from "@/components/ui/BackLink";
 
 const CALLOUT_LABELS: Record<CalloutStyle, string> = {
   zapamietaj: "Zapamiętaj",
@@ -65,10 +65,8 @@ export default function EbookPage() {
 
   return (
     <div>
-      <Link href={`/sections/${sectionId}/${subsectionId}`} className="text-sm text-gray-500 hover:text-infiro-navy">
-        &larr; Wróć do podsekcji
-      </Link>
-      <article className="mt-3 max-w-2xl rounded-lg border border-infiro-border bg-white p-8">
+      <BackLink href={`/sections/${sectionId}/${subsectionId}`}>Wróć do podsekcji</BackLink>
+      <article className="mt-3 max-w-2xl rounded-sm border border-infiro-border bg-white p-8">
         <h1 className="text-2xl font-semibold text-infiro-navy">{ebook.title}</h1>
         {ebook.intro && <p className="mt-3 text-gray-600">{ebook.intro}</p>}
         {ebook.blocks.map((block, index) => (

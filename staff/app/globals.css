@@ -16,6 +16,13 @@
   --color-infiro-purple: #c873d9;
   --color-infiro-white: #fefefe;
   --color-infiro-border: #dfe2ee;
+
+  --color-tone-good: #1f7a5c;
+  --color-tone-good-soft: rgba(31, 122, 92, 0.1);
+  --color-tone-warn: #8a5a16;
+  --color-tone-warn-soft: rgba(240, 182, 126, 0.3);
+  --color-tone-bad: #c2352e;
+  --color-tone-bad-soft: rgba(255, 95, 85, 0.13);
 }
 
 body {
