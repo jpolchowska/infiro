@@ -35,7 +35,7 @@ def _viewer():
 def list_teachers():
     teachers = (
         User.query.filter_by(role=UserRole.TEACHER)
-        .order_by(User.last_name, User.first_name, User.id)
+        .order_by(User.username, User.id)
         .all()
     )
     return jsonify([teacher_json(teacher) for teacher in teachers]), 200
@@ -48,7 +48,7 @@ def list_students():
     if role is None:
         return jsonify({"error": MISSING_ROLE}), 403
 
-    query = User.query.filter_by(role=UserRole.STUDENT)
+    query = User.query.filter_by(role=UserRole.STUDENT).order_by(User.username, User.id)
     if role == RealmRole.TEACHER:
         query = query.filter_by(teacher_id=teacher.id)
 

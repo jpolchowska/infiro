@@ -26,15 +26,11 @@ SHORT_ACTIVITY_WINDOW = timedelta(days=7)
 LONG_ACTIVITY_WINDOW = timedelta(days=30)
 
 
-def full_name(user):
-    return f"{user.first_name or ''} {user.last_name or ''}".strip() or None
-
-
 def teacher_json(teacher):
     return {
         "id": teacher.id,
-        "name": full_name(teacher),
-        "email": teacher.email,
+        "username": teacher.username,
+        "name": teacher.name,
     }
 
 
@@ -61,12 +57,12 @@ def _summary(student, total_tasks, settings):
 
     return {
         "id": student.id,
-        "name": full_name(student),
-        "email": student.email,
+        "username": student.username,
         "interest": student.interest,
         "joined_at": iso_utc(student.created_at),
         "teacher_id": student.teacher_id,
-        "teacher_name": full_name(teacher) if teacher else None,
+        "teacher_username": teacher.username if teacher else None,
+        "teacher_name": teacher.name if teacher else None,
         "solved_tasks": len({answer.task_id for answer in answers if answer.is_correct}),
         "total_tasks": total_tasks,
         "accuracy": round(100 * correct_attempts / len(answers)) if answers else None,

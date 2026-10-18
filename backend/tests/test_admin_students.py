@@ -72,19 +72,42 @@ def test_admin_student_doesnt_exist(client, login):
     assert response.status_code == 404
 
 
-def test_admin_lists_teachers_by_name(client, login):
+def test_admin_lists_teachers_by_username(client, login):
     login(roles=["admin"])
     db.session.add_all([
-        User(keycloak_sub="t1", role="teacher", first_name="Zofia", last_name="Wójcik", email="z@example.com"),
-        User(keycloak_sub="t2", role="teacher", first_name="Adam", last_name="Nowak"),
-        User(keycloak_sub="s1", role="student", first_name="Ala"),
+        User(keycloak_sub="t1", role="teacher", username="zofia.w", name="Zofia"),
+        User(keycloak_sub="t2", role="teacher", username="bartek"),
+        User(keycloak_sub="t3", role="teacher", username="anna.k", name="Anna"),
+        User(keycloak_sub="s1", role="student", username="uczen-1"),
     ])
     db.session.commit()
 
     response = client.get("/api/admin/teachers", headers=HEADERS)
 
     assert response.status_code == 200
-    assert [teacher["name"] for teacher in response.json] == ["Adam Nowak", "Zofia Wójcik"]
+    assert [(teacher["username"], teacher["name"]) for teacher in response.json] == [
+        ("anna.k", "Anna"),
+        ("bartek", None),
+        ("zofia.w", "Zofia"),
+    ]
+
+
+def test_students_are_listed_by_username_without_personal_data(client, login):
+    login(roles=["admin"])
+    teacher = User(keycloak_sub="t1", role="teacher", username="anna.k", name="Anna")
+    db.session.add(teacher)
+    db.session.flush()
+    db.session.add_all([
+        User(keycloak_sub="s1", role="student", username="uczen-2"),
+        User(keycloak_sub="s2", role="student", username="uczen-1", teacher_id=teacher.id),
+    ])
+    db.session.commit()
+
+    students = client.get("/api/admin/students", headers=HEADERS).json
+
+    assert [student["username"] for student in students] == ["uczen-1", "uczen-2"]
+    assert (students[0]["teacher_username"], students[0]["teacher_name"]) == ("anna.k", "Anna")
+    assert not {"name", "email"} & students[0].keys()
 
 
 def test_admin_can_unassign_a_teacher(client, login):

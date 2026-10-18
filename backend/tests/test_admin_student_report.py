@@ -77,10 +77,9 @@ def report_data(client, login):
     client.post("/api/admin/tasks/import", json=CONTENT, headers=HEADERS)
     client.post("/api/admin/sections/1/final-test/import", json=FINAL_TEST, headers=HEADERS)
 
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["ROLE_TEACHER"], preferred_username="anna.k", given_name="Anna")
     client.get("/api/admin/students", headers=HEADERS)
     teacher = User.query.filter_by(keycloak_sub="teacher-sub").one()
-    teacher.first_name, teacher.last_name = "Anna", "Nowak"
 
     login("student-sub", ["student"])
     client.get("/api/student/me", headers=HEADERS)
@@ -124,7 +123,7 @@ def test_summary_shows_profile_and_learning_results_only(client, report_data):
     summary = client.get("/api/admin/students", headers=HEADERS).json[0]
 
     assert summary["interest"] == "sport"
-    assert summary["teacher_name"] == "Anna Nowak"
+    assert (summary["teacher_username"], summary["teacher_name"]) == ("anna.k", "Anna")
     assert summary["joined_at"] is not None
     assert summary["total_attempts"] == 4
     assert summary["solved_tasks"] == 2

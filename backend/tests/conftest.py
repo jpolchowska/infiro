@@ -26,10 +26,11 @@ def client(tmp_path):
 
 @pytest.fixture
 def login(monkeypatch):
-    def _login(sub=None, roles=()):
+    def _login(sub=None, roles=(), **profile):
         claims = {
             "iss": KEYCLOAK_ISSUER,
             "realm_access": {"roles": list(roles)},
+            **profile,
         }
         if sub is not None:
             claims["sub"] = sub
