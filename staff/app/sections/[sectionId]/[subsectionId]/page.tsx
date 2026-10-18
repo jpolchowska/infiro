@@ -5,12 +5,11 @@ import { notFound, useParams } from "next/navigation";
 import { LoadState } from "@/components/ui/LoadState";
 import { getSection, getSubsection } from "@/lib/data";
 import { Badge } from "@/components/ui/Badge";
+import { COLUMN_HEADER, TABLE_ROW, TableCard } from "@/components/ui/TableCard";
 import { difficultyLabel, taskTypeLabel } from "@/lib/labels";
 import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 import { BackLink } from "@/components/ui/BackLink";
-
-const COLUMN_HEADER = "px-6 py-3 text-[11px] font-medium uppercase tracking-[0.08em] text-gray-500";
 
 export default function SubsectionPage() {
   const { sectionId, subsectionId } = useParams<{ sectionId: string; subsectionId: string }>();
@@ -49,55 +48,48 @@ export default function SubsectionPage() {
         </div>
       </section>
 
-      <section className="mt-6 overflow-hidden rounded-sm border border-infiro-border bg-white">
-        <div className="flex items-baseline gap-3 border-b border-gray-100 px-6 py-4">
-          <h2 className="text-sm font-semibold text-infiro-navy">Zadania</h2>
-          <span className="text-sm text-gray-500">{pluralize(subsection.tasks.length, WORDS.task)}</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-background/50">
-              <tr className="border-b border-gray-100 text-left">
-                <th className={COLUMN_HEADER}>Zadanie</th>
-                <th className={COLUMN_HEADER}>Treść</th>
-                <th className={COLUMN_HEADER}>Typ</th>
-                <th className={COLUMN_HEADER}>Poziom</th>
-                <th className={COLUMN_HEADER} />
+      <div className="mt-6">
+        <TableCard title="Zadania" count={pluralize(subsection.tasks.length, WORDS.task)}>
+          <thead className="bg-background/50">
+            <tr className="border-b border-gray-100 text-left">
+              <th className={COLUMN_HEADER}>Zadanie</th>
+              <th className={COLUMN_HEADER}>Treść</th>
+              <th className={COLUMN_HEADER}>Typ</th>
+              <th className={COLUMN_HEADER}>Poziom</th>
+              <th className={COLUMN_HEADER} />
+            </tr>
+          </thead>
+          <tbody>
+            {subsection.tasks.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-6 py-10 text-center text-gray-400">
+                  Brak zadań w tej podsekcji.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {subsection.tasks.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-gray-400">
-                    Brak zadań w tej podsekcji.
+            )}
+            {subsection.tasks.map((task, index) => {
+              const difficulty = difficultyLabel(task.difficulty);
+              return (
+                <tr key={task.id} className={TABLE_ROW}>
+                  <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">Zadanie {index + 1}</td>
+                  <td className="max-w-md px-6 py-4 text-gray-600">
+                    <span className="line-clamp-2">{task.prompt}</span>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-gray-600">{taskTypeLabel(task.type)}</td>
+                  <td className="px-6 py-4">
+                    <Badge variant={difficulty.variant}>{difficulty.label}</Badge>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right">
+                    <Link href={`${basePath}/tasks/${task.id}`} className="font-medium text-infiro-navy hover:underline">
+                      Podgląd &rsaquo;
+                    </Link>
                   </td>
                 </tr>
-              )}
-              {subsection.tasks.map((task, index) => {
-                const difficulty = difficultyLabel(task.difficulty);
-                return (
-                  <tr key={task.id} className="border-b border-gray-100 last:border-0 hover:bg-background/40">
-                    <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">Zadanie {index + 1}</td>
-                    <td className="max-w-md px-6 py-4 text-gray-600">
-                      <span className="line-clamp-2">{task.prompt}</span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-gray-600">{taskTypeLabel(task.type)}</td>
-                    <td className="px-6 py-4">
-                      <Badge variant={difficulty.variant}>{difficulty.label}</Badge>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right">
-                      <Link href={`${basePath}/tasks/${task.id}`} className="font-medium text-infiro-navy hover:underline">
-                        Podgląd &rsaquo;
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
+              );
+            })}
+          </tbody>
+        </TableCard>
+      </div>
     </div>
   );
 }

@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { getStudents } from "@/lib/data";
 import { Badge } from "@/components/ui/Badge";
-import { ProgressBar } from "@/components/ui/ProgressBar";
+import { BackLink } from "@/components/ui/BackLink";
 import { LoadState } from "@/components/ui/LoadState";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { COLUMN_HEADER, TABLE_ROW, TableCard } from "@/components/ui/TableCard";
 import { formatAccount, formatRelativeDate, ratioPercent, studentLabel } from "@/lib/format";
 import { accuracyTone, levelingTestStatusLabel } from "@/lib/labels";
+import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
-import { BackLink } from "@/components/ui/BackLink";
 
 export default function ResultsPage() {
   const { state } = useApiData(getStudents);
@@ -25,55 +27,57 @@ export default function ResultsPage() {
         Lista uczniów i ich postępów. Kliknij ucznia, aby zobaczyć szczegóły.
       </p>
 
-      <div className="mt-6 overflow-x-auto rounded-sm border border-infiro-border bg-white">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
-              <th className="px-4 py-3 font-medium">Uczeń</th>
-              <th className="px-4 py-3 font-medium">Nauczyciel</th>
-              <th className="px-4 py-3 font-medium">Rozwiązane</th>
-              <th className="px-4 py-3 font-medium">Celność</th>
-              <th className="px-4 py-3 font-medium">Test poziomujący</th>
-              <th className="px-4 py-3 font-medium">Ostatnia aktywność</th>
-              <th className="px-4 py-3"></th>
+      <div className="mt-6">
+        <TableCard title="Uczniowie" count={pluralize(students.length, WORDS.student)}>
+          <thead className="bg-background/50">
+            <tr className="border-b border-gray-100 text-left">
+              <th className={COLUMN_HEADER}>Uczeń</th>
+              <th className={COLUMN_HEADER}>Nauczyciel</th>
+              <th className={COLUMN_HEADER}>Rozwiązane</th>
+              <th className={COLUMN_HEADER}>Celność</th>
+              <th className={COLUMN_HEADER}>Test poziomujący</th>
+              <th className={COLUMN_HEADER}>Ostatnia aktywność</th>
+              <th className={COLUMN_HEADER} />
             </tr>
           </thead>
           <tbody>
             {students.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">
                   Brak uczniów.
                 </td>
               </tr>
             )}
             {students.map((student) => {
               const levelingTest = levelingTestStatusLabel(student.levelingTest.status);
+              const teacher = formatAccount(student.teacherUsername, student.teacherName);
               return (
-                <tr key={student.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3">
+                <tr key={student.id} className={TABLE_ROW}>
+                  <td className="whitespace-nowrap px-6 py-4">
                     <Link href={`/students/${student.id}`} className="font-medium text-infiro-navy hover:underline">
                       {studentLabel(student)}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{formatAccount(student.teacherUsername, student.teacherName) ?? "—"}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-24">
-                        <ProgressBar percent={ratioPercent(student.solvedTasks, student.totalTasks)} tone={accuracyTone(student.accuracy)} />
-                      </div>
-                      <span className="text-xs text-gray-500">
-                        {student.solvedTasks}/{student.totalTasks}
-                      </span>
+                  <td className="whitespace-nowrap px-6 py-4 text-gray-600">{teacher ?? "—"}</td>
+                  <td className="px-6 py-4">
+                    <div className="w-40">
+                      <ProgressBar
+                        percent={ratioPercent(student.solvedTasks, student.totalTasks)}
+                        tone={accuracyTone(student.accuracy)}
+                      />
                     </div>
+                    <span className="mt-1.5 block text-xs text-gray-500">
+                      {student.solvedTasks} z {student.totalTasks}
+                    </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-6 py-4">
                     {student.accuracy !== null ? (
                       <Badge variant={accuracyTone(student.accuracy)}>{student.accuracy}%</Badge>
                     ) : (
                       <span className="text-gray-400">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="whitespace-nowrap px-6 py-4">
                     <Badge variant={levelingTest.variant}>{levelingTest.label}</Badge>
                     {student.lastLevelingTest && (
                       <span className="ml-2 text-xs text-gray-500">
@@ -81,17 +85,17 @@ export default function ResultsPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{formatRelativeDate(student.lastActivity)}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link href={`/students/${student.id}`} className="text-infiro-navy hover:underline">
-                      Zobacz
+                  <td className="whitespace-nowrap px-6 py-4 text-gray-600">{formatRelativeDate(student.lastActivity)}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right">
+                    <Link href={`/students/${student.id}`} className="font-medium text-infiro-navy hover:underline">
+                      Zobacz &rsaquo;
                     </Link>
                   </td>
                 </tr>
               );
             })}
           </tbody>
-        </table>
+        </TableCard>
       </div>
     </div>
   );
