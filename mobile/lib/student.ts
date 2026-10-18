@@ -1,11 +1,20 @@
 import { apiFetch } from "./api";
 import { TaskType } from "./tasks";
 
+export type LevelingTestStatus = "not_taken" | "up_to_date" | "due" | "overdue";
+
+export type LevelingTestState = {
+  status: LevelingTestStatus;
+  dueAt: string | null;
+  deadlineAt: string | null;
+};
+
 export type StudentMe = {
   id: number;
   username: string | null;
   role: string;
   levelingTestCompleted: boolean;
+  levelingTest: LevelingTestState;
   interest: string | null;
 };
 
@@ -14,6 +23,7 @@ type RawMe = {
   username: string | null;
   role: string;
   leveling_test_completed: boolean;
+  leveling_test: { status: LevelingTestStatus; due_at: string | null; deadline_at: string | null };
   interest: string | null;
 };
 
@@ -25,6 +35,11 @@ export async function getMe(): Promise<StudentMe> {
     username: raw.username,
     role: raw.role,
     levelingTestCompleted: raw.leveling_test_completed,
+    levelingTest: {
+      status: raw.leveling_test.status,
+      dueAt: raw.leveling_test.due_at,
+      deadlineAt: raw.leveling_test.deadline_at,
+    },
     interest: raw.interest,
   };
 }

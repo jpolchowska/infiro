@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../components/Text';
@@ -30,6 +30,8 @@ const CTA_SHADOW = {
 };
 
 export default function LevelingTestScreen() {
+  const { optional } = useLocalSearchParams<{ optional?: string }>();
+  const isOptional = optional === '1';
   const [step, setStep] = useState<Step>('intro');
   const [questions, setQuestions] = useState<LevelingQuestion[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -93,6 +95,13 @@ export default function LevelingTestScreen() {
   };
 
   const handleClose = () => {
+    if (isOptional) {
+      Alert.alert('Przerwać test?', 'Możesz do niego wrócić później z ekranu głównego.', [
+        { text: 'Zostań', style: 'cancel' },
+        { text: 'Przerwij', style: 'destructive', onPress: goToApp },
+      ]);
+      return;
+    }
     Alert.alert('Przerwać test?', 'Test trzeba będzie zrobić od nowa, żeby wejść do aplikacji.', [
       { text: 'Zostań', style: 'cancel' },
       { text: 'Przerwij', style: 'destructive', onPress: restartTest },
@@ -180,6 +189,11 @@ export default function LevelingTestScreen() {
                 </>
               )}
             </Pressable>
+            {isOptional && (
+              <Pressable onPress={goToApp} className="rounded-2xl py-4 items-center mt-3 bg-infiro-white/10">
+                <Text className="text-infiro-white font-manrope-semibold text-base">Później</Text>
+              </Pressable>
+            )}
           </View>
         </View>
       </SafeAreaView>

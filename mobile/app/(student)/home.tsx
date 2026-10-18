@@ -51,6 +51,7 @@ export default function HomeScreen() {
 
   const loading = !me || !stats;
 
+  const levelingTestDue = me?.levelingTest.status === 'due';
   const current = stats?.current ?? null;
   const currentColor = current ? topicColor(theme, current.sectionIndex) : theme.accent;
   const currentPct =
@@ -81,6 +82,47 @@ export default function HomeScreen() {
                 Cześć!
               </Text>
             </View>
+
+            {levelingTestDue && (
+              <View
+                style={{
+                  backgroundColor: theme.surface,
+                  borderRadius: 20,
+                  padding: 18,
+                  marginBottom: 20,
+                  borderWidth: 1.5,
+                  borderColor: theme.accent,
+                }}
+              >
+                <View className="flex-row items-center" style={{ gap: 14 }}>
+                  <View
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: withAlpha(theme.accent, 0.12) }}
+                  >
+                    <Ionicons name="speedometer-outline" size={22} color={theme.accent} />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="font-manrope-extrabold text-[15px]" style={{ color: theme.textPrimary }}>
+                      Czas na test poziomujący
+                    </Text>
+                    <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs mt-0.5">
+                      {me?.levelingTest.deadlineAt
+                        ? `Zrób go do ${formatShortDate(me.levelingTest.deadlineAt)}.`
+                        : 'Zrób go, kiedy znajdziesz chwilę.'}
+                    </Text>
+                  </View>
+                </View>
+                <Pressable
+                  onPress={() => router.push('/(student)/leveling-test?optional=1')}
+                  className="items-center justify-center"
+                  style={{ height: 48, borderRadius: 100, backgroundColor: theme.accent, marginTop: 14 }}
+                >
+                  <Text className="font-manrope-extrabold text-[15px]" style={{ color: theme.accentInk }}>
+                    Zrób test
+                  </Text>
+                </Pressable>
+              </View>
+            )}
 
             {current && (
               <LinearGradient
