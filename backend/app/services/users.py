@@ -1,4 +1,4 @@
-from app.constants import INTERESTS, UserRole
+from app.constants import DEFAULT_THEME, INTERESTS, UserRole
 from app.extensions import db
 from app.models.users import User
 
@@ -27,7 +27,7 @@ def get_or_create_user(claims, role):
 
 
 def update_interest(user, interest):
-    if interest is not None and interest not in INTERESTS:
+    if interest is not None and interest != DEFAULT_THEME and interest not in INTERESTS:
         raise ValueError("Invalid interest")
 
     user.interest = interest

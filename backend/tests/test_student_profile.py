@@ -72,7 +72,7 @@ def test_teacher_name_is_taken_from_token(client, login):
     assert (teacher.username, teacher.name) == ("anna.k", "Anna")
 
 
-@pytest.mark.parametrize("interest,status", [("sport", 204), (None, 204), ("kosmos", 400)])
+@pytest.mark.parametrize("interest,status", [("sport", 204), ("default", 204), (None, 204), ("kosmos", 400)])
 def test_interest_must_be_one_of_the_themes(client, login, interest, status):
     login("student-sub", ["student"])
     client.get("/api/student/me", headers=HEADERS)
