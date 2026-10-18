@@ -114,8 +114,8 @@ export type Ebook = {
 
 export type Teacher = {
   id: number;
+  username: string | null;
   name: string | null;
-  email: string | null;
 };
 
 export type LevelingTestStatus = "not_taken" | "up_to_date" | "due" | "overdue";
@@ -139,11 +139,11 @@ export type AttemptSummary = TestScore & {
 
 export type Student = {
   id: number;
-  name: string | null;
-  email: string | null;
+  username: string | null;
   interest: string | null;
   joinedAt: string | null;
   teacherId: number | null;
+  teacherUsername: string | null;
   teacherName: string | null;
   solvedTasks: number;
   totalTasks: number;

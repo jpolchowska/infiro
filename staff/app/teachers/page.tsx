@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { LoadState } from "@/components/ui/LoadState";
 import { getStudents, getTeachers, updateStudentTeacher } from "@/lib/data";
+import { formatAccount, studentLabel } from "@/lib/format";
 import type { Student, Teacher } from "@/lib/types";
 import { useApiData } from "@/hooks/useApiData";
 
@@ -91,10 +92,7 @@ function TeacherAssignments({ initialStudents, teachers }: { initialStudents: St
             {students.map((student) => (
               <tr key={student.id} className="border-b border-gray-100 last:border-0">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-gray-900">
-                    {student.name ?? "Uczeń bez imienia"}
-                  </div>
-                  <div className="mt-0.5 text-xs text-gray-500">{student.email ?? "—"}</div>
+                  <div className="font-medium text-gray-900">{studentLabel(student)}</div>
                 </td>
                 <td className="px-4 py-3">
                   <select
@@ -103,12 +101,12 @@ function TeacherAssignments({ initialStudents, teachers }: { initialStudents: St
                       setTeacherIds((current) => ({ ...current, [student.id]: event.target.value }))
                     }
                     className="w-56 rounded-sm border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-infiro-navy focus:ring-1 focus:ring-infiro-navy"
-                    aria-label={`Nauczyciel dla ${student.name ?? "ucznia"}`}
+                    aria-label={`Nauczyciel dla ${studentLabel(student)}`}
                   >
                     <option value="">Brak przypisania</option>
                     {teachers.map((teacher) => (
                       <option key={teacher.id} value={teacher.id}>
-                        {teacher.name ?? teacher.email ?? `Nauczyciel #${teacher.id}`}
+                        {formatAccount(teacher.username, teacher.name) ?? `Nauczyciel #${teacher.id}`}
                       </option>
                     ))}
                   </select>

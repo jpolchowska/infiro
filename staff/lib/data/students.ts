@@ -21,11 +21,11 @@ type RawSectionScore = { section_id: number | null; section_title: string; score
 
 type RawStudent = {
   id: number;
-  name: string | null;
-  email: string | null;
+  username: string | null;
   interest: string | null;
   joined_at: string | null;
   teacher_id: number | null;
+  teacher_username: string | null;
   teacher_name: string | null;
   solved_tasks: number;
   total_tasks: number;
@@ -151,11 +151,11 @@ function mapAnsweredQuestion(raw: RawAnsweredQuestion): AnsweredQuestion {
 function mapStudent(raw: RawStudent): Student {
   return {
     id: raw.id,
-    name: raw.name,
-    email: raw.email,
+    username: raw.username,
     interest: raw.interest,
     joinedAt: raw.joined_at,
     teacherId: raw.teacher_id,
+    teacherUsername: raw.teacher_username,
     teacherName: raw.teacher_name,
     solvedTasks: raw.solved_tasks,
     totalTasks: raw.total_tasks,
