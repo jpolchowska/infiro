@@ -240,7 +240,7 @@ def test_invalid_settings_are_rejected(client, login, payload):
 
 
 def test_only_admin_can_change_settings(client, login):
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["teacher"])
 
     response = client.patch("/api/admin/settings/leveling-test", json={"interval_days": 14}, headers=HEADERS)
 

@@ -6,7 +6,7 @@ from tests.ebook_zip import build_ebook_zip, import_ebook
 
 
 def test_get_student_ebooks_existing_ebook(client, login):
-    login("admin-sub", ["admin", "student"])
+    login("admin-sub", ["admin"])
 
     admin = User(
         keycloak_sub="admin-sub",
@@ -44,6 +44,7 @@ def test_get_student_ebooks_existing_ebook(client, login):
 
     assert response.status_code == 201
 
+    login("student-sub", ["student"])
     response = client.get(
         f'/api/student/subsections/{subsection.id}/ebook',
         headers={
@@ -56,7 +57,7 @@ def test_get_student_ebooks_existing_ebook(client, login):
 
 
 def test_get_student_ebooks_nonexisting_ebook(client, login):
-    login("admin-sub", ["admin", "student"])
+    login("student-sub", ["student"])
 
     section = Section(
         title="Ułamki proste",
@@ -97,7 +98,7 @@ def test_staff_can_preview_an_ebook(client, login):
     db.session.commit()
     import_ebook(client, build_ebook_zip())
 
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["teacher"])
     response = client.get(
         f"/api/admin/subsections/{subsection.id}/ebook",
         headers={"Authorization": "Bearer test-token"},

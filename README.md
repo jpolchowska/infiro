@@ -13,7 +13,7 @@ An educational mathematics platform — structured course content, adaptive leve
 
 ## Overview
 
-The project organizes course content into sections → subsections → tasks, with a short theory e-book attached to each subsection. Tasks come in three types and three difficulty levels, and every task carries per-theme variants so the same exercise can be framed around a student's interests. Students work through this content, a leveling test, and timed practice from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to sections and the results of their assigned students, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin`, `ROLE_TEACHER`, and `ROLE_STUDENT` roles, and members of the `nauczyciele` (teachers) group receive `ROLE_TEACHER`.
+The project organizes course content into sections → subsections → tasks, with a short theory e-book attached to each subsection. Tasks come in three types and three difficulty levels, and every task carries per-theme variants so the same exercise can be framed around a student's interests. Students work through this content, a leveling test, and timed practice from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to sections and the results of their assigned students, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin`, `teacher`, and `student` roles, and members of the `nauczyciele` (teachers) group receive `teacher`.
 
 ## Table of Contents
 
@@ -76,13 +76,13 @@ The project organizes course content into sections → subsections → tasks, wi
 ```mermaid
 graph LR
   subgraph Clients
-    MOBILE["mobile\nExpo / React Native\nStudent\nclient: matematyka-mobile"]
-    STAFF["staff\nNext.js panel\nAdmin + Teacher\nclient: nextjs-app"]
+    MOBILE["mobile\nExpo / React Native\nStudent\nclient: infiro-mobile"]
+    STAFF["staff\nNext.js panel\nAdmin + Teacher\nclient: infiro-staff"]
   end
 
   subgraph "Docker network"
     NGINX["nginx :80\nsingle entrypoint"]
-    KC["Keycloak\nmatematyka-app realm"]
+    KC["Keycloak\ninfiro realm"]
     API["backend :5000\nFlask REST API + JWKS validation"]
     DB[("PostgreSQL")]
     UPLOADS[("static/uploads\nvolume")]
@@ -229,7 +229,7 @@ docker compose exec backend python -m pytest tests -q
    docker compose -f compose.yaml -f compose.prod.yaml ps
 ```
 
-5. Log into Keycloak as admin (`https://mathiro.test/admin/` or the tunnel address), switch to the `matematyka-app` realm, open the `nextjs-app` client, and add the tunnel URL from step 2 with `/*` appended to **Valid Redirect URIs** (e.g. `https://xxxx.trycloudflare.com/*`). Add it alongside the existing entries — don't replace them.
+5. Log into Keycloak as admin (`https://mathiro.test/admin/` or the tunnel address), switch to the `infiro` realm, open the `infiro-staff` client, and add the tunnel URL from step 2 with `/*` appended to **Valid Redirect URIs** (e.g. `https://xxxx.trycloudflare.com/*`). Add it alongside the existing entries — don't replace them.
 
 6. Open the app:
    - Browser, this machine: `https://mathiro.test`
@@ -249,32 +249,30 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 
 | Role | Permissions |
 |---|---|
-| **Admin** (`admin`) | browse course content; import tasks, e-books, and final tests; assign teachers to students; change leveling test settings |
-| **Teacher** (`ROLE_TEACHER`, via the `nauczyciele` group) | view sections and the results of their assigned students (read-only) |
-| **Student** (`ROLE_STUDENT`) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
+| **Admin** (`admin`, via the `administratorzy` group) | browse course content; import tasks, e-books, and final tests; assign teachers to students; change leveling test settings |
+| **Teacher** (`teacher`, via the `nauczyciele` group) | view sections and the results of their assigned students (read-only) |
+| **Student** (`student`, via the `uczniowie` group) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
 
 ## Creating Accounts
 
-Account creation and role assignment currently happen directly in the Keycloak admin console, under the `matematyka-app` realm.
+Accounts are created in the Keycloak admin console, under the `infiro` realm. Every account is set up the same way — a username, a password, and one group that grants its role:
 
-Users sign in with a username and password only. The realm does not require an email or a last name, and users cannot edit their own profile.
+| Group | Role | For |
+|---|---|---|
+| `uczniowie` | `student` | students |
+| `nauczyciele` | `teacher` | teachers |
+| `administratorzy` | `admin` | admins |
 
-**Student (Uczeń)**
-1. Log in to the Keycloak admin console.
-2. Go to the `matematyka-app` realm → **Users** → create a new user with just a username (for example a code such as `uczen-0142`) and leave the name fields empty.
-3. Open **Credentials** and set a password with **Temporary** turned off.
+1. Log in to the Keycloak admin console and open the `infiro` realm → **Users** → **Create new user**.
+2. Enter a username — for students a code such as `uczen-0142`. Leave the email and name fields empty; for teachers and admins the **First name** is optional and is shown in the panel next to the username.
+3. Click **Join Groups**, select the group for the account, and create the user.
+4. Open **Credentials** and set a password with **Temporary** turned off.
+
+Users sign in with their username and password only, and cannot edit their own profile. An account without a group has no access: the student app tells the user to ask whoever created the account to finish setting it up, and the panel shows a no-access page.
 
 Do not reuse the username of a deleted account — the backend keeps the old student's record and the username must stay unique.
 
-**Teacher (Nauczyciel)**
-1. Same as above; the **First name** field is optional and is shown in the panel next to the username.
-2. Open the created user → **Groups** → **Join Group**, select `nauczyciele`, and join.
-
 Staff accounts (teachers and admins) cannot use the student app — it shows them a notice to use the panel instead.
-
-**Admin (Administrator)**
-1. Create the user as above.
-2. On the user, go to **Role mapping** → **Assign role**, filter by realm roles, and assign `admin` (the role is imported with the realm).
 
 ## Content Import
 
@@ -296,7 +294,7 @@ All endpoints except `/api/health` require `Authorization: Bearer <token>`. Erro
 
 ### Student
 
-Available to student accounts; the local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call). Staff accounts (`admin`, `ROLE_TEACHER`) get `403` from `/api/student/me`, so no student record is ever created for them.
+Requires the `student` role and no staff role; any other account gets `403`, so no student record is ever created for it. The local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call).
 
 | Method | Endpoint | Description |
 |---|---|---|

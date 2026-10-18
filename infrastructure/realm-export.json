@@ -1,6 +1,6 @@
 {
   "id": "7e20365d-9195-49ad-afae-e49cf0cf9fb0",
-  "realm": "matematyka-app",
+  "realm": "infiro",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
@@ -75,7 +75,7 @@
       },
       {
         "id": "9c2fadfc-02a3-4739-bb1f-01e35c0d8bb9",
-        "name": "ROLE_STUDENT",
+        "name": "student",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -84,7 +84,7 @@
       },
       {
         "id": "fdb16a87-59ef-45a8-bbd7-6aeb78213c3f",
-        "name": "ROLE_TEACHER",
+        "name": "teacher",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -93,7 +93,7 @@
       },
       {
         "id": "f170111f-b46b-4de6-b54e-116d2241847f",
-        "name": "default-roles-matematyka-app",
+        "name": "default-roles-infiro",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
@@ -328,7 +328,7 @@
       ],
       "security-admin-console": [],
       "admin-cli": [],
-      "nextjs-app": [],
+      "infiro-staff": [],
       "account-console": [],
       "broker": [
         {
@@ -429,10 +429,21 @@
           "attributes": {}
         }
       ],
-      "matematyka-mobile": []
+      "infiro-mobile": []
     }
   },
   "groups": [
+    {
+      "id": "7126e17b-cc79-484a-8c14-d8d7c18817f3",
+      "name": "administratorzy",
+      "path": "/administratorzy",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [
+        "admin"
+      ],
+      "clientRoles": {}
+    },
     {
       "id": "2e575d1f-1dfb-48b5-bf34-6c070b04d75c",
       "name": "nauczyciele",
@@ -440,14 +451,25 @@
       "subGroups": [],
       "attributes": {},
       "realmRoles": [
-        "ROLE_TEACHER"
+        "teacher"
+      ],
+      "clientRoles": {}
+    },
+    {
+      "id": "fc656680-eb02-42a3-9e7a-866d3bb6427b",
+      "name": "uczniowie",
+      "path": "/uczniowie",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [
+        "student"
       ],
       "clientRoles": {}
     }
   ],
   "defaultRole": {
     "id": "f170111f-b46b-4de6-b54e-116d2241847f",
-    "name": "default-roles-matematyka-app",
+    "name": "default-roles-infiro",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
@@ -522,13 +544,13 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/matematyka-app/account/",
+      "baseUrl": "/realms/infiro/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/matematyka-app/account/*"
+        "/realms/infiro/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -569,13 +591,13 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/matematyka-app/account/",
+      "baseUrl": "/realms/infiro/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/matematyka-app/account/*"
+        "/realms/infiro/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -711,7 +733,7 @@
     },
     {
       "id": "e069b49f-5814-41bb-958a-95c4370c520b",
-      "clientId": "matematyka-mobile",
+      "clientId": "infiro-mobile",
       "name": "Aplikacja Mobilna Matematyka",
       "description": "",
       "rootUrl": "",
@@ -780,7 +802,7 @@
     },
     {
       "id": "c11c60c7-eed2-47d9-a6ee-76bc2dd76461",
-      "clientId": "nextjs-app",
+      "clientId": "infiro-staff",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -890,13 +912,13 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/matematyka-app/console/",
+      "baseUrl": "/admin/infiro/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/admin/matematyka-app/console/*"
+        "/admin/infiro/console/*"
       ],
       "webOrigins": [
         "+"

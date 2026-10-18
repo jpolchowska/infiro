@@ -5,7 +5,7 @@ import pytest
 from app import create_app
 from app.extensions import db
 
-KEYCLOAK_ISSUER = "http://keycloak:8080/realms/matematyka-app"
+KEYCLOAK_ISSUER = "http://keycloak:8080/realms/infiro"
 
 
 @pytest.fixture

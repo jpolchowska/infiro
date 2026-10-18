@@ -14,7 +14,7 @@ from app.services.users import get_or_create_user
 
 bp = Blueprint("admin_students", __name__, url_prefix="/api/admin")
 
-MISSING_ROLE = "Missing required role: admin or ROLE_TEACHER"
+MISSING_ROLE = "Missing required role: admin or teacher"
 
 
 def _viewer():

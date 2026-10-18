@@ -54,15 +54,16 @@ def test_me_creates_the_student_and_refreshes_their_username(client, login):
     assert (second["username"], second["role"]) == ("uczen-2", "student")
 
 
-@pytest.mark.parametrize("roles", [["admin"], ["ROLE_TEACHER"], ["ROLE_TEACHER", "student"]])
-def test_staff_accounts_cannot_use_the_student_app(client, login, roles):
-    login("staff-sub", roles, preferred_username="staff")
+@pytest.mark.parametrize("roles", [[], ["admin"], ["teacher"], ["teacher", "student"], ["admin", "student"]])
+@pytest.mark.parametrize("url", ["/api/student/me", "/api/student/stats", "/api/student/subsections/1/ebook"])
+def test_only_student_accounts_can_use_the_student_app(client, login, roles, url):
+    login("other-sub", roles, preferred_username="other")
 
-    response = client.get("/api/student/me", headers=HEADERS)
+    response = client.get(url, headers=HEADERS)
 
     assert response.status_code == 403
-    assert response.json == {"error": "Staff accounts cannot use the student app"}
-    assert User.query.filter_by(keycloak_sub="staff-sub").first() is None
+    assert response.json == {"message": "Student account required"}
+    assert User.query.filter_by(keycloak_sub="other-sub").first() is None
 
 
 def test_student_name_from_token_is_never_stored(client, login):
@@ -75,7 +76,7 @@ def test_student_name_from_token_is_never_stored(client, login):
 
 
 def test_teacher_name_is_taken_from_token(client, login):
-    login("teacher-sub", ["ROLE_TEACHER"], preferred_username="anna.k", given_name="Anna")
+    login("teacher-sub", ["teacher"], preferred_username="anna.k", given_name="Anna")
 
     client.get("/api/admin/students", headers=HEADERS)
 

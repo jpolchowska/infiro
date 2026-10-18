@@ -162,7 +162,7 @@ def test_missing_course_items_return_404(client, login, url):
 def test_teacher_can_browse_but_not_change_the_course(client, login):
     login("admin-sub", ["admin"])
     client.post("/api/admin/sections", json={"title": "Ułamki"}, headers=HEADERS)
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["teacher"])
 
     assert client.get("/api/admin/sections", headers=HEADERS).status_code == 200
     assert client.get("/api/admin/sections/1", headers=HEADERS).status_code == 200

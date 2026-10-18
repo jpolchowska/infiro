@@ -51,7 +51,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" options={{ animation: 'fade', animationDuration: 220 }} />
         <Stack.Screen name="(student)" options={{ animation: 'fade', animationDuration: 220 }} />
-        <Stack.Screen name="(staff)" options={{ animation: 'fade', animationDuration: 220 }} />
+        <Stack.Screen name="account-notice" options={{ animation: 'fade', animationDuration: 220 }} />
       </Stack>
     </SafeAreaProvider>
   );

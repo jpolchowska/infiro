@@ -22,8 +22,7 @@ ENDPOINTS = [
 
 
 @pytest.fixture
-def content(login):
-    login("user-sub", ["admin"])
+def content():
     db.session.add_all([
         User(keycloak_sub="user-sub", role="student"),
         Section(title="Ułamki", order_index=1),
@@ -33,9 +32,15 @@ def content(login):
     db.session.commit()
 
 
+def _login_for(login, url):
+    login("user-sub", ["admin"] if url.startswith("/api/admin/") else ["student"])
+
+
 @pytest.mark.parametrize("method,url", ENDPOINTS)
 @pytest.mark.parametrize("body", [[], "text", 5, None])
-def test_non_object_json_body_is_rejected(client, content, method, url, body):
+def test_non_object_json_body_is_rejected(client, login, content, method, url, body):
+    _login_for(login, url)
+
     response = getattr(client, method)(url, json=body, headers=HEADERS)
 
     assert response.status_code == 400
@@ -46,7 +51,9 @@ def test_non_object_json_body_is_rejected(client, content, method, url, body):
     ("post", "/api/admin/tasks/import"),
     ("post", "/api/admin/sections/1/final-test/import"),
 ])
-def test_non_json_body_is_rejected(client, content, method, url):
+def test_non_json_body_is_rejected(client, login, content, method, url):
+    _login_for(login, url)
+
     response = getattr(client, method)(url, data="not json", headers=HEADERS)
 
     assert response.status_code == 400

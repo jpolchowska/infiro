@@ -77,7 +77,7 @@ def report_data(client, login):
     client.post("/api/admin/tasks/import", json=CONTENT, headers=HEADERS)
     client.post("/api/admin/sections/1/final-test/import", json=FINAL_TEST, headers=HEADERS)
 
-    login("teacher-sub", ["ROLE_TEACHER"], preferred_username="anna.k", given_name="Anna")
+    login("teacher-sub", ["teacher"], preferred_username="anna.k", given_name="Anna")
     client.get("/api/admin/students", headers=HEADERS)
     teacher = User.query.filter_by(keycloak_sub="teacher-sub").one()
 
@@ -210,10 +210,10 @@ def test_teacher_sees_only_own_students_tests(client, login, report_data):
     student_id, attempt_id = report_data["student"].id, report_data["attempt_id"]
     url = f"/api/admin/students/{student_id}/leveling-tests/{attempt_id}"
 
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["teacher"])
     assert client.get(url, headers=HEADERS).status_code == 200
 
-    login("other-teacher-sub", ["ROLE_TEACHER"])
+    login("other-teacher-sub", ["teacher"])
     assert client.get(url, headers=HEADERS).status_code == 404
 
 
