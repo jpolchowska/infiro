@@ -434,6 +434,17 @@
   },
   "groups": [
     {
+      "id": "7126e17b-cc79-484a-8c14-d8d7c18817f3",
+      "name": "administratorzy",
+      "path": "/administratorzy",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [
+        "admin"
+      ],
+      "clientRoles": {}
+    },
+    {
       "id": "2e575d1f-1dfb-48b5-bf34-6c070b04d75c",
       "name": "nauczyciele",
       "path": "/nauczyciele",
@@ -441,6 +452,17 @@
       "attributes": {},
       "realmRoles": [
         "teacher"
+      ],
+      "clientRoles": {}
+    },
+    {
+      "id": "fc656680-eb02-42a3-9e7a-866d3bb6427b",
+      "name": "uczniowie",
+      "path": "/uczniowie",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [
+        "student"
       ],
       "clientRoles": {}
     }

@@ -249,32 +249,30 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 
 | Role | Permissions |
 |---|---|
-| **Admin** (`admin`) | browse course content; import tasks, e-books, and final tests; assign teachers to students; change leveling test settings |
+| **Admin** (`admin`, via the `administratorzy` group) | browse course content; import tasks, e-books, and final tests; assign teachers to students; change leveling test settings |
 | **Teacher** (`teacher`, via the `nauczyciele` group) | view sections and the results of their assigned students (read-only) |
-| **Student** (`student`) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
+| **Student** (`student`, via the `uczniowie` group) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
 
 ## Creating Accounts
 
-Account creation and role assignment currently happen directly in the Keycloak admin console, under the `matematyka-app` realm.
+Accounts are created in the Keycloak admin console, under the `matematyka-app` realm. Every account is set up the same way — a username, a password, and one group that grants its role:
 
-Users sign in with a username and password only. The realm does not require an email or a last name, and users cannot edit their own profile.
+| Group | Role | For |
+|---|---|---|
+| `uczniowie` | `student` | students |
+| `nauczyciele` | `teacher` | teachers |
+| `administratorzy` | `admin` | admins |
 
-**Student (Uczeń)**
-1. Log in to the Keycloak admin console.
-2. Go to the `matematyka-app` realm → **Users** → create a new user with just a username (for example a code such as `uczen-0142`) and leave the name fields empty.
-3. Open **Credentials** and set a password with **Temporary** turned off.
+1. Log in to the Keycloak admin console and open the `matematyka-app` realm → **Users** → **Create new user**.
+2. Enter a username — for students a code such as `uczen-0142`. Leave the email and name fields empty; for teachers and admins the **First name** is optional and is shown in the panel next to the username.
+3. Click **Join Groups**, select the group for the account, and create the user.
+4. Open **Credentials** and set a password with **Temporary** turned off.
+
+Users sign in with their username and password only, and cannot edit their own profile.
 
 Do not reuse the username of a deleted account — the backend keeps the old student's record and the username must stay unique.
 
-**Teacher (Nauczyciel)**
-1. Same as above; the **First name** field is optional and is shown in the panel next to the username.
-2. Open the created user → **Groups** → **Join Group**, select `nauczyciele`, and join.
-
 Staff accounts (teachers and admins) cannot use the student app — it shows them a notice to use the panel instead.
-
-**Admin (Administrator)**
-1. Create the user as above.
-2. On the user, go to **Role mapping** → **Assign role**, filter by realm roles, and assign `admin` (the role is imported with the realm).
 
 ## Content Import
 
