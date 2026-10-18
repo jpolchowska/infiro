@@ -10,6 +10,7 @@ export const WORDS = {
   attempt: ["próba", "próby", "prób"],
   testAttempt: ["podejście", "podejścia", "podejść"],
   student: ["uczeń", "uczniowie", "uczniów", "uczniów"],
+  teacher: ["nauczyciel", "nauczyciele", "nauczycieli", "nauczycieli"],
 } as const satisfies Record<string, PluralForms>;
 
 export function pluralForm(count: number, forms: PluralForms): string {

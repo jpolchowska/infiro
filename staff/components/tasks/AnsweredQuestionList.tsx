@@ -6,7 +6,7 @@ export function AnsweredQuestionList({ answers }: { answers: AnsweredQuestion[] 
   return (
     <ol className="mt-4 flex flex-col gap-3">
       {answers.map((answer, index) => (
-        <li key={index} className="rounded-lg border border-infiro-border bg-white p-4 text-sm">
+        <li key={index} className="rounded-sm border border-infiro-border bg-white p-4 text-sm">
           <div className="flex items-start justify-between gap-4">
             <p className="whitespace-pre-wrap text-gray-900">
               <span className="mr-2 text-gray-400">{index + 1}.</span>

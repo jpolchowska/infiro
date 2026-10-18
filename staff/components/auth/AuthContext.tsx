@@ -10,6 +10,7 @@ type AuthContextValue = {
   authenticated: boolean;
   initialized: boolean;
   role: StaffRole | null;
+  firstName: string | null;
   getToken: () => Promise<string | undefined>;
   logout: () => void;
 };
@@ -33,6 +34,11 @@ function currentRole(): StaffRole | null {
   if (keycloak.hasRealmRole(REALM_ROLES.admin)) return "admin";
   if (keycloak.hasRealmRole(REALM_ROLES.teacher)) return "teacher";
   return null;
+}
+
+function currentFirstName(): string | null {
+  const givenName = keycloak.tokenParsed?.given_name;
+  return typeof givenName === "string" && givenName.trim() ? givenName.trim() : null;
 }
 
 function logout() {
@@ -95,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authenticated,
         initialized,
         role: authenticated ? currentRole() : null,
+        firstName: authenticated ? currentFirstName() : null,
         getToken,
         logout,
       }}

@@ -1,5 +1,7 @@
 import type { LevelingTestStatus, TaskDifficulty, TaskType } from "./types";
 
+export type Tone = "easy" | "mid" | "hard" | "neutral";
+
 const TASK_TYPES: Record<TaskType, string> = {
   single_choice: "Zamknięte",
   short_answer: "Otwarte",
@@ -19,7 +21,7 @@ const THEMES: Record<string, string> = {
 
 const LEVELING_TEST_STATUSES: Record<
   LevelingTestStatus,
-  { label: string; variant: "easy" | "mid" | "hard" | "neutral" }
+  { label: string; variant: Tone }
 > = {
   not_taken: { label: "Nierozwiązany", variant: "neutral" },
   up_to_date: { label: "Aktualny", variant: "easy" },
@@ -40,7 +42,7 @@ export function levelingTestStatusLabel(status: LevelingTestStatus) {
   return LEVELING_TEST_STATUSES[status];
 }
 
-type DifficultyLabel = { label: string; variant: "easy" | "mid" | "hard" | "neutral" };
+type DifficultyLabel = { label: string; variant: Tone };
 
 const DIFFICULTIES: Record<TaskDifficulty, DifficultyLabel> = {
   1: { label: "Łatwy", variant: "easy" },
@@ -50,4 +52,11 @@ const DIFFICULTIES: Record<TaskDifficulty, DifficultyLabel> = {
 
 export function difficultyLabel(level: TaskDifficulty | null): DifficultyLabel {
   return level === null ? { label: "—", variant: "neutral" } : DIFFICULTIES[level];
+}
+
+export function accuracyTone(accuracy: number | null): Tone {
+  if (accuracy === null) return "neutral";
+  if (accuracy >= 70) return "easy";
+  if (accuracy >= 40) return "mid";
+  return "hard";
 }

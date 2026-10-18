@@ -9,7 +9,7 @@ import { pluralForm, pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
 
 export default function Home() {
-  const { role } = useAuth();
+  const { role, firstName } = useAuth();
   const isTeacher = role === "teacher";
   const { state } = useApiData(async (token) => {
     const [sections, students] = await Promise.all([getSections(token), getStudents(token)]);
@@ -24,7 +24,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-infiro-navy">Witaj!</h1>
+      <h1 className="text-2xl font-semibold text-infiro-navy">{firstName ? `Witaj, ${firstName}!` : "Witaj!"}</h1>
       <p className="mt-1 max-w-2xl text-sm text-gray-500">
         {isTeacher
           ? "Przeglądaj treść kursu: sekcje, podsekcje i zadania."
@@ -66,7 +66,7 @@ export default function Home() {
           <Link
             key={section.id}
             href={`/sections/${section.id}`}
-            className="flex min-h-41 flex-col rounded-lg border border-infiro-border bg-white p-5 hover:border-infiro-navy"
+            className="flex min-h-41 flex-col rounded-sm border border-infiro-border bg-white p-5 hover:border-infiro-navy"
           >
             <span className="text-xs font-medium text-gray-400">
               {String(index + 1).padStart(2, "0")}
