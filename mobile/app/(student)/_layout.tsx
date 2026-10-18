@@ -1,7 +1,10 @@
 import { Stack } from 'expo-router';
+import { useRequiredStepCheck } from '../../lib/session';
 import { ThemeProvider } from '../../lib/theme';
 
 export default function StudentLayout() {
+  useRequiredStepCheck();
+
   return (
     <ThemeProvider>
       <Stack screenOptions={{ headerShown: false }}>
