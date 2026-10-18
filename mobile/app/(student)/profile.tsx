@@ -258,7 +258,7 @@ export default function ProfileScreen() {
                 O aplikacji
               </Text>
               <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-[13px]">
-                Prototyp
+                Wersja testowa
               </Text>
             </View>
           </View>
