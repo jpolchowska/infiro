@@ -6,7 +6,11 @@ import { ApiError } from "./api";
 import { getMe, StudentMe } from "./student";
 
 export type RequiredStudentRoute = "/(student)/interests" | "/(student)/leveling-test";
-export type StartRoute = RequiredStudentRoute | "/(student)/home" | "/(staff)/home";
+export type StartRoute =
+  | RequiredStudentRoute
+  | "/(student)/home"
+  | "/account-notice?kind=staff"
+  | "/account-notice?kind=unassigned";
 
 export function requiredStudentRoute(me: StudentMe): RequiredStudentRoute | null {
   if (me.interest === null) return "/(student)/interests";
@@ -15,7 +19,9 @@ export function requiredStudentRoute(me: StudentMe): RequiredStudentRoute | null
 }
 
 export async function startRoute(accessToken: string): Promise<StartRoute> {
-  if (getAccountType(accessToken) === "staff") return "/(staff)/home";
+  const accountType = getAccountType(accessToken);
+  if (accountType === "staff") return "/account-notice?kind=staff";
+  if (accountType === "unassigned") return "/account-notice?kind=unassigned";
 
   try {
     return requiredStudentRoute(await getMe()) ?? "/(student)/home";
@@ -26,7 +32,7 @@ export async function startRoute(accessToken: string): Promise<StartRoute> {
 }
 
 function isSessionError(error: unknown): boolean {
-  return error instanceof ApiError && (error.status === 401 || error.message === "Token expired");
+  return error instanceof ApiError && (error.status === 401 || error.status === 403);
 }
 
 export function useRequiredStepCheck() {

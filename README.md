@@ -268,7 +268,7 @@ Accounts are created in the Keycloak admin console, under the `matematyka-app` r
 3. Click **Join Groups**, select the group for the account, and create the user.
 4. Open **Credentials** and set a password with **Temporary** turned off.
 
-Users sign in with their username and password only, and cannot edit their own profile.
+Users sign in with their username and password only, and cannot edit their own profile. An account without a group has no access: the student app tells the user to ask whoever created the account to finish setting it up, and the panel shows a no-access page.
 
 Do not reuse the username of a deleted account — the backend keeps the old student's record and the username must stay unique.
 
@@ -294,7 +294,7 @@ All endpoints except `/api/health` require `Authorization: Bearer <token>`. Erro
 
 ### Student
 
-Available to student accounts; the local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call). Staff accounts (`admin`, `teacher`) get `403` from `/api/student/me`, so no student record is ever created for them.
+Requires the `student` role and no staff role; any other account gets `403`, so no student record is ever created for it. The local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call).
 
 | Method | Endpoint | Description |
 |---|---|---|
