@@ -1,38 +1,50 @@
-import * as SecureStore from "expo-secure-store";
 import { apiFetch } from "./api";
-import { getGivenName } from "../utils/decodeToken";
 import { TaskType } from "./tasks";
+
+export type LevelingTestStatus = "not_taken" | "up_to_date" | "due" | "overdue";
+
+export type LevelingTestState = {
+  status: LevelingTestStatus;
+  dueAt: string | null;
+  deadlineAt: string | null;
+};
 
 export type StudentMe = {
   id: number;
+  username: string | null;
   role: string;
-  name: string | null;
   levelingTestCompleted: boolean;
+  levelingTest: LevelingTestState;
   interest: string | null;
 };
 
 type RawMe = {
   id: number;
+  username: string | null;
   role: string;
   leveling_test_completed: boolean;
+  leveling_test: { status: LevelingTestStatus; due_at: string | null; deadline_at: string | null };
   interest: string | null;
 };
 
 export async function getMe(): Promise<StudentMe> {
   const raw = await apiFetch<RawMe>("/api/student/me");
-  const token = await SecureStore.getItemAsync("access_token");
-  const name = token ? getGivenName(token) : null;
 
   return {
     id: raw.id,
+    username: raw.username,
     role: raw.role,
-    name,
     levelingTestCompleted: raw.leveling_test_completed,
+    levelingTest: {
+      status: raw.leveling_test.status,
+      dueAt: raw.leveling_test.due_at,
+      deadlineAt: raw.leveling_test.deadline_at,
+    },
     interest: raw.interest,
   };
 }
 
-export async function saveInterest(interest: string | null): Promise<void> {
+export async function saveInterest(interest: string): Promise<void> {
   await apiFetch<void>("/api/student/interest", {
     method: "PATCH",
     json: { interest },
@@ -253,6 +265,13 @@ export async function getSubsectionTasks(subsectionId: number): Promise<Subsecti
   };
 }
 
+type RawTestAttempt = { score: number; total: number; completed_at: string };
+
 export async function getLevelingTestHistory(): Promise<LastLevelingTest[]> {
-  return apiFetch<LastLevelingTest[]>("/api/student/leveling-test/history");
+  const raw = await apiFetch<RawTestAttempt[]>("/api/student/leveling-test/history");
+  return raw.map((attempt) => ({
+    completedAt: attempt.completed_at,
+    score: attempt.score,
+    total: attempt.total,
+  }));
 }

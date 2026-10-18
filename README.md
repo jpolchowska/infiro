@@ -52,20 +52,22 @@ The project organizes course content into sections → subsections → tasks, wi
 - Browse sections and subsections, work through tasks with instant feedback
 - Three attempts per task; the solution is revealed after the last failed attempt
 - Higher difficulty levels unlock once every task on the level below is solved
-- Timed practice — up to 20 single-choice questions in 60 seconds
-- Leveling (diagnostic) test with per-section results and attempt history
+- Timed practice — up to 20 single-choice and short-answer questions in 60 seconds
+- Leveling (diagnostic) test with per-section results and attempt history; a reminder appears when the next test is due, and the app requires it once the deadline passes
 - Theory e-book reader
 - Fractions rendered in stacked notation
-- Per-interest visual theme — background, accent colors, and heading font adapt to the chosen interest across the panel
+- Per-interest visual theme — background, accent colors, and heading font adapt to the chosen interest across the app
 - Personal stats, interests, and profile
+- Stays signed in for up to 30 days of inactivity; the theme choice and an overdue leveling test are rechecked every time the app opens
 
 **Teachers & Admins**
 - Teacher panel — read-only view of sections and the results of assigned students
-- Admin panel — manage sections, subsections, tasks, students, and teachers, and import content
+- Admin panel — browse course content, import tasks, e-books, and final tests, assign teachers to students, and change leveling test settings
 - Role and access control fully driven by Keycloak (realm roles + groups)
 
 **Authentication**
-- Login and registration via Keycloak (OAuth2 + OpenID Connect)
+- Login via Keycloak (OAuth2 + OpenID Connect); accounts are created by an admin, with no self-registration
+- Students are identified by username only — no name or email is stored
 - Backend validates every request by fetching signing keys from Keycloak's JWKS endpoint — no session state on the API
 - A single nginx entrypoint routes traffic to Keycloak, the API, and the web panel
 
@@ -247,7 +249,7 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 
 | Role | Permissions |
 |---|---|
-| **Admin** (`admin`) | manage sections, subsections, tasks, students, and teachers; import tasks and e-books |
+| **Admin** (`admin`) | browse course content; import tasks, e-books, and final tests; assign teachers to students; change leveling test settings |
 | **Teacher** (`ROLE_TEACHER`, via the `nauczyciele` group) | view sections and the results of their assigned students (read-only) |
 | **Student** (`ROLE_STUDENT`) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
 
@@ -255,13 +257,20 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 
 Account creation and role assignment currently happen directly in the Keycloak admin console, under the `matematyka-app` realm.
 
+Users sign in with a username and password only. The realm does not require an email or a last name, and users cannot edit their own profile.
+
 **Student (Uczeń)**
 1. Log in to the Keycloak admin console.
-2. Go to the `matematyka-app` realm → **Users** → create a new user with the form.
+2. Go to the `matematyka-app` realm → **Users** → create a new user with just a username (for example a code such as `uczen-0142`) and leave the name fields empty.
+3. Open **Credentials** and set a password with **Temporary** turned off.
+
+Do not reuse the username of a deleted account — the backend keeps the old student's record and the username must stay unique.
 
 **Teacher (Nauczyciel)**
-1. Same as above, then open the created user → **Groups** → **Join Group**.
-2. Select `nauczyciele` and join.
+1. Same as above; the **First name** field is optional and is shown in the panel next to the username.
+2. Open the created user → **Groups** → **Join Group**, select `nauczyciele`, and join.
+
+Staff accounts (teachers and admins) cannot use the student app — it shows them a notice to use the panel instead.
 
 **Admin (Administrator)**
 1. Create the user as above.
@@ -287,19 +296,19 @@ All endpoints except `/api/health` require `Authorization: Bearer <token>`. Erro
 
 ### Student
 
-Available to any authenticated user; the local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call).
+Available to student accounts; the local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call). Staff accounts (`admin`, `ROLE_TEACHER`) get `403` from `/api/student/me`, so no student record is ever created for them.
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/student/me` | Current student's profile: interest and leveling test status (`not_taken`, `up_to_date`, `due`, `overdue`) with due dates |
-| `PATCH` | `/api/student/interest` | Set the student's interest (theme) |
+| `GET` | `/api/student/me` | Current student's profile: username, interest, and leveling test status (`not_taken`, `up_to_date`, `due`, `overdue`) with due dates |
+| `PATCH` | `/api/student/interest` | Set the student's interest (theme), or `default` for the neutral theme |
 | `GET` | `/api/student/stats` | Solved tasks, accuracy, current subsection, recent sections |
 | `GET` | `/api/student/sections` | List sections with progress |
 | `GET` | `/api/student/subsections/:id/tasks` | List tasks in a subsection, with unlocked difficulty level |
 | `GET` | `/api/student/tasks/:id` | Get a task rendered in the student's theme |
 | `POST` | `/api/student/tasks/:id/answers` | Submit an answer; returns correctness, attempts left, solution, and newly unlocked level |
 | `GET` | `/api/student/subsections/:id/ebook` | Get the subsection's theory e-book |
-| `GET` | `/api/student/subsections/:id/timed` | Get timed practice questions (60 s) |
+| `GET` | `/api/student/subsections/:id/timed` | Get timed practice questions (60 s, single-choice and short-answer) |
 | `POST` | `/api/student/subsections/:id/timed/submit` | Submit timed practice answers |
 | `GET` | `/api/student/sections/:id/final-test` | Get the section's final test |
 | `POST` | `/api/student/sections/:id/final-test/submit` | Submit the final test; returns the score |

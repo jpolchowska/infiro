@@ -51,7 +51,18 @@ def test_me_creates_the_student_and_refreshes_their_username(client, login):
     student = User.query.filter_by(keycloak_sub="student-sub").one()
     assert first["id"] == second["id"]
     assert student.username == "uczen-2"
-    assert second["role"] == "student"
+    assert (second["username"], second["role"]) == ("uczen-2", "student")
+
+
+@pytest.mark.parametrize("roles", [["admin"], ["ROLE_TEACHER"], ["ROLE_TEACHER", "student"]])
+def test_staff_accounts_cannot_use_the_student_app(client, login, roles):
+    login("staff-sub", roles, preferred_username="staff")
+
+    response = client.get("/api/student/me", headers=HEADERS)
+
+    assert response.status_code == 403
+    assert response.json == {"error": "Staff accounts cannot use the student app"}
+    assert User.query.filter_by(keycloak_sub="staff-sub").first() is None
 
 
 def test_student_name_from_token_is_never_stored(client, login):

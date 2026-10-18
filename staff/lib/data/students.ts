@@ -15,7 +15,7 @@ import type {
   TestScore,
 } from "@/lib/types";
 
-type RawTestScore = { score: number; total: number; completedAt: string | null };
+type RawTestScore = { score: number; total: number; completed_at: string | null };
 type RawAttemptSummary = RawTestScore & { id: number };
 type RawSectionScore = { section_id: number | null; section_title: string; score: number; total: number };
 
@@ -111,7 +111,7 @@ type RawFinalTestAttemptDetail = RawAttemptSummary & {
 };
 
 function mapTestScore(raw: RawTestScore): TestScore {
-  return { score: raw.score, total: raw.total, completedAt: raw.completedAt };
+  return { score: raw.score, total: raw.total, completedAt: raw.completed_at };
 }
 
 function mapAttemptSummary(raw: RawAttemptSummary): AttemptSummary {

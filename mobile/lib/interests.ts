@@ -2,6 +2,8 @@ import { InterestId } from '../components/student/InterestIcon';
 
 export type InterestOption = { id: InterestId; label: string; tile: string };
 
+export const DEFAULT_INTEREST = 'default';
+
 export const INTERESTS: InterestOption[] = [
   { id: 'sport', label: 'Sport', tile: '#ff5f55' },
   { id: 'gry', label: 'Gry komputerowe', tile: '#c873d9' },

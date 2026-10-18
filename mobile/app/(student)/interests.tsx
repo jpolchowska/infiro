@@ -6,7 +6,7 @@ import { Text } from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { InterestIcon, InterestId } from '../../components/student/InterestIcon';
-import { INTERESTS } from '../../lib/interests';
+import { DEFAULT_INTEREST, INTERESTS } from '../../lib/interests';
 import { getMe, saveInterest } from '../../lib/student';
 import { NEUTRAL_THEME, ThemeTokens, useTheme, useThemeRefresh } from '../../lib/theme';
 
@@ -87,7 +87,7 @@ export default function InterestsScreen() {
       .then((me) => {
         if (active) {
           setLevelingTestCompleted(me.levelingTestCompleted);
-          if (me.interest) setPicked(me.interest as InterestId);
+          if (me.interest && me.interest !== DEFAULT_INTEREST) setPicked(me.interest as InterestId);
         }
       })
       .catch((error) => console.error('Failed to load /me:', error));
@@ -108,7 +108,7 @@ export default function InterestsScreen() {
     if (saving) return;
     setSaving(true);
     try {
-      await saveInterest(picked);
+      await saveInterest(picked ?? DEFAULT_INTEREST);
       refreshTheme();
     } catch (error) {
       console.error('Failed to save interest:', error);

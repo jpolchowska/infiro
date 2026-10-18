@@ -1,36 +1,52 @@
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
-import * as SecureStore from 'expo-secure-store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, View } from 'react-native';
 import { Text } from '../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getAccountType } from '../utils/decodeToken';
-import { CLIENT_ID, KEYCLOAK_URL, REALM } from '../lib/auth';
-import { getMe } from '../lib/student';
+import { CLIENT_ID, KEYCLOAK_URL, REALM, restoreSession, saveTokens } from '../lib/auth';
+import { startRoute } from '../lib/session';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
+  const [checkingSession, setCheckingSession] = useState(true);
   const discovery = AuthSession.useAutoDiscovery(`${KEYCLOAK_URL}/realms/${REALM}`);
 
   const redirectUri = AuthSession.makeRedirectUri({
-    scheme: 'infiro', 
+    scheme: 'infiro',
   });
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: CLIENT_ID,
       redirectUri,
-      scopes: ['openid', 'profile', 'email'],
+      scopes: ['openid', 'profile', 'offline_access'],
     },
     discovery
   );
 
-useEffect(() => {
-  const handleAuthResponse = async () => {
-    if (response?.type === 'success' && response.params.code && discovery) {
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const accessToken = await restoreSession();
+      if (!active) return;
+      if (accessToken) {
+        router.replace(await startRoute(accessToken));
+      } else {
+        setCheckingSession(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleAuthResponse = async () => {
+      if (response?.type !== 'success' || !response.params.code || !discovery) return;
+
       try {
         const tokenResult = await AuthSession.exchangeCodeAsync(
           {
@@ -44,39 +60,23 @@ useEffect(() => {
           discovery
         );
 
-        await SecureStore.setItemAsync('access_token', tokenResult.accessToken);
-        if (tokenResult.refreshToken) {
-          await SecureStore.setItemAsync('refresh_token', tokenResult.refreshToken);
-        }
-
-        console.log('Logged in successfully!');
-        const accountType = getAccountType(tokenResult.accessToken);
-
-        if (accountType === "Nauczyciel") {
-          router.replace('/(teacher)/home');
-        } else if (accountType === "Uczeń") {
-          let nextRoute: '/(student)/interests' | '/(student)/leveling-test' | '/(student)/home' = '/(student)/home';
-          try {
-            const me = await getMe();
-            if (me.interest === null) {
-              nextRoute = '/(student)/interests';
-            } else if (!me.levelingTestCompleted) {
-              nextRoute = '/(student)/leveling-test';
-            }
-          } catch (syncError) {
-            console.error('Backend sync failed:', syncError);
-          }
-
-          router.replace(nextRoute);
-        }
+        await saveTokens(tokenResult.accessToken, tokenResult.refreshToken);
+        router.replace(await startRoute(tokenResult.accessToken));
       } catch (error) {
         console.error('Token exchange failed:', error);
       }
-    }
-  };
+    };
 
-  handleAuthResponse();
-}, [response, discovery, request, redirectUri]);
+    handleAuthResponse();
+  }, [response, discovery, request, redirectUri]);
+
+  if (checkingSession) {
+    return (
+      <View className="flex-1 bg-infiro-navy items-center justify-center">
+        <ActivityIndicator color="#fefefe" />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-infiro-navy" style={{ overflow: 'hidden' }}>

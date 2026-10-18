@@ -74,9 +74,3 @@ export async function submitFinalTest(
   );
   return { score: raw.score, maxScore: raw.max_score };
 }
-
-export type FinalTestAttempt = { score: number; total: number; completedAt: string };
-
-export async function getFinalTestHistory(sectionId: number): Promise<FinalTestAttempt[]> {
-  return apiFetch<FinalTestAttempt[]>(`/api/student/sections/${sectionId}/final-test/history`);
-}
