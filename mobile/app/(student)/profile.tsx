@@ -54,8 +54,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const name = me?.name ?? null;
-  const initial = name ? name.slice(0, 1).toUpperCase() : null;
   const pickedInterest = INTERESTS.find((i) => i.id === me?.interest) ?? null;
   const isNeutral = me?.interest === DEFAULT_INTEREST;
 
@@ -131,17 +129,14 @@ export default function ProfileScreen() {
                 borderColor: withAlpha(theme.textPrimary, 0.15),
               }}
             >
-              {initial ? (
-                <Text className="font-manrope-bold text-lg" style={{ color: theme.textPrimary }}>
-                  {initial}
-                </Text>
-              ) : (
-                <Ionicons name="person" size={22} color={theme.textPrimary} />
-              )}
+              <Ionicons name="person" size={22} color={theme.textPrimary} />
             </View>
             <View className="flex-1">
+              <Text className="font-manrope-semibold text-xs" style={{ color: theme.textSecondary }}>
+                Twój login
+              </Text>
               <Text className="font-manrope-extrabold text-xl" style={{ color: theme.textPrimary }}>
-                {name ?? 'Uczeń'}
+                {me.username ?? 'Uczeń'}
               </Text>
             </View>
           </View>

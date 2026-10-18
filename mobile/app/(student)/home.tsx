@@ -51,7 +51,6 @@ export default function HomeScreen() {
 
   const loading = !me || !stats;
 
-  const name = me?.name ?? null;
   const current = stats?.current ?? null;
   const currentColor = current ? topicColor(theme, current.sectionIndex) : theme.accent;
   const currentPct =
@@ -79,7 +78,7 @@ export default function HomeScreen() {
                 className="text-[27px] leading-[31px]"
                 style={{ color: theme.textPrimary, fontFamily: theme.headingFontFamily }}
               >
-                {name ? `Cześć, ${name}!` : 'Cześć!'}
+                Cześć!
               </Text>
             </View>
 

@@ -5,7 +5,6 @@ interface KeycloakTokenPayload {
     roles?: string[];
   };
   user_role_test?: "Nauczyciel" | "Uczeń";
-  given_name?: string;
 }
 
 export function getAccountType(token: string): "Nauczyciel" | "Uczeń" | null {
@@ -18,9 +17,4 @@ export function getAccountType(token: string): "Nauczyciel" | "Uczeń" | null {
     return "Uczeń";
   }
 
-}
-
-export function getGivenName(token: string): string | null {
-  const decoded = jwtDecode<KeycloakTokenPayload>(token);
-  return decoded.given_name ?? null;
 }

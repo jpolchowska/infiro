@@ -1,18 +1,17 @@
-import * as SecureStore from "expo-secure-store";
 import { apiFetch } from "./api";
-import { getGivenName } from "../utils/decodeToken";
 import { TaskType } from "./tasks";
 
 export type StudentMe = {
   id: number;
+  username: string | null;
   role: string;
-  name: string | null;
   levelingTestCompleted: boolean;
   interest: string | null;
 };
 
 type RawMe = {
   id: number;
+  username: string | null;
   role: string;
   leveling_test_completed: boolean;
   interest: string | null;
@@ -20,13 +19,11 @@ type RawMe = {
 
 export async function getMe(): Promise<StudentMe> {
   const raw = await apiFetch<RawMe>("/api/student/me");
-  const token = await SecureStore.getItemAsync("access_token");
-  const name = token ? getGivenName(token) : null;
 
   return {
     id: raw.id,
+    username: raw.username,
     role: raw.role,
-    name,
     levelingTestCompleted: raw.leveling_test_completed,
     interest: raw.interest,
   };
