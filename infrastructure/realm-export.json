@@ -75,7 +75,7 @@
       },
       {
         "id": "9c2fadfc-02a3-4739-bb1f-01e35c0d8bb9",
-        "name": "ROLE_STUDENT",
+        "name": "student",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -84,7 +84,7 @@
       },
       {
         "id": "fdb16a87-59ef-45a8-bbd7-6aeb78213c3f",
-        "name": "ROLE_TEACHER",
+        "name": "teacher",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -440,7 +440,7 @@
       "subGroups": [],
       "attributes": {},
       "realmRoles": [
-        "ROLE_TEACHER"
+        "teacher"
       ],
       "clientRoles": {}
     }

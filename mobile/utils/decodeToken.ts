@@ -1,6 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 
-const STAFF_ROLES = ["admin", "ROLE_TEACHER"];
+const STAFF_ROLES = ["admin", "teacher"];
 
 type KeycloakTokenPayload = {
   realm_access?: {

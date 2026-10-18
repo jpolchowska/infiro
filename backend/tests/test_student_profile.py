@@ -54,7 +54,7 @@ def test_me_creates_the_student_and_refreshes_their_username(client, login):
     assert (second["username"], second["role"]) == ("uczen-2", "student")
 
 
-@pytest.mark.parametrize("roles", [["admin"], ["ROLE_TEACHER"], ["ROLE_TEACHER", "student"]])
+@pytest.mark.parametrize("roles", [["admin"], ["teacher"], ["teacher", "student"]])
 def test_staff_accounts_cannot_use_the_student_app(client, login, roles):
     login("staff-sub", roles, preferred_username="staff")
 
@@ -75,7 +75,7 @@ def test_student_name_from_token_is_never_stored(client, login):
 
 
 def test_teacher_name_is_taken_from_token(client, login):
-    login("teacher-sub", ["ROLE_TEACHER"], preferred_username="anna.k", given_name="Anna")
+    login("teacher-sub", ["teacher"], preferred_username="anna.k", given_name="Anna")
 
     client.get("/api/admin/students", headers=HEADERS)
 

@@ -148,7 +148,7 @@ def test_task_detail_counts_learning_answers(client, content):
 
 def test_teacher_can_preview_tasks_but_not_delete_them(client, login, content):
     task_id = _tasks_by_key(client)["choice"]["id"]
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["teacher"])
 
     assert client.get(f"/api/admin/tasks/{task_id}", headers=HEADERS).status_code == 200
     assert client.delete(f"/api/admin/tasks/{task_id}", headers=HEADERS).status_code == 403

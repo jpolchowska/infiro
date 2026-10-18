@@ -13,7 +13,7 @@ An educational mathematics platform — structured course content, adaptive leve
 
 ## Overview
 
-The project organizes course content into sections → subsections → tasks, with a short theory e-book attached to each subsection. Tasks come in three types and three difficulty levels, and every task carries per-theme variants so the same exercise can be framed around a student's interests. Students work through this content, a leveling test, and timed practice from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to sections and the results of their assigned students, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin`, `ROLE_TEACHER`, and `ROLE_STUDENT` roles, and members of the `nauczyciele` (teachers) group receive `ROLE_TEACHER`.
+The project organizes course content into sections → subsections → tasks, with a short theory e-book attached to each subsection. Tasks come in three types and three difficulty levels, and every task carries per-theme variants so the same exercise can be framed around a student's interests. Students work through this content, a leveling test, and timed practice from a React Native (Expo) app; admins manage content, students, and teachers, while teachers get read-only access to sections and the results of their assigned students, both from a Next.js panel. A single Flask REST API backs both clients and validates every request by verifying the JWT against Keycloak's JWKS endpoint. Keycloak is the single source of truth for identity — the realm defines the `admin`, `teacher`, and `student` roles, and members of the `nauczyciele` (teachers) group receive `teacher`.
 
 ## Table of Contents
 
@@ -250,8 +250,8 @@ Everything is served through the nginx entrypoint on `http://localhost`:
 | Role | Permissions |
 |---|---|
 | **Admin** (`admin`) | browse course content; import tasks, e-books, and final tests; assign teachers to students; change leveling test settings |
-| **Teacher** (`ROLE_TEACHER`, via the `nauczyciele` group) | view sections and the results of their assigned students (read-only) |
-| **Student** (`ROLE_STUDENT`) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
+| **Teacher** (`teacher`, via the `nauczyciele` group) | view sections and the results of their assigned students (read-only) |
+| **Student** (`student`) | browse content, complete tasks, read e-books, take timed practice and the leveling test |
 
 ## Creating Accounts
 
@@ -296,7 +296,7 @@ All endpoints except `/api/health` require `Authorization: Bearer <token>`. Erro
 
 ### Student
 
-Available to student accounts; the local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call). Staff accounts (`admin`, `ROLE_TEACHER`) get `403` from `/api/student/me`, so no student record is ever created for them.
+Available to student accounts; the local student record is resolved from the token's `sub` claim (created on the first `/api/student/me` call). Staff accounts (`admin`, `teacher`) get `403` from `/api/student/me`, so no student record is ever created for them.
 
 | Method | Endpoint | Description |
 |---|---|---|

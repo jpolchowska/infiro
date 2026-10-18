@@ -138,7 +138,7 @@ def test_teacher_id_must_be_an_integer(client, login):
 
 
 def test_teacher_sees_only_assigned_students(client, login):
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["teacher"])
     client.get("/api/admin/students", headers=HEADERS)
     teacher = User.query.filter_by(keycloak_sub="teacher-sub").one()
     db.session.add_all([

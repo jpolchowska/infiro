@@ -97,7 +97,7 @@ def test_staff_can_preview_an_ebook(client, login):
     db.session.commit()
     import_ebook(client, build_ebook_zip())
 
-    login("teacher-sub", ["ROLE_TEACHER"])
+    login("teacher-sub", ["teacher"])
     response = client.get(
         f"/api/admin/subsections/{subsection.id}/ebook",
         headers={"Authorization": "Bearer test-token"},
