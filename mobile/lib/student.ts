@@ -32,7 +32,7 @@ export async function getMe(): Promise<StudentMe> {
   };
 }
 
-export async function saveInterest(interest: string | null): Promise<void> {
+export async function saveInterest(interest: string): Promise<void> {
   await apiFetch<void>("/api/student/interest", {
     method: "PATCH",
     json: { interest },

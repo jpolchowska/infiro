@@ -10,7 +10,7 @@ import { ErrorState } from '../../components/student/ErrorState';
 import { InterestIcon } from '../../components/student/InterestIcon';
 import { logout } from '../../lib/auth';
 import { formatShortDate } from '../../lib/formatDate';
-import { INTERESTS } from '../../lib/interests';
+import { DEFAULT_INTEREST, INTERESTS } from '../../lib/interests';
 import {
   LastLevelingTest,
   StudentMe,
@@ -57,6 +57,7 @@ export default function ProfileScreen() {
   const name = me?.name ?? null;
   const initial = name ? name.slice(0, 1).toUpperCase() : null;
   const pickedInterest = INTERESTS.find((i) => i.id === me?.interest) ?? null;
+  const isNeutral = me?.interest === DEFAULT_INTEREST;
 
   if (error) {
     return (
@@ -192,14 +193,14 @@ export default function ProfileScreen() {
                 className="flex-1 font-manrope-extrabold text-[15px]"
                 style={{ color: theme.textPrimary }}
               >
-                Nie wybrano
+                {isNeutral ? 'Neutralny' : 'Nie wybrano'}
               </Text>
               <Pressable
                 onPress={() => router.push('/(student)/interests?from=profile')}
                 style={{ backgroundColor: theme.surfaceMuted, borderRadius: 100, paddingVertical: 9, paddingHorizontal: 14 }}
               >
                 <Text className="font-manrope-bold text-xs" style={{ color: theme.textPrimary }}>
-                  Wybierz
+                  {isNeutral ? 'Zmień' : 'Wybierz'}
                 </Text>
               </Pressable>
             </View>
