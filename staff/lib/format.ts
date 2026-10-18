@@ -21,3 +21,12 @@ export function formatPercent(value: number | null): string {
 export function ratioPercent(part: number, total: number): number {
   return total > 0 ? (part / total) * 100 : 0;
 }
+
+export function formatAccount(username: string | null, name: string | null): string | null {
+  if (!username) return name;
+  return name ? `${username} (${name})` : username;
+}
+
+export function studentLabel(student: { id: number; username: string | null }): string {
+  return student.username ?? `Uczeń #${student.id}`;
+}

@@ -310,15 +310,17 @@ def test_question_set_with_deleted_task_is_replaced(client, login, course, stude
 
 def test_answers_to_an_older_open_test_are_accepted(client, course, student):
     answers = _correct_answers(client)
-    question_set = LevelingTestQuestionSet.query.one()
-    question_set.created_at = utc_now() - timedelta(hours=25)
+    older = LevelingTestQuestionSet.query.one()
+    older.created_at = utc_now() - timedelta(hours=25)
+    newer = LevelingTestQuestionSet(student_id=student.id, task_ids=older.task_ids[:-1])
+    db.session.add(newer)
     db.session.commit()
-    _get_test(client)
 
     response = _submit(client, answers)
 
     assert response.status_code == 201
-    assert db.session.get(LevelingTestQuestionSet, question_set.id).attempt_id is not None
+    assert db.session.get(LevelingTestQuestionSet, older.id).attempt_id == response.json["attempt_id"]
+    assert db.session.get(LevelingTestQuestionSet, newer.id).attempt_id is None
 
 
 @pytest.mark.parametrize("change,error", [

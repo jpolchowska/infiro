@@ -5,7 +5,7 @@ import { getStudents } from "@/lib/data";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { LoadState } from "@/components/ui/LoadState";
-import { formatRelativeDate, ratioPercent } from "@/lib/format";
+import { formatAccount, formatRelativeDate, ratioPercent, studentLabel } from "@/lib/format";
 import { levelingTestStatusLabel } from "@/lib/labels";
 import { useApiData } from "@/hooks/useApiData";
 
@@ -60,11 +60,10 @@ export default function ResultsPage() {
                 <tr key={student.id} className="border-b border-gray-100 last:border-0">
                   <td className="px-4 py-3">
                     <Link href={`/students/${student.id}`} className="font-medium text-infiro-navy hover:underline">
-                      {student.name ?? "Uczeń bez imienia"}
+                      {studentLabel(student)}
                     </Link>
-                    <div className="mt-0.5 text-xs text-gray-500">{student.email ?? "—"}</div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{student.teacherName ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600">{formatAccount(student.teacherUsername, student.teacherName) ?? "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-24">

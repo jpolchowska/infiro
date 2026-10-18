@@ -8,7 +8,7 @@ import { LevelingTestPanel } from "@/components/student/LevelingTestPanel";
 import { SectionProgressList } from "@/components/student/SectionProgressList";
 import { NeedsPracticeList, RecentActivityTable } from "@/components/student/TaskActivity";
 import { getStudentDetail } from "@/lib/data";
-import { formatDate, formatPercent } from "@/lib/format";
+import { formatAccount, formatDate, formatPercent, studentLabel } from "@/lib/format";
 import { themeLabel } from "@/lib/labels";
 import { pluralForm } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
@@ -27,10 +27,10 @@ export default function StudentPage() {
       <Link href="/students" className="text-sm text-gray-500 hover:text-infiro-navy">
         &larr; Wszyscy uczniowie
       </Link>
-      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{student.name ?? "Uczeń bez imienia"}</h1>
+      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{studentLabel(student)}</h1>
       <p className="mt-1 text-sm text-gray-500">
-        {student.email ?? "—"} · zainteresowanie: {themeLabel(student.interest)} · dołączył(a){" "}
-        {formatDate(student.joinedAt)} · nauczyciel: {student.teacherName ?? "brak"}
+        zainteresowanie: {themeLabel(student.interest)} · dołączył(a) {formatDate(student.joinedAt)} · nauczyciel:{" "}
+        {formatAccount(student.teacherUsername, student.teacherName) ?? "brak"}
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
