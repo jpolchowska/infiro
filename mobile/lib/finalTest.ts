@@ -74,16 +74,3 @@ export async function submitFinalTest(
   );
   return { score: raw.score, maxScore: raw.max_score };
 }
-
-export type FinalTestAttempt = { score: number; total: number; completedAt: string };
-
-type RawFinalTestAttempt = { score: number; total: number; completed_at: string };
-
-export async function getFinalTestHistory(sectionId: number): Promise<FinalTestAttempt[]> {
-  const raw = await apiFetch<RawFinalTestAttempt[]>(`/api/student/sections/${sectionId}/final-test/history`);
-  return raw.map((attempt) => ({
-    score: attempt.score,
-    total: attempt.total,
-    completedAt: attempt.completed_at,
-  }));
-}
