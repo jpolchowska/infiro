@@ -22,7 +22,7 @@ export function ratioPercent(part: number, total: number): number {
   return total > 0 ? (part / total) * 100 : 0;
 }
 
-export function formatAccount(username: string | null, name: string | null = null): string | null {
+export function formatAccount(username: string | null, name: string | null): string | null {
   if (!username) return name;
   return name ? `${username} (${name})` : username;
 }

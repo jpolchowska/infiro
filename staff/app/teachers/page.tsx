@@ -36,13 +36,8 @@ function TeacherAssignments({ initialStudents, teachers }: { initialStudents: St
   const [savedId, setSavedId] = useState<number | null>(null);
 
   async function saveTeacher(student: Student) {
-    const value = teacherIds[student.id]?.trim() ?? "";
+    const value = teacherIds[student.id] ?? "";
     const teacherId = value === "" ? null : Number(value);
-
-    if (teacherId !== null && (!Number.isInteger(teacherId) || teacherId < 1)) {
-      setError("ID nauczyciela musi być dodatnią liczbą całkowitą.");
-      return;
-    }
 
     setSavingId(student.id);
     setSavedId(null);
