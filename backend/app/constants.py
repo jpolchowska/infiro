@@ -12,6 +12,7 @@ class UserRole:
 class RealmRole:
     ADMIN = "admin"
     TEACHER = "teacher"
+    STUDENT = "student"
 
 
 class LevelingTestStatus:

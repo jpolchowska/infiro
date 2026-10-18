@@ -4,12 +4,15 @@ import jwt
 from flask import jsonify, request
 from jwt import PyJWKClient
 
+from app.constants import RealmRole
 from app.models.users import User
 
 KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/matematyka-app/protocol/openid-connect/certs"
 KEYCLOAK_ISSUER_PATH = "/realms/matematyka-app"
 
 jwks_client = PyJWKClient(KEYCLOAK_JWKS_URI)
+
+STAFF_ROLES = {RealmRole.ADMIN, RealmRole.TEACHER}
 
 
 def authenticate_token(f):
@@ -85,6 +88,22 @@ def require_realm_role(role):
     return decorator
 
 
+def _realm_roles():
+    return set(getattr(request, "user", {}).get("realm_access", {}).get("roles", []))
+
+
+def require_student_account(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        realm_roles = _realm_roles()
+        if RealmRole.STUDENT not in realm_roles or realm_roles & STAFF_ROLES:
+            return jsonify({"message": "Student account required"}), 403
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
 def current_user():
     sub = request.user.get("sub")
     return User.query.filter_by(keycloak_sub=sub).first()
@@ -99,4 +118,4 @@ def require_student(f):
 
         return f(student, *args, **kwargs)
 
-    return authenticate_token(decorated)
+    return authenticate_token(require_student_account(decorated))
