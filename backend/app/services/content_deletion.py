@@ -6,20 +6,36 @@ from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_answers import SectionTestAnswer
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.section_test_questions import SectionTestQuestion
+from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
 
 
+def _renumber(query):
+    for position, item in enumerate(query.all(), start=1):
+        item.order_index = position
+
+
+def _renumber_tasks(subsection_ids):
+    for subsection_id in subsection_ids:
+        _renumber(Task.query.filter_by(subsection_id=subsection_id).order_by(Task.order_index, Task.id))
+
+
 def _delete_tasks(task_ids):
     if not task_ids:
         return
 
+    subsection_ids = {
+        subsection_id
+        for (subsection_id,) in db.session.query(Task.subsection_id).filter(Task.id.in_(task_ids)).distinct()
+    }
     StudentAnswer.query.filter(StudentAnswer.task_id.in_(task_ids)).delete(synchronize_session=False)
     LevelingTestAnswer.query.filter(LevelingTestAnswer.task_id.in_(task_ids)).delete(synchronize_session=False)
     TaskAnswerOption.query.filter(TaskAnswerOption.task_id.in_(task_ids)).delete(synchronize_session=False)
     Task.query.filter(Task.id.in_(task_ids)).delete(synchronize_session=False)
+    _renumber_tasks(subsection_ids)
 
 
 def _delete_subsections(subsection_ids):
@@ -59,8 +75,14 @@ def delete_task(task):
     _delete_tasks([task.id])
 
 
+def delete_tasks(task_ids):
+    _delete_tasks(list(task_ids))
+
+
 def delete_subsection(subsection):
+    section_id = subsection.section_id
     _delete_subsections([subsection.id])
+    _renumber(Subsection.query.filter_by(section_id=section_id).order_by(Subsection.order_index, Subsection.id))
 
 
 def delete_section(section):
@@ -73,3 +95,5 @@ def delete_section(section):
         {"section_id": None}, synchronize_session=False
     )
     db.session.delete(section)
+    db.session.flush()
+    _renumber(Section.query.order_by(Section.order_index, Section.id))
