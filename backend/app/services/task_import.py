@@ -4,7 +4,9 @@ from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
+from app.services import content_deletion
 from app.services.answer_options import sync_answer_options
+from app.services.import_summary import summarize_task_import
 from app.services.import_validation import MEMORY_DIFFICULTY_BY_PAIRS, validate_task_import
 from app.services.themes import merge_theme_variants
 
@@ -85,10 +87,22 @@ def _upsert_task(subsection, task_data, order_index):
     return task
 
 
-def import_tasks(data):
+def _remove_missing_content(summary):
+    content_deletion.delete_tasks([task["id"] for task in summary["tasks"]["deleted"]])
+    for subsection in summary["subsections"]["deleted"]:
+        content_deletion.delete_subsection(db.session.get(Subsection, subsection["id"]))
+    for section in summary["sections"]["deleted"]:
+        content_deletion.delete_section(db.session.get(Section, section["id"]))
+
+
+def import_tasks(data, dry_run=False):
     errors = validate_task_import(data)
     if errors:
         return None, errors
+
+    summary = summarize_task_import(data)
+    if dry_run:
+        return {"summary": summary}, None
 
     section_cache = {}
     subsection_cache = {}
@@ -106,10 +120,12 @@ def import_tasks(data):
                 task = _upsert_task(subsection, task_data, task_order)
                 imported_tasks.append(_task_output(task))
 
+    _remove_missing_content(summary)
     db.session.commit()
 
     return {
         "task_count": len(imported_tasks),
         "tasks": imported_tasks,
+        "summary": summary,
         "data": data,
     }, None
