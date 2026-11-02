@@ -34,8 +34,9 @@ export default function ImportPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">Import treści</h1>
-      <p className="mt-2 max-w-2xl text-sm text-gray-600">
-        Dodawaj treści do aplikacji z plików JSON i ZIP.
+      <p className="mt-2 text-sm text-gray-600">
+        Treści do aplikacji powstają z plików JSON i ZIP. Najpierw należy importować zadania, potem e-booki i testy
+        końcowe.
       </p>
 
       <ImportErrors errors={errors} />

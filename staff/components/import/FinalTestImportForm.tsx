@@ -8,18 +8,20 @@ import { getSections, importFinalTest } from "@/lib/data";
 import { useApiData } from "@/hooks/useApiData";
 import { validateFinalTestImport } from "@/lib/validateImport";
 import { pluralize, WORDS } from "@/lib/pluralize";
+import { ResultDialog } from "@/components/ui/ResultDialog";
 
 export function FinalTestImportForm({ controls }: { controls: ImportControls }) {
   const { state } = useApiData(getSections);
   const sections = state.status === "ready" ? state.data : [];
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [questionCount, setQuestionCount] = useState<number | null>(null);
+  const [result, setResult] = useState<{ questionCount: number; sectionTitle: string } | null>(null);
+  const [uploadKey, setUploadKey] = useState(0);
 
   const sectionId = selectedSectionId ?? sections[0]?.id ?? null;
 
   async function handleSubmit() {
-    setQuestionCount(null);
+    setResult(null);
     if (!sectionId) {
       controls.showErrors(["Wybierz dział."]);
       return;
@@ -35,42 +37,56 @@ export function FinalTestImportForm({ controls }: { controls: ImportControls }) 
       return;
     }
 
+    const sectionTitle = sections.find((section) => section.id === sectionId)?.title ?? "";
     await controls.run(async (token) => {
-      const result = await importFinalTest(token, sectionId, data);
-      setQuestionCount(result.questionCount);
+      const imported = await importFinalTest(token, sectionId, data);
+      setResult({ questionCount: imported.questionCount, sectionTitle });
+      setFile(null);
+      setUploadKey((current) => current + 1);
     }, "Import testu końcowego się nie powiódł. Spróbuj ponownie.");
   }
 
   return (
-    <ImportCard
-      title="Test końcowy działu (JSON)"
-      successMessage={questionCount !== null ? `Zaimportowano ${pluralize(questionCount, WORDS.question)} testu końcowego.` : null}
-      submitLabel="Importuj test końcowy"
-      submittingLabel="Importowanie…"
-      submitting={controls.submitting}
-      stretch
-      onSubmit={handleSubmit}
-    >
-      <div className="mt-4">
-        <label className="block text-sm text-gray-600">
-          Dział
-          <select
-            className="mt-1 block w-full rounded-sm border border-gray-300 px-3 py-2 text-sm"
-            value={sectionId ?? ""}
-            onChange={(e) => setSelectedSectionId(Number(e.target.value) || null)}
-          >
-            {sections.length === 0 && <option value="">Brak działów</option>}
-            {sections.map((section) => (
-              <option key={section.id} value={section.id}>
-                {section.title}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className="mt-4 flex flex-1 flex-col">
-        <UploadField accept=".json" hint=".json" onFileSelected={setFile} />
-      </div>
-    </ImportCard>
+    <>
+      <ImportCard
+        title="Test końcowy"
+        format="JSON"
+        description="Pytania testu końcowego dla wybranej sekcji. Ponowny import aktualizuje pytania i dodaje nowe."
+        submitLabel="Importuj test końcowy"
+        submittingLabel="Importowanie…"
+        submitting={controls.submitting}
+        stretch
+        onSubmit={handleSubmit}
+      >
+        <div className="mt-4">
+          <label className="block text-sm text-gray-600">
+            Dział
+            <select
+              className="mt-1 block w-full rounded-sm border border-gray-300 px-3 py-2 text-sm"
+              value={sectionId ?? ""}
+              onChange={(e) => setSelectedSectionId(Number(e.target.value) || null)}
+            >
+              {sections.length === 0 && <option value="">Brak działów</option>}
+              {sections.map((section) => (
+                <option key={section.id} value={section.id}>
+                  {section.title}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="mt-4 flex flex-1 flex-col">
+          <UploadField key={uploadKey} accept=".json" hint=".json" onFileSelected={setFile} />
+        </div>
+      </ImportCard>
+
+      <ResultDialog open={result !== null} title="Import zakończony" onClose={() => setResult(null)}>
+        {result && (
+          <>
+            Test końcowy sekcji „{result.sectionTitle}” ma {pluralize(result.questionCount, WORDS.question)}.
+          </>
+        )}
+      </ResultDialog>
+    </>
   );
 }

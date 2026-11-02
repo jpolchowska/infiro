@@ -25,7 +25,7 @@ export default function Home() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">{firstName ? `Witaj, ${firstName}!` : "Witaj!"}</h1>
-      <p className="mt-1 max-w-2xl text-sm text-gray-500">
+      <p className="mt-1 text-sm text-gray-500">
         {isTeacher
           ? "Przeglądaj treść kursu: sekcje, podsekcje i zadania."
           : "Przeglądaj treść kursu: sekcje, podsekcje i zadania. Nową treść dodasz przez import JSON."}

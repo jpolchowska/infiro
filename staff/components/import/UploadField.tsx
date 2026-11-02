@@ -12,7 +12,7 @@ export function UploadField({ accept, hint, onFileSelected }: UploadFieldProps) 
   const [fileName, setFileName] = useState<string | null>(null);
 
   return (
-    <label className="flex flex-1 cursor-pointer items-center justify-center rounded-sm border border-dashed border-gray-300 px-6 py-8 text-center hover:border-infiro-navy">
+    <label className="flex flex-1 cursor-pointer items-center justify-center rounded-sm border border-dashed border-gray-300 px-6 py-7 text-center hover:border-infiro-navy">
       <input
         type="file"
         accept={accept}

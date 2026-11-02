@@ -26,7 +26,7 @@ export default function SectionPage() {
     <div>
       <BackLink href="/">Wszystkie sekcje</BackLink>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{section.title}</h1>
-      {section.description && <p className="mt-2 max-w-2xl text-sm text-gray-600">{section.description}</p>}
+      {section.description && <p className="mt-2 text-sm text-gray-600">{section.description}</p>}
 
       <section
         className={`mt-6 flex flex-wrap items-center justify-between gap-4 rounded-sm border border-infiro-border px-6 py-5 ${

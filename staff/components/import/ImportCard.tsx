@@ -2,7 +2,8 @@ import type { ReactNode, SubmitEvent } from "react";
 
 type ImportCardProps = {
   title: string;
-  successMessage: string | null;
+  format: string;
+  description: string;
   submitLabel: string;
   submittingLabel: string;
   submitting: boolean;
@@ -13,7 +14,8 @@ type ImportCardProps = {
 
 export function ImportCard({
   title,
-  successMessage,
+  format,
+  description,
   submitLabel,
   submittingLabel,
   submitting,
@@ -27,29 +29,25 @@ export function ImportCard({
   }
 
   return (
-    <>
-      {successMessage !== null && (
-        <div className="rounded-sm border border-green-300 bg-green-50 p-4 text-sm text-green-700">
-          {successMessage}
-        </div>
-      )}
-
-      <form
-        onSubmit={handleSubmit}
-        className={`${stretch ? "flex flex-1 flex-col " : ""}rounded-sm border border-infiro-border bg-white p-6`}
-      >
+    <form
+      onSubmit={handleSubmit}
+      className={`${stretch ? "flex flex-1 flex-col " : ""}rounded-sm border border-infiro-border bg-white px-5 py-4.5`}
+    >
+      <div className="flex items-center justify-between gap-4">
         <h2 className="text-sm font-semibold text-infiro-navy">{title}</h2>
-        {children}
-        <div className="mt-4 flex justify-center">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
-          >
-            {submitting ? submittingLabel : submitLabel}
-          </button>
-        </div>
-      </form>
-    </>
+        <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-gray-400">{format}</span>
+      </div>
+      <p className="mt-1 text-sm text-gray-500">{description}</p>
+      {children}
+      <div className="mt-4 flex justify-center">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+        >
+          {submitting ? submittingLabel : submitLabel}
+        </button>
+      </div>
+    </form>
   );
 }

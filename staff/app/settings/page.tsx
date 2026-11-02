@@ -38,7 +38,7 @@ export default function SettingsPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">Ustawienia</h1>
-      <p className="mt-2 max-w-2xl text-sm text-gray-600">Ustawienia działają dla wszystkich uczniów w aplikacji.</p>
+      <p className="mt-2 text-sm text-gray-600">Ustawienia działają dla wszystkich uczniów w aplikacji.</p>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[13rem_1fr]">
         <nav className="flex gap-1 lg:flex-col" aria-label="Kategorie ustawień">

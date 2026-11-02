@@ -145,7 +145,7 @@ export default function SubsectionPage() {
     <div>
       <BackLink href={`/sections/${section.id}`}>{section.title}</BackLink>
       <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">{subsection.title}</h1>
-      <p className="mt-2 max-w-2xl text-sm text-gray-600">{subsection.description}</p>
+      <p className="mt-2 text-sm text-gray-600">{subsection.description}</p>
 
       <section className="mt-8 rounded-sm border border-infiro-border bg-white">
         <div className="flex items-center justify-between gap-4 px-6 py-4">
