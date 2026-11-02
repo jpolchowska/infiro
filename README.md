@@ -358,7 +358,6 @@ infiro/
 │   │   ├── services/              # business logic: imports, grading, progress, reports
 │   │   └── static/uploads/        # uploaded task and e-book images (bind-mounted)
 │   ├── migrations/                # Flask-Migrate migrations, applied on startup
-│   ├── seed/                      # sample task import file (tasks_example.json)
 │   └── tests/                     # pytest suite
 ├── staff/                         # Next.js panel (admin + teacher)
 │   ├── app/                       # pages: course, students, teachers, import, settings, login
@@ -385,6 +384,6 @@ infiro/
 
 ## Documentation
 
-- [docs/format-zadan.md](docs/format-zadan.md) — JSON format spec for the task import file used by the admin panel's import feature. A sample file is in [backend/seed/tasks_example.json](backend/seed/tasks_example.json).
+- [docs/format-zadan.md](docs/format-zadan.md) — JSON format spec for the task import file used by the admin panel's import feature.
 - [docs/format-ebookow.md](docs/format-ebookow.md) — format spec for e-book ZIP archives (`ebook.json` + `images/`) imported through the admin panel.
 - [docs/format-testu-koncowego.md](docs/format-testu-koncowego.md) — JSON format spec for the section final test import file.
