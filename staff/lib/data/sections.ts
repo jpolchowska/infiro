@@ -77,3 +77,7 @@ export async function getFinalTestPreview(token: string, sectionId: number): Pro
     };
   });
 }
+
+export async function deleteFinalTest(token: string, sectionId: number): Promise<void> {
+  await apiFetch<void>(`/api/admin/sections/${sectionId}/final-test`, { token, method: "DELETE" });
+}

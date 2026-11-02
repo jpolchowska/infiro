@@ -81,6 +81,35 @@ def test_reimport_removes_questions_missing_from_the_file(client, section):
     assert SectionTestAttempt.query.count() == 1
 
 
+def test_admin_deletes_the_final_test_and_keeps_attempt_scores(client, section):
+    _import(client, section, IMPORT_PAYLOAD)
+    _answer(section, "final-ulamki-1")
+
+    response = client.delete(f"/api/admin/sections/{section.id}/final-test", headers=HEADERS)
+
+    assert response.status_code == 204
+    assert SectionTestQuestion.query.count() == 0
+    assert SectionTestAnswer.query.count() == 0
+    assert SectionTestAttempt.query.count() == 1
+    assert db.session.get(Section, section.id) is not None
+
+
+def test_deleting_a_missing_final_test_returns_404(client, section):
+    response = client.delete(f"/api/admin/sections/{section.id}/final-test", headers=HEADERS)
+
+    assert response.status_code == 404
+
+
+def test_teacher_cannot_delete_the_final_test(client, login, section):
+    _import(client, section, IMPORT_PAYLOAD)
+    login("teacher-sub", ["teacher"])
+
+    response = client.delete(f"/api/admin/sections/{section.id}/final-test", headers=HEADERS)
+
+    assert response.status_code == 403
+    assert SectionTestQuestion.query.count() == 2
+
+
 def test_dry_run_reports_changes_without_saving_them(client, section):
     _import(client, section, IMPORT_PAYLOAD)
     payload = copy.deepcopy(IMPORT_PAYLOAD)

@@ -1,3 +1,6 @@
+export const DELETE_LINK =
+  "relative inline-flex items-center gap-1.5 text-sm font-medium text-tone-bad after:absolute after:left-[2.5px] after:right-0 after:bottom-[3px] after:h-px after:bg-current after:opacity-0 hover:after:opacity-100 disabled:pointer-events-none disabled:opacity-40";
+
 export function TrashIcon() {
   return (
     <svg

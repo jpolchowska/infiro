@@ -98,6 +98,12 @@ def delete_final_test_questions(question_ids):
         )
 
 
+def delete_final_test(section):
+    delete_final_test_questions(
+        question.id for question in SectionTestQuestion.query.filter_by(section_id=section.id).all()
+    )
+
+
 def delete_ebook(ebook):
     remove_image_directories(image_directories(ebook.content))
     db.session.delete(ebook)
