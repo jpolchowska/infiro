@@ -13,6 +13,7 @@ from app.extensions import db
 from app.models.ebooks import Ebook
 from app.models.sections import Section
 from app.models.subsections import Subsection
+from app.services.ebook_images import image_directories, remove_image_directories
 
 ALLOWED_CALLOUT_STYLES = {
     "zapamietaj", "wskazowka", "uwaga", "definicja",
@@ -166,7 +167,8 @@ def _store_images(loaded, import_prefix):
     image_urls = {}
     image_dimensions = {}
     upload_dir = os.path.join(current_app.static_folder, "uploads", import_prefix)
-    os.makedirs(upload_dir, exist_ok=True)
+    if loaded["image_bytes"]:
+        os.makedirs(upload_dir, exist_ok=True)
     for path, image_data in loaded["image_bytes"].items():
         filename = f"{uuid4().hex}_{secure_filename(os.path.basename(path))}"
         destination = os.path.join(upload_dir, filename)
@@ -208,6 +210,7 @@ def import_ebook(file_storage):
         for block in data["blocks"]
     ]
     ebook = Ebook.query.filter_by(subsection_id=subsection.id).first()
+    previous_directories = image_directories(ebook.content) if ebook else set()
     if ebook is None:
         ebook = Ebook(subsection_id=subsection.id, title=title)
         db.session.add(ebook)
@@ -215,6 +218,7 @@ def import_ebook(file_storage):
     ebook.intro = data.get("intro")
     ebook.content = blocks
     db.session.commit()
+    remove_image_directories(previous_directories - image_directories(blocks))
 
     return {
         "id": ebook.id,

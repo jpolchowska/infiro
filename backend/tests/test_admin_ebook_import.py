@@ -1,6 +1,7 @@
 import io
 import json
 import zipfile
+from pathlib import Path
 
 import pytest
 
@@ -128,3 +129,44 @@ def test_reimporting_an_ebook_replaces_its_content(client, login):
     assert response.status_code == 201
     assert response.json["title"] == "Nowy tytuł"
     assert Ebook.query.filter_by(subsection_id=subsection.id).count() == 1
+
+
+def _image_directories(client):
+    uploads = Path(client.application.static_folder) / "uploads"
+    return sorted(path.name for path in uploads.iterdir()) if uploads.exists() else []
+
+
+def test_reimporting_an_ebook_removes_its_old_images(client, login):
+    login("admin-sub", ["admin"])
+    _create_subsection()
+    import_ebook(client, build_ebook_zip())
+    first = _image_directories(client)
+
+    import_ebook(client, build_ebook_zip(ebook_json=_ebook_json(title="Nowy tytuł")))
+
+    second = _image_directories(client)
+    assert len(first) == 1 and len(second) == 1
+    assert first != second
+
+
+def test_ebook_without_images_creates_no_upload_folder(client, login):
+    login("admin-sub", ["admin"])
+    _create_subsection()
+    content = ebook_content()
+    content["blocks"] = [block for block in content["blocks"] if block["type"] != "image"]
+
+    response = import_ebook(client, build_ebook_zip(ebook_json=json.dumps(content, ensure_ascii=False), images=()))
+
+    assert response.status_code == 201
+    assert _image_directories(client) == []
+
+
+def test_deleting_a_subsection_removes_its_ebook_images(client, login):
+    login("admin-sub", ["admin"])
+    subsection = _create_subsection()
+    import_ebook(client, build_ebook_zip())
+
+    response = client.delete(f"/api/admin/subsections/{subsection.id}", headers={"Authorization": "Bearer test-token"})
+
+    assert response.status_code == 204
+    assert _image_directories(client) == []

@@ -11,6 +11,7 @@ from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
 from app.models.task_answer_options import TaskAnswerOption
 from app.models.tasks import Task
+from app.services.ebook_images import image_directories, remove_image_directories
 
 
 def _renumber(query):
@@ -46,6 +47,8 @@ def _delete_subsections(subsection_ids):
         task.id for task in Task.query.filter(Task.subsection_id.in_(subsection_ids)).all()
     ]
     _delete_tasks(task_ids)
+    ebooks = Ebook.query.filter(Ebook.subsection_id.in_(subsection_ids)).all()
+    remove_image_directories(set().union(*(image_directories(ebook.content) for ebook in ebooks)))
     Ebook.query.filter(Ebook.subsection_id.in_(subsection_ids)).delete(synchronize_session=False)
     Subsection.query.filter(Subsection.id.in_(subsection_ids)).delete(synchronize_session=False)
 
