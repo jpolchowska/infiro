@@ -25,7 +25,7 @@ export default function TeachersPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-infiro-navy">Nauczyciele</h1>
-      <p className="mt-2 max-w-2xl text-sm text-gray-600">
+      <p className="mt-2 text-sm text-gray-600">
         Nauczyciele i wyniki ich uczniów. Otwórz nauczyciela, aby przypisać mu uczniów.
       </p>
 

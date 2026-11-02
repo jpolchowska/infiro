@@ -87,3 +87,11 @@ export async function getTask(token: string, id: number): Promise<TaskDetail | u
     };
   });
 }
+
+export async function deleteTask(token: string, id: number): Promise<void> {
+  await apiFetch<void>(`/api/admin/tasks/${id}`, { token, method: "DELETE" });
+}
+
+export async function deleteTasks(token: string, ids: number[]): Promise<void> {
+  await apiFetch<void>("/api/admin/tasks/delete", { token, method: "POST", json: { task_ids: ids } });
+}

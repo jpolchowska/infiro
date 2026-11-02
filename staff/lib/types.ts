@@ -264,3 +264,51 @@ export type LevelingTestSettings = {
     completionWindowDays: { min: number; max: number };
   };
 };
+
+export type DeletedTask = {
+  id: number;
+  prompt: string;
+  sectionTitle: string;
+  subsectionTitle: string;
+  answerCount: number;
+};
+
+export type DeletedSubsection = {
+  id: number;
+  sectionTitle: string;
+  title: string;
+  taskCount: number;
+  answerCount: number;
+  hasEbook: boolean;
+};
+
+export type DeletedSection = {
+  id: number;
+  title: string;
+  subsectionCount: number;
+  taskCount: number;
+  answerCount: number;
+  hasFinalTest: boolean;
+};
+
+export type TaskImportSummary = {
+  createdTasks: number;
+  updatedTasks: number;
+  deletedTasks: DeletedTask[];
+  createdSubsections: number;
+  deletedSubsections: DeletedSubsection[];
+  createdSections: number;
+  deletedSections: DeletedSection[];
+};
+
+export type DeletedFinalTestQuestion = {
+  id: number;
+  prompt: string;
+  answerCount: number;
+};
+
+export type FinalTestImportSummary = {
+  createdQuestions: number;
+  updatedQuestions: number;
+  deletedQuestions: DeletedFinalTestQuestion[];
+};

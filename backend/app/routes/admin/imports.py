@@ -20,11 +20,12 @@ def import_tasks_json():
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
-    result, errors = import_tasks(data)
+    dry_run = request.args.get("dry_run") == "true"
+    result, errors = import_tasks(data, dry_run=dry_run)
     if errors:
         return jsonify({"errors": errors}), 400
 
-    return jsonify(result), 201
+    return jsonify(result), 200 if dry_run else 201
 
 
 @bp.route("/ebooks/import", methods=["POST"])
@@ -50,8 +51,9 @@ def import_final_test_json(section_id):
     if data is None:
         return jsonify({"error": "JSON body is required"}), 400
 
-    result, errors = import_final_test(section, data)
+    dry_run = request.args.get("dry_run") == "true"
+    result, errors = import_final_test(section, data, dry_run=dry_run)
     if errors:
         return jsonify({"errors": errors}), 400
 
-    return jsonify(result), 201
+    return jsonify(result), 200 if dry_run else 201

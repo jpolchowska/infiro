@@ -137,7 +137,7 @@ def _validate_question(question, label, content_keys, errors):
         errors.append(f"{label}: must be an object")
         return
 
-    _validate_content_key(question, label, content_keys, errors, required=False)
+    _validate_content_key(question, label, content_keys, errors, required=True)
     _validate_item_themes(question, label, ALLOWED_FINAL_TEST_TYPES, errors)
 
 

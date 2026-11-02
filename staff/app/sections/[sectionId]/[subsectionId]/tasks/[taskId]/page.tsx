@@ -1,17 +1,23 @@
 "use client";
 
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useAuth } from "@/components/auth/AuthContext";
 import { BackLink } from "@/components/ui/BackLink";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { TrashIcon } from "@/components/ui/TrashIcon";
 import { DifficultyMeter } from "@/components/ui/DifficultyMeter";
 import { TaskTypeBadge } from "@/components/ui/TaskTypeBadge";
 import { LoadState } from "@/components/ui/LoadState";
 import { TaskContentView } from "@/components/tasks/TaskContentView";
-import { getTask } from "@/lib/data";
+import { deleteTask, getTask } from "@/lib/data";
 import { themeLabel } from "@/lib/labels";
 import { pluralize } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
+import { useSubmit } from "@/hooks/useSubmit";
 
 const VARIANT_WORDS = ["wariant", "warianty", "wariantów"] as const;
+const DELETE_ERROR = "Nie udało się usunąć zadania. Spróbuj ponownie.";
 
 function ContentCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -24,6 +30,10 @@ function ContentCard({ title, children }: { title: string; children: React.React
 
 export default function TaskPage() {
   const { taskId } = useParams<{ taskId: string }>();
+  const router = useRouter();
+  const { role } = useAuth();
+  const [confirming, setConfirming] = useState(false);
+  const { submitting, error, submit } = useSubmit();
   const { state } = useApiData((token) => getTask(token, Number(taskId)), taskId);
 
   if (state.status !== "ready") return <LoadState state={state} />;
@@ -31,12 +41,34 @@ export default function TaskPage() {
   const task = state.data;
   if (!task) notFound();
 
+  const subsectionPath = `/sections/${task.sectionId}/${task.subsectionId}`;
+  const id = task.id;
+
+  async function confirmDelete() {
+    await submit(async (token) => {
+      await deleteTask(token, id);
+      router.push(subsectionPath);
+    }, DELETE_ERROR);
+  }
+
   return (
     <div>
-      <BackLink href={`/sections/${task.sectionId}/${task.subsectionId}`}>
+      <BackLink href={subsectionPath}>
         {task.sectionTitle} / {task.subsectionTitle}
       </BackLink>
-      <h1 className="mt-3 text-2xl font-semibold text-infiro-navy">Zadanie {task.orderIndex}</h1>
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
+        <h1 className="text-2xl font-semibold text-infiro-navy">Zadanie {task.orderIndex}</h1>
+        {role === "admin" && (
+          <button
+            type="button"
+            onClick={() => setConfirming(true)}
+            className="relative inline-flex items-center gap-1.5 text-sm font-medium text-tone-bad after:absolute after:left-[2.5px] after:right-0 after:bottom-[3px] after:h-px after:bg-current after:opacity-0 hover:after:opacity-100"
+          >
+            <TrashIcon />
+            Usuń zadanie
+          </button>
+        )}
+      </div>
       <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
         <TaskTypeBadge type={task.type} />
         <DifficultyMeter level={task.difficulty} />
@@ -63,6 +95,19 @@ export default function TaskPage() {
           </div>
         </>
       )}
+
+      <ConfirmDialog
+        open={confirming}
+        title={`Usunąć zadanie ${task.orderIndex}?`}
+        confirmLabel="Usuń zadanie"
+        busy={submitting}
+        error={error}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirming(false)}
+      >
+        Odpowiedzi uczniów na to zadanie też zostaną usunięte. Tej operacji nie można cofnąć, a zadanie wróci tylko
+        wtedy, gdy będzie w następnym imporcie.
+      </ConfirmDialog>
     </div>
   );
 }

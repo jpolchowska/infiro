@@ -145,7 +145,7 @@ function validateQuestion(question: unknown, label: string, contentKeys: Set<str
     return;
   }
 
-  validateContentKey(question, label, contentKeys, errors, false);
+  validateContentKey(question, label, contentKeys, errors, true);
   validateItemThemes(question, label, FINAL_TEST_TYPES, errors);
 }
 
