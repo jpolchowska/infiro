@@ -7,6 +7,7 @@ type ImportCardProps = {
   submitLabel: string;
   submittingLabel: string;
   submitting: boolean;
+  ready: boolean;
   stretch?: boolean;
   onSubmit: () => void;
   children: ReactNode;
@@ -19,6 +20,7 @@ export function ImportCard({
   submitLabel,
   submittingLabel,
   submitting,
+  ready,
   stretch = false,
   onSubmit,
   children,
@@ -42,8 +44,8 @@ export function ImportCard({
       <div className="mt-4 flex justify-center">
         <button
           type="submit"
-          disabled={submitting}
-          className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+          disabled={submitting || !ready}
+          className="rounded-sm bg-infiro-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? submittingLabel : submitLabel}
         </button>

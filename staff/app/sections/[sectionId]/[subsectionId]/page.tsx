@@ -10,7 +10,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { LoadState } from "@/components/ui/LoadState";
 import { COLUMN_HEADER, TABLE_ROW, TableCard } from "@/components/ui/TableCard";
 import { TrashIcon } from "@/components/ui/TrashIcon";
-import { deleteTasks, getSection, getSubsection } from "@/lib/data";
+import { deleteEbook, deleteTasks, getSection, getSubsection } from "@/lib/data";
 import { difficultyLabel, taskTypeLabel } from "@/lib/labels";
 import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
@@ -56,7 +56,9 @@ export default function SubsectionPage() {
   const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [confirming, setConfirming] = useState(false);
+  const [confirmingEbook, setConfirmingEbook] = useState(false);
   const { submitting, error, submit } = useSubmit();
+  const ebookDeletion = useSubmit();
   const { state } = useApiData(async (token) => {
     const [section, subsection] = await Promise.all([
       getSection(token, Number(sectionId)),
@@ -99,6 +101,14 @@ export default function SubsectionPage() {
       stopSelecting();
       setVersion((current) => current + 1);
     }, DELETE_ERROR);
+  }
+
+  async function confirmEbookDelete() {
+    await ebookDeletion.submit(async (token) => {
+      await deleteEbook(token, Number(subsectionId));
+      setConfirmingEbook(false);
+      setVersion((current) => current + 1);
+    }, "Nie udało się usunąć e-booka. Spróbuj ponownie.");
   }
 
   const selectButton =
@@ -154,9 +164,17 @@ export default function SubsectionPage() {
             <p className="mt-0.5 text-sm text-gray-600">{subsection.ebook ? subsection.ebook.title : "Brak e-booka."}</p>
           </div>
           {subsection.ebook && (
-            <Link href={`${basePath}/ebook`} className="shrink-0 text-sm font-medium text-infiro-navy hover:underline">
-              Podgląd &rsaquo;
-            </Link>
+            <div className="flex shrink-0 items-center gap-5">
+              {isAdmin && (
+                <button type="button" onClick={() => setConfirmingEbook(true)} className={DANGER_LINK}>
+                  <TrashIcon />
+                  Usuń
+                </button>
+              )}
+              <Link href={`${basePath}/ebook`} className="text-sm font-medium text-infiro-navy hover:underline">
+                Podgląd &rsaquo;
+              </Link>
+            </div>
           )}
         </div>
       </section>
@@ -244,6 +262,19 @@ export default function SubsectionPage() {
       >
         Odpowiedzi uczniów na te zadania też zostaną usunięte. Tej operacji nie można cofnąć, a zadania wrócą tylko
         wtedy, gdy będą w następnym imporcie.
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        open={confirmingEbook}
+        title="Usunąć e-book?"
+        confirmLabel="Usuń"
+        busy={ebookDeletion.submitting}
+        error={ebookDeletion.error}
+        onConfirm={confirmEbookDelete}
+        onCancel={() => setConfirmingEbook(false)}
+      >
+        E-book „{subsection.ebook?.title}” zniknie z tej podsekcji razem z obrazkami, a uczniowie przestaną go widzieć.
+        Zadania zostają. E-book można później zaimportować ponownie.
       </ConfirmDialog>
     </div>
   );

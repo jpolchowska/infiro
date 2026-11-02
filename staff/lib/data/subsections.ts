@@ -58,3 +58,7 @@ export async function getEbook(token: string, subsectionId: number): Promise<Ebo
     };
   });
 }
+
+export async function deleteEbook(token: string, subsectionId: number): Promise<void> {
+  await apiFetch<void>(`/api/admin/subsections/${subsectionId}/ebook`, { token, method: "DELETE" });
+}

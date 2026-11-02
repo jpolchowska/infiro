@@ -27,10 +27,7 @@ export function TaskImportForm({ controls }: { controls: ImportControls }) {
 
   async function handleSubmit() {
     setResult(null);
-    if (!file) {
-      controls.showErrors(["Wybierz plik .json."]);
-      return;
-    }
+    if (!file) return;
 
     const { data, errors } = await readValidatedJson(file, validateTaskImport);
     if (errors.length > 0) {
@@ -66,10 +63,11 @@ export function TaskImportForm({ controls }: { controls: ImportControls }) {
         submitLabel="Importuj zadania"
         submittingLabel="Importowanie…"
         submitting={controls.submitting}
+        ready={file !== null}
         onSubmit={handleSubmit}
       >
         <div className="mt-4">
-          <UploadField key={uploadKey} accept=".json" hint=".json" onFileSelected={setFile} />
+          <UploadField key={uploadKey} accept=".json" hint=".json" onFilesSelected={(files) => setFile(files[0] ?? null)} />
         </div>
       </ImportCard>
 

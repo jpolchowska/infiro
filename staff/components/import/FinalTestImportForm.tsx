@@ -29,14 +29,7 @@ export function FinalTestImportForm({ controls }: { controls: ImportControls }) 
 
   async function handleSubmit() {
     setResult(null);
-    if (!sectionId) {
-      controls.showErrors(["Wybierz dział."]);
-      return;
-    }
-    if (!file) {
-      controls.showErrors(["Wybierz plik .json."]);
-      return;
-    }
+    if (!sectionId || !file) return;
 
     const { data, errors } = await readValidatedJson(file, validateFinalTestImport);
     if (errors.length > 0) {
@@ -82,6 +75,7 @@ export function FinalTestImportForm({ controls }: { controls: ImportControls }) 
         submitLabel="Importuj test końcowy"
         submittingLabel="Importowanie…"
         submitting={controls.submitting}
+        ready={sectionId !== null && file !== null}
         stretch
         onSubmit={handleSubmit}
       >
@@ -103,7 +97,7 @@ export function FinalTestImportForm({ controls }: { controls: ImportControls }) 
           </label>
         </div>
         <div className="mt-4 flex flex-1 flex-col">
-          <UploadField key={uploadKey} accept=".json" hint=".json" onFileSelected={setFile} />
+          <UploadField key={uploadKey} accept=".json" hint=".json" onFilesSelected={(files) => setFile(files[0] ?? null)} />
         </div>
       </ImportCard>
 
