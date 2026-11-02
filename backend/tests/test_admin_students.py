@@ -159,3 +159,14 @@ def test_user_without_staff_role_cannot_list_students(client, login):
     response = client.get("/api/admin/students", headers=HEADERS)
 
     assert response.status_code == 403
+
+
+def test_user_without_staff_role_cannot_open_a_student(client, login):
+    login("student-sub", ["student"])
+    student = User(keycloak_sub="other-student", role="student")
+    db.session.add(student)
+    db.session.commit()
+
+    response = client.get(f"/api/admin/students/{student.id}", headers=HEADERS)
+
+    assert response.status_code == 403

@@ -90,8 +90,17 @@ export type FinalTestPreview = {
   sectionId: number;
   sectionTitle: string;
   questions: FinalTestQuestion[];
-  attempts: number;
   studentsAttempted: number;
+  studentsTotal: number;
+  averageAttempts: number | null;
+  averageScore: number | null;
+  easiest: FinalTestQuestionGroup | null;
+  hardest: FinalTestQuestionGroup | null;
+};
+
+export type FinalTestQuestionGroup = {
+  questionIds: number[];
+  correctRate: number;
 };
 
 export type CalloutStyle = "zapamietaj" | "wskazowka" | "uwaga" | "definicja";

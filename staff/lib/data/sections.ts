@@ -1,5 +1,5 @@
 import { apiFetch, fetchOrUndefined } from "@/lib/api";
-import type { FinalTestPreview, Section, SectionDetail, TaskType } from "@/lib/types";
+import type { FinalTestPreview, FinalTestQuestionGroup, Section, SectionDetail, TaskType } from "@/lib/types";
 import { mapSubsection, type RawSubsection } from "./subsections";
 import { mapContent, type RawContent } from "./tasks";
 
@@ -27,9 +27,22 @@ type RawFinalTestPreview = {
     order_index: number;
     themes: string[];
   })[];
-  attempts: number;
   students_attempted: number;
+  students_total: number;
+  average_attempts: number | null;
+  average_score: number | null;
+  easiest: RawFinalTestQuestionGroup | null;
+  hardest: RawFinalTestQuestionGroup | null;
 };
+
+type RawFinalTestQuestionGroup = {
+  question_ids: number[];
+  correct_rate: number;
+};
+
+function mapQuestionGroup(raw: RawFinalTestQuestionGroup | null): FinalTestQuestionGroup | null {
+  return raw && { questionIds: raw.question_ids, correctRate: raw.correct_rate };
+}
 
 function mapSection(raw: RawSection): Section {
   return {
@@ -72,8 +85,12 @@ export async function getFinalTestPreview(token: string, sectionId: number): Pro
         orderIndex: question.order_index,
         themes: question.themes,
       })),
-      attempts: raw.attempts,
       studentsAttempted: raw.students_attempted,
+      studentsTotal: raw.students_total,
+      averageAttempts: raw.average_attempts,
+      averageScore: raw.average_score,
+      easiest: mapQuestionGroup(raw.easiest),
+      hardest: mapQuestionGroup(raw.hardest),
     };
   });
 }

@@ -69,7 +69,7 @@ export default function SectionPage() {
             )}
             <Link
               href={`/sections/${section.id}/final-test`}
-              className="rounded-sm border border-infiro-border px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
+              className="text-sm font-medium text-infiro-navy hover:underline"
             >
               Podgląd &rsaquo;
             </Link>

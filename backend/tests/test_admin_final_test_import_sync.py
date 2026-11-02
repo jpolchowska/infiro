@@ -100,6 +100,13 @@ def test_deleting_a_missing_final_test_returns_404(client, section):
     assert response.status_code == 404
 
 
+def test_deleting_the_final_test_of_a_missing_section_returns_404(client, section):
+    response = client.delete("/api/admin/sections/9999/final-test", headers=HEADERS)
+
+    assert response.status_code == 404
+    assert response.json["error"] == "Section not found"
+
+
 def test_teacher_cannot_delete_the_final_test(client, login, section):
     _import(client, section, IMPORT_PAYLOAD)
     login("teacher-sub", ["teacher"])
