@@ -184,7 +184,7 @@ def test_final_test_preview_lists_questions_with_answers(client, content):
     assert response.status_code == 200
     preview = response.json
     assert preview["section_title"] == "Tabliczka mnożenia"
-    assert preview["attempts"] == 0
+    assert (preview["students_attempted"], preview["average_score"], preview["easiest"]) == (0, None, None)
     first, second = preview["questions"]
     assert first["prompt"] == "Ile to 7 · 8?"
     assert [(o["text"], o["is_correct"]) for o in first["options"]] == [("56", True), ("54", False), ("58", False)]

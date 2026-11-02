@@ -1,8 +1,15 @@
-import { pluralize, WORDS } from "@/lib/pluralize";
+import { pluralForm, pluralize, WORDS, type PluralForms } from "@/lib/pluralize";
 import type { FinalTestImportSummary, TaskImportSummary } from "@/lib/types";
 
 const ANSWER_WORDS = ["odpowiedź ucznia", "odpowiedzi uczniów", "odpowiedzi uczniów"] as const;
 const SECTION_WORDS = ["sekcja", "sekcje", "sekcji"] as const;
+const ADDED_WORDS = ["Dodane", "Dodane", "Dodanych"] as const;
+const UPDATED_WORDS = ["Zaktualizowane", "Zaktualizowane", "Zaktualizowanych"] as const;
+const DELETED_WORDS = ["Usunięte", "Usunięte", "Usuniętych"] as const;
+
+function countLabel(count: number, adjective: PluralForms, noun?: PluralForms): string {
+  return noun ? `${pluralForm(count, adjective)} ${pluralForm(count, noun)}` : pluralForm(count, adjective);
+}
 
 export function hasDeletions(summary: TaskImportSummary): boolean {
   return summary.deletedTasks.length + summary.deletedSubsections.length + summary.deletedSections.length > 0;
@@ -40,9 +47,13 @@ export function TaskImportSummaryView({ summary }: { summary: TaskImportSummary 
   return (
     <div>
       <div className="flex gap-3">
-        <Count label="Dodane zadania" value={summary.createdTasks} />
-        <Count label="Zaktualizowane" value={summary.updatedTasks} />
-        <Count label="Usunięte zadania" value={deletedTaskCount(summary)} tone="bad" />
+        <Count label={countLabel(summary.createdTasks, ADDED_WORDS, WORDS.task)} value={summary.createdTasks} />
+        <Count label={countLabel(summary.updatedTasks, UPDATED_WORDS)} value={summary.updatedTasks} />
+        <Count
+          label={countLabel(deletedTaskCount(summary), DELETED_WORDS, WORDS.task)}
+          value={deletedTaskCount(summary)}
+          tone="bad"
+        />
       </div>
       {structureChanges.length > 0 && <p className="mt-3 text-sm text-gray-500">{structureChanges.join(" · ")}</p>}
 
@@ -98,9 +109,13 @@ export function FinalTestImportSummaryView({ summary }: { summary: FinalTestImpo
   return (
     <div>
       <div className="flex gap-3">
-        <Count label="Dodane pytania" value={summary.createdQuestions} />
-        <Count label="Zaktualizowane" value={summary.updatedQuestions} />
-        <Count label="Usunięte pytania" value={summary.deletedQuestions.length} tone="bad" />
+        <Count label={countLabel(summary.createdQuestions, ADDED_WORDS, WORDS.question)} value={summary.createdQuestions} />
+        <Count label={countLabel(summary.updatedQuestions, UPDATED_WORDS)} value={summary.updatedQuestions} />
+        <Count
+          label={countLabel(summary.deletedQuestions.length, DELETED_WORDS, WORDS.question)}
+          value={summary.deletedQuestions.length}
+          tone="bad"
+        />
       </div>
 
       {summary.deletedQuestions.length > 0 && (

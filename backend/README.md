@@ -14,7 +14,6 @@ Setup, environment variables and deployment are described in the [main README](.
 | `app/models/` | SQLAlchemy models |
 | `app/auth.py` | Token verification and role checks |
 | `migrations/` | Flask-Migrate migrations, applied on container start |
-| `seed/` | Example import files |
 | `tests/` | pytest suite |
 
 ## Running

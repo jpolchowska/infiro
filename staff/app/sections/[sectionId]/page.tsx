@@ -2,18 +2,26 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
+import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { BackLink } from "@/components/ui/BackLink";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { LoadState } from "@/components/ui/LoadState";
-import { getSection } from "@/lib/data";
+import { DELETE_LINK, TrashIcon } from "@/components/ui/TrashIcon";
+import { deleteFinalTest, getSection } from "@/lib/data";
 import { pluralize, WORDS } from "@/lib/pluralize";
 import { useApiData } from "@/hooks/useApiData";
+import { useSubmit } from "@/hooks/useSubmit";
 
 export default function SectionPage() {
   const { sectionId } = useParams<{ sectionId: string }>();
   const { role } = useAuth();
   const isTeacher = role === "teacher";
-  const { state } = useApiData((token) => getSection(token, Number(sectionId)), sectionId);
+  const isAdmin = role === "admin";
+  const [version, setVersion] = useState(0);
+  const [confirmingFinalTest, setConfirmingFinalTest] = useState(false);
+  const finalTestDeletion = useSubmit();
+  const { state } = useApiData((token) => getSection(token, Number(sectionId)), `${sectionId}/${version}`);
 
   if (state.status !== "ready") return <LoadState state={state} />;
 
@@ -21,6 +29,14 @@ export default function SectionPage() {
   if (!section) notFound();
 
   const hasFinalTest = section.finalTestQuestionCount > 0;
+
+  async function confirmFinalTestDelete() {
+    await finalTestDeletion.submit(async (token) => {
+      await deleteFinalTest(token, Number(sectionId));
+      setConfirmingFinalTest(false);
+      setVersion((current) => current + 1);
+    }, "Nie udało się usunąć testu końcowego. Spróbuj ponownie.");
+  }
 
   return (
     <div>
@@ -44,12 +60,20 @@ export default function SectionPage() {
           </p>
         </div>
         {hasFinalTest && (
-          <Link
-            href={`/sections/${section.id}/final-test`}
-            className="rounded-sm border border-infiro-border px-4 py-2 text-sm font-medium text-infiro-navy hover:border-infiro-navy"
-          >
-            Podgląd &rsaquo;
-          </Link>
+          <div className="flex shrink-0 items-center gap-5">
+            {isAdmin && (
+              <button type="button" onClick={() => setConfirmingFinalTest(true)} className={DELETE_LINK}>
+                <TrashIcon />
+                Usuń
+              </button>
+            )}
+            <Link
+              href={`/sections/${section.id}/final-test`}
+              className="text-sm font-medium text-infiro-navy hover:underline"
+            >
+              Podgląd &rsaquo;
+            </Link>
+          </div>
         )}
       </section>
 
@@ -81,6 +105,19 @@ export default function SectionPage() {
           </Link>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={confirmingFinalTest}
+        title="Usunąć test końcowy?"
+        confirmLabel="Usuń"
+        busy={finalTestDeletion.submitting}
+        error={finalTestDeletion.error}
+        onConfirm={confirmFinalTestDelete}
+        onCancel={() => setConfirmingFinalTest(false)}
+      >
+        Pytania testu końcowego i odpowiedzi uczniów na nie zostaną usunięte, a uczniowie przestaną widzieć test.
+        Wyniki wcześniejszych podejść zostają w historii. Test można później zaimportować ponownie.
+      </ConfirmDialog>
     </div>
   );
 }

@@ -1,10 +1,12 @@
-from app.constants import DEFAULT_THEME, TaskType
+from app.constants import DEFAULT_THEME, TaskType, UserRole
 from app.extensions import db
+from app.models.section_test_answers import SectionTestAnswer
 from app.models.section_test_attempts import SectionTestAttempt
 from app.models.section_test_questions import SectionTestQuestion
 from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
 from app.models.subsections import Subsection
+from app.models.users import User
 from app.services.themes import question_options, resolve_theme, task_options
 
 
@@ -109,17 +111,53 @@ def _question_summary(question):
     }
 
 
-def final_test_preview(section):
+def _correct_rates(attempt_ids, question_ids):
+    answers = SectionTestAnswer.query.filter(
+        SectionTestAnswer.attempt_id.in_(attempt_ids),
+        SectionTestAnswer.question_id.in_(question_ids),
+    ).all()
+    totals = {}
+    for answer in answers:
+        correct, total = totals.get(answer.question_id, (0, 0))
+        totals[answer.question_id] = (correct + answer.is_correct, total + 1)
+    return {question_id: round(100 * correct / total) for question_id, (correct, total) in totals.items()}
+
+
+def _questions_with_rate(question_ids, rates, rate):
+    return {
+        "question_ids": [question_id for question_id in question_ids if rates.get(question_id) == rate],
+        "correct_rate": rate,
+    }
+
+
+def final_test_preview(section, teacher=None):
     questions = (
         SectionTestQuestion.query.filter_by(section_id=section.id)
         .order_by(SectionTestQuestion.order_index, SectionTestQuestion.id)
         .all()
     )
-    attempts = SectionTestAttempt.query.filter_by(section_id=section.id).all()
+    students = User.query.filter_by(role=UserRole.STUDENT)
+    if teacher is not None:
+        students = students.filter_by(teacher_id=teacher.id)
+    student_ids = [student.id for student in students.all()]
+    attempts = SectionTestAttempt.query.filter(
+        SectionTestAttempt.section_id == section.id,
+        SectionTestAttempt.student_id.in_(student_ids),
+    ).all()
+    students_attempted = len({attempt.student_id for attempt in attempts})
+    scores = [attempt.score / attempt.max_score for attempt in attempts if attempt.max_score]
+    question_ids = [question.id for question in questions]
+    rates = _correct_rates([attempt.id for attempt in attempts], question_ids)
+    distinct_rates = set(rates.values())
+
     return {
         "section_id": section.id,
         "section_title": section.title,
         "questions": [_question_summary(question) for question in questions],
-        "attempts": len(attempts),
-        "students_attempted": len({attempt.student_id for attempt in attempts}),
+        "students_attempted": students_attempted,
+        "students_total": len(student_ids),
+        "average_attempts": round(len(attempts) / students_attempted, 1) if students_attempted else None,
+        "average_score": round(100 * sum(scores) / len(scores)) if scores else None,
+        "easiest": _questions_with_rate(question_ids, rates, max(distinct_rates)) if len(distinct_rates) > 1 else None,
+        "hardest": _questions_with_rate(question_ids, rates, min(distinct_rates)) if len(distinct_rates) > 1 else None,
     }

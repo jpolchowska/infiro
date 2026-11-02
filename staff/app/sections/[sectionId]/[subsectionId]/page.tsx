@@ -9,7 +9,7 @@ import { BackLink } from "@/components/ui/BackLink";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { LoadState } from "@/components/ui/LoadState";
 import { COLUMN_HEADER, TABLE_ROW, TableCard } from "@/components/ui/TableCard";
-import { TrashIcon } from "@/components/ui/TrashIcon";
+import { DELETE_LINK, TrashIcon } from "@/components/ui/TrashIcon";
 import { deleteEbook, deleteTasks, getSection, getSubsection } from "@/lib/data";
 import { difficultyLabel, taskTypeLabel } from "@/lib/labels";
 import { pluralize, WORDS } from "@/lib/pluralize";
@@ -20,8 +20,6 @@ const DELETE_ERROR = "Nie udało się usunąć zadań. Spróbuj ponownie.";
 const LINK_BUTTON = "inline-flex items-center gap-1.5 text-sm font-medium hover:underline";
 const NAVY_LINK = `${LINK_BUTTON} text-infiro-navy`;
 const MUTED_LINK = `${LINK_BUTTON} text-gray-500`;
-const DANGER_LINK =
-  "relative inline-flex items-center gap-1.5 text-sm font-medium text-tone-bad after:absolute after:left-[2.5px] after:right-0 after:bottom-[3px] after:h-px after:bg-current after:opacity-0 hover:after:opacity-100 disabled:pointer-events-none disabled:opacity-40";
 const CHECKBOX = "block h-4 w-4 cursor-pointer accent-infiro-navy";
 
 function SelectAllCheckbox({ total, selectedCount, onToggle }: {
@@ -139,7 +137,7 @@ export default function SubsectionPage() {
           type="button"
           onClick={() => setConfirming(true)}
           disabled={selected.size === 0}
-          className={DANGER_LINK}
+          className={DELETE_LINK}
         >
           <TrashIcon />
           Usuń
@@ -166,7 +164,7 @@ export default function SubsectionPage() {
           {subsection.ebook && (
             <div className="flex shrink-0 items-center gap-5">
               {isAdmin && (
-                <button type="button" onClick={() => setConfirmingEbook(true)} className={DANGER_LINK}>
+                <button type="button" onClick={() => setConfirmingEbook(true)} className={DELETE_LINK}>
                   <TrashIcon />
                   Usuń
                 </button>

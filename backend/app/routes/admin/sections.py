@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify
 
-from app.auth import authenticate_token, require_any_realm_role, require_realm_role
+from app.auth import authenticate_token, require_any_realm_role, require_realm_role, staff_viewer
 from app.constants import RealmRole
 from app.extensions import db
+from app.models.section_test_questions import SectionTestQuestion
 from app.models.sections import Section
 from app.models.subsections import Subsection
 from app.payload import json_object
@@ -69,7 +70,24 @@ def get_final_test(section_id):
     if section is None:
         return jsonify({"error": "Section not found"}), 404
 
-    return jsonify(final_test_preview(section)), 200
+    _, teacher = staff_viewer()
+    return jsonify(final_test_preview(section, teacher)), 200
+
+
+@bp.route("/sections/<int:section_id>/final-test", methods=["DELETE"])
+@authenticate_token
+@require_realm_role(RealmRole.ADMIN)
+def delete_final_test(section_id):
+    section = db.session.get(Section, section_id)
+    if section is None:
+        return jsonify({"error": "Section not found"}), 404
+    if SectionTestQuestion.query.filter_by(section_id=section_id).first() is None:
+        return jsonify({"error": "Final test not found"}), 404
+
+    content_deletion.delete_final_test(section)
+    db.session.commit()
+
+    return "", 204
 
 
 @bp.route("/sections/<int:section_id>", methods=["PATCH"])
