@@ -71,6 +71,30 @@ def _delete_section_test(section_id):
     SectionTestAttempt.query.filter_by(section_id=section_id).delete(synchronize_session=False)
 
 
+def delete_final_test_questions(question_ids):
+    question_ids = list(question_ids)
+    if not question_ids:
+        return
+
+    section_ids = {
+        section_id
+        for (section_id,) in db.session.query(SectionTestQuestion.section_id)
+        .filter(SectionTestQuestion.id.in_(question_ids))
+        .distinct()
+    }
+    SectionTestAnswer.query.filter(SectionTestAnswer.question_id.in_(question_ids)).delete(synchronize_session=False)
+    SectionTestAnswerOption.query.filter(
+        SectionTestAnswerOption.section_test_question_id.in_(question_ids)
+    ).delete(synchronize_session=False)
+    SectionTestQuestion.query.filter(SectionTestQuestion.id.in_(question_ids)).delete(synchronize_session=False)
+    for section_id in section_ids:
+        _renumber(
+            SectionTestQuestion.query.filter_by(section_id=section_id).order_by(
+                SectionTestQuestion.order_index, SectionTestQuestion.id
+            )
+        )
+
+
 def delete_task(task):
     _delete_tasks([task.id])
 

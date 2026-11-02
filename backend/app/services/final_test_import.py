@@ -1,10 +1,10 @@
-from uuid import uuid4
-
 from app.constants import DEFAULT_THEME, TaskType
 from app.extensions import db
 from app.models.section_test_answer_options import SectionTestAnswerOption
 from app.models.section_test_questions import SectionTestQuestion
+from app.services import content_deletion
 from app.services.answer_options import sync_answer_options
+from app.services.import_summary import summarize_final_test_import
 from app.services.import_validation import validate_final_test_import
 from app.services.themes import merge_theme_variants
 
@@ -52,7 +52,7 @@ def _upsert_question(section, question_data, content_key, order_index):
     return question
 
 
-def import_final_test(section, data):
+def import_final_test(section, data, dry_run=False):
     errors = validate_final_test_import(data)
     if errors:
         return None, errors
@@ -63,17 +63,21 @@ def import_final_test(section, data):
     if section_entry is None:
         return None, [f"Payload does not contain a 'section' matching '{section.title}'"]
 
-    imported_questions = []
+    summary = summarize_final_test_import(section, section_entry)
+    if dry_run:
+        return {"summary": summary}, None
 
+    imported_questions = []
     for question_order, question_data in enumerate(section_entry["questions"], start=1):
-        content_key = question_data.get("content_key") or str(uuid4())
-        question = _upsert_question(section, question_data, content_key, question_order)
+        question = _upsert_question(section, question_data, question_data["content_key"], question_order)
         imported_questions.append(_question_output(question))
 
+    content_deletion.delete_final_test_questions(question["id"] for question in summary["questions"]["deleted"])
     db.session.commit()
 
     return {
         "question_count": len(imported_questions),
         "questions": imported_questions,
+        "summary": summary,
         "data": data,
     }, None

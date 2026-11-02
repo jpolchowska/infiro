@@ -16,6 +16,7 @@ Plik to **lista sekcji**. Każda sekcja ma **listę pytań** — bez podsekcji, 
     "section": "Nazwa działu (musi już istnieć)",
     "questions": [
       {
+        "content_key": "nazwa-dzialu-test-01",
         "type": "single_choice",
         "themes": {
           "default": {
@@ -32,6 +33,7 @@ Plik to **lista sekcji**. Każda sekcja ma **listę pytań** — bez podsekcji, 
         }
       },
       {
+        "content_key": "nazwa-dzialu-test-02",
         "type": "short_answer",
         "themes": {
           "default": {
@@ -54,6 +56,7 @@ Plik to **lista sekcji**. Każda sekcja ma **listę pytań** — bez podsekcji, 
 |---|---|
 | `section` | nazwa działu, do którego test należy — musi dokładnie pasować do istniejącego działu |
 | `questions` | lista pytań testu końcowego, w kolejności |
+| `content_key` | stały, unikalny identyfikator pytania (np. `ulamki-test-01`); obowiązkowy — po nim ponowny import rozpoznaje to samo pytanie |
 | `type` | rodzaj pytania: `single_choice` albo `short_answer` (bez `memory` — test końcowy nie ma pytań na łączenie w pary) |
 | `themes` | warianty treści per motyw; `default` musi być zawsze; wariant motywu podaje zwykle tylko `prompt`, resztę dziedziczy z `default` — tak samo jak przy zwykłych zadaniach |
 | `prompt` | treść pytania |
@@ -68,6 +71,18 @@ Plik to **lista sekcji**. Każda sekcja ma **listę pytań** — bez podsekcji, 
 - **Brak `difficulty`.** Trudność zadań decyduje o odblokowywaniu kolejnych poziomów w podsekcji — test końcowy nie ma nic wspólnego z tym mechanizmem, więc pole jest zbędne.
 - **Brak `memory`.** Test końcowy sprawdza wiedzę pytaniami, nie łączeniem w pary.
 - **Brak `subsections`.** Pytania są przypisane bezpośrednio do działu, nie do konkretnej podsekcji.
+
+---
+
+## Ponowny import
+
+Po imporcie test końcowy działu wygląda **dokładnie jak plik**:
+
+- pytania z tym samym `content_key` są aktualizowane (treść, odpowiedzi, kolejność),
+- nowe pytania są dodawane,
+- pytania, których nie ma już w pliku, są **usuwane** razem z odpowiedziami uczniów na nie. Zanim to nastąpi, panel pokazuje listę pytań do usunięcia i prosi o potwierdzenie.
+
+Wyniki wcześniejszych podejść uczniów zostają w historii.
 
 ---
 

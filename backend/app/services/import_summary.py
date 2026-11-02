@@ -2,6 +2,7 @@ from collections import Counter
 
 from app.extensions import db
 from app.models.ebooks import Ebook
+from app.models.section_test_answers import SectionTestAnswer
 from app.models.section_test_questions import SectionTestQuestion
 from app.models.sections import Section
 from app.models.student_answers import StudentAnswer
@@ -128,5 +129,47 @@ def summarize_task_import(data):
         "sections": {
             "created": [title for title in dict.fromkeys(section_titles) if title not in existing_sections],
             "deleted": deleted_sections,
+        },
+    }
+
+
+def summarize_final_test_import(section, section_entry):
+    content_keys = {question_data["content_key"] for question_data in section_entry["questions"]}
+    existing_keys = {
+        content_key
+        for (content_key,) in db.session.query(SectionTestQuestion.content_key).filter(
+            SectionTestQuestion.content_key.in_(content_keys)
+        )
+    }
+    removed = (
+        SectionTestQuestion.query.filter(
+            SectionTestQuestion.section_id == section.id,
+            db.or_(SectionTestQuestion.content_key.is_(None), SectionTestQuestion.content_key.notin_(content_keys)),
+        )
+        .order_by(SectionTestQuestion.order_index, SectionTestQuestion.id)
+        .all()
+    )
+    answer_counts = Counter()
+    if removed:
+        rows = (
+            db.session.query(SectionTestAnswer.question_id, db.func.count(SectionTestAnswer.id))
+            .filter(SectionTestAnswer.question_id.in_([question.id for question in removed]))
+            .group_by(SectionTestAnswer.question_id)
+        )
+        answer_counts = Counter(dict(rows.all()))
+
+    return {
+        "questions": {
+            "created": len(content_keys - existing_keys),
+            "updated": len(content_keys & existing_keys),
+            "deleted": [
+                {
+                    "id": question.id,
+                    "content_key": question.content_key,
+                    "prompt": question.prompt,
+                    "answer_count": answer_counts[question.id],
+                }
+                for question in removed
+            ],
         },
     }
