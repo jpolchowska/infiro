@@ -92,6 +92,7 @@ export function MemoryBoard({ pairs, onSolved }: { pairs: MemoryPair[]; onSolved
               <MathText
                 className={`font-manrope-extrabold text-[22px] ${isMatched ? 'text-[#1f9d63]' : 'text-infiro-navy'}`}
                 color={isMatched ? GREEN : NAVY}
+                unbroken
               >
                 {tile.text}
               </MathText>
