@@ -262,7 +262,7 @@ export default function SubsectionTasksScreen() {
                     Ćwicz na czas
                   </Text>
                   <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs mt-0.5">
-                    60 sekund, zadania ABC z tej podsekcji
+                    60 sekund — zadania z tej podsekcji
                   </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={16} color={theme.textSecondary} />
