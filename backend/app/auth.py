@@ -4,8 +4,9 @@ import jwt
 from flask import jsonify, request
 from jwt import PyJWKClient
 
-from app.constants import RealmRole
+from app.constants import RealmRole, UserRole
 from app.models.users import User
+from app.services.users import get_or_create_user
 
 KEYCLOAK_JWKS_URI = "http://keycloak:8080/realms/infiro/protocol/openid-connect/certs"
 KEYCLOAK_ISSUER_PATH = "/realms/infiro"
@@ -107,6 +108,18 @@ def require_student_account(f):
 def current_user():
     sub = request.user.get("sub")
     return User.query.filter_by(keycloak_sub=sub).first()
+
+
+def staff_viewer():
+    realm_roles = _realm_roles()
+
+    if RealmRole.ADMIN in realm_roles:
+        return RealmRole.ADMIN, None
+
+    if RealmRole.TEACHER in realm_roles:
+        return RealmRole.TEACHER, get_or_create_user(request.user, UserRole.TEACHER)
+
+    return None, None
 
 
 def require_student(f):
