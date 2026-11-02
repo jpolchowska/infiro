@@ -98,6 +98,11 @@ def delete_final_test_questions(question_ids):
         )
 
 
+def delete_ebook(ebook):
+    remove_image_directories(image_directories(ebook.content))
+    db.session.delete(ebook)
+
+
 def delete_task(task):
     _delete_tasks([task.id])
 

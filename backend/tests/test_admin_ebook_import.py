@@ -170,3 +170,38 @@ def test_deleting_a_subsection_removes_its_ebook_images(client, login):
 
     assert response.status_code == 204
     assert _image_directories(client) == []
+
+
+def test_admin_deletes_an_ebook_with_its_images(client, login):
+    login("admin-sub", ["admin"])
+    subsection = _create_subsection()
+    import_ebook(client, build_ebook_zip())
+
+    response = client.delete(f"/api/admin/subsections/{subsection.id}/ebook", headers={"Authorization": "Bearer test-token"})
+
+    assert response.status_code == 204
+    assert Ebook.query.count() == 0
+    assert _image_directories(client) == []
+    assert Subsection.query.count() == 1
+
+
+def test_deleting_a_missing_ebook_returns_404(client, login):
+    login("admin-sub", ["admin"])
+    subsection = _create_subsection()
+
+    response = client.delete(f"/api/admin/subsections/{subsection.id}/ebook", headers={"Authorization": "Bearer test-token"})
+
+    assert response.status_code == 404
+    assert response.json == {"error": "Ebook not found"}
+
+
+def test_teacher_cannot_delete_an_ebook(client, login):
+    login("admin-sub", ["admin"])
+    subsection = _create_subsection()
+    import_ebook(client, build_ebook_zip())
+    login("teacher-sub", ["teacher"])
+
+    response = client.delete(f"/api/admin/subsections/{subsection.id}/ebook", headers={"Authorization": "Bearer test-token"})
+
+    assert response.status_code == 403
+    assert Ebook.query.count() == 1

@@ -85,6 +85,20 @@ def get_subsection_ebook(subsection_id):
     }), 200
 
 
+@bp.route("/subsections/<int:subsection_id>/ebook", methods=["DELETE"])
+@authenticate_token
+@require_realm_role(RealmRole.ADMIN)
+def delete_subsection_ebook(subsection_id):
+    ebook = Ebook.query.filter_by(subsection_id=subsection_id).first()
+    if ebook is None:
+        return jsonify({"error": "Ebook not found"}), 404
+
+    content_deletion.delete_ebook(ebook)
+    db.session.commit()
+
+    return "", 204
+
+
 @bp.route("/subsections/<int:subsection_id>", methods=["PATCH"])
 @authenticate_token
 @require_realm_role(RealmRole.ADMIN)
