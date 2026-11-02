@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from app.auth import authenticate_token, require_any_realm_role, require_realm_role
+from app.auth import authenticate_token, require_any_realm_role, require_realm_role, staff_viewer
 from app.constants import RealmRole
 from app.extensions import db
 from app.models.section_test_questions import SectionTestQuestion
@@ -70,7 +70,8 @@ def get_final_test(section_id):
     if section is None:
         return jsonify({"error": "Section not found"}), 404
 
-    return jsonify(final_test_preview(section)), 200
+    _, teacher = staff_viewer()
+    return jsonify(final_test_preview(section, teacher)), 200
 
 
 @bp.route("/sections/<int:section_id>/final-test", methods=["DELETE"])
