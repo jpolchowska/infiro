@@ -300,3 +300,15 @@ export type TaskImportSummary = {
   createdSections: number;
   deletedSections: DeletedSection[];
 };
+
+export type DeletedFinalTestQuestion = {
+  id: number;
+  prompt: string;
+  answerCount: number;
+};
+
+export type FinalTestImportSummary = {
+  createdQuestions: number;
+  updatedQuestions: number;
+  deletedQuestions: DeletedFinalTestQuestion[];
+};

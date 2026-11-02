@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ImportCard } from "@/components/import/ImportCard";
-import { hasDeletions, TaskImportSummaryView } from "@/components/import/TaskImportSummaryView";
+import { hasDeletions, TaskImportSummaryView } from "@/components/import/ImportSummaryView";
 import { readValidatedJson, type ImportControls } from "@/lib/importControls";
 import { UploadField } from "@/components/import/UploadField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";

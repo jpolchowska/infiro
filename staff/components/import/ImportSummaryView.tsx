@@ -1,5 +1,5 @@
 import { pluralize, WORDS } from "@/lib/pluralize";
-import type { TaskImportSummary } from "@/lib/types";
+import type { FinalTestImportSummary, TaskImportSummary } from "@/lib/types";
 
 const ANSWER_WORDS = ["odpowiedź ucznia", "odpowiedzi uczniów", "odpowiedzi uczniów"] as const;
 const SECTION_WORDS = ["sekcja", "sekcje", "sekcji"] as const;
@@ -85,6 +85,34 @@ export function TaskImportSummaryView({ summary }: { summary: TaskImportSummary 
                     task.answerCount > 0 && pluralize(task.answerCount, ANSWER_WORDS),
                   ])}
                 </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function FinalTestImportSummaryView({ summary }: { summary: FinalTestImportSummary }) {
+  return (
+    <div>
+      <div className="flex gap-3">
+        <Count label="Dodane pytania" value={summary.createdQuestions} />
+        <Count label="Zaktualizowane" value={summary.updatedQuestions} />
+        <Count label="Usunięte pytania" value={summary.deletedQuestions.length} tone="bad" />
+      </div>
+
+      {summary.deletedQuestions.length > 0 && (
+        <div className="mt-4">
+          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-gray-500">Usunięte z testu</p>
+          <ul className="mt-2 max-h-64 divide-y divide-gray-100 overflow-y-auto rounded-sm border border-infiro-border text-sm">
+            {summary.deletedQuestions.map((question) => (
+              <li key={question.id} className="px-4 py-2.5">
+                <p className="line-clamp-1 text-gray-900">{question.prompt}</p>
+                {question.answerCount > 0 && (
+                  <p className="mt-0.5 text-xs text-gray-500">{pluralize(question.answerCount, ANSWER_WORDS)}</p>
+                )}
               </li>
             ))}
           </ul>

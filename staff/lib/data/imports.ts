@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api";
-import type { TaskImportSummary } from "@/lib/types";
+import type { FinalTestImportSummary, TaskImportSummary } from "@/lib/types";
 
 type RawTaskImportSummary = {
   tasks: {
@@ -88,15 +88,46 @@ export async function importEbook(token: string, file: File): Promise<{ title: s
   return { title: raw.title };
 }
 
+type RawFinalTestImportSummary = {
+  questions: {
+    created: number;
+    updated: number;
+    deleted: { id: number; prompt: string; answer_count: number }[];
+  };
+};
+
+function mapFinalTestSummary(raw: RawFinalTestImportSummary): FinalTestImportSummary {
+  return {
+    createdQuestions: raw.questions.created,
+    updatedQuestions: raw.questions.updated,
+    deletedQuestions: raw.questions.deleted.map((question) => ({
+      id: question.id,
+      prompt: question.prompt,
+      answerCount: question.answer_count,
+    })),
+  };
+}
+
+export async function previewFinalTestImport(
+  token: string,
+  sectionId: number,
+  payload: unknown
+): Promise<FinalTestImportSummary> {
+  const raw = await apiFetch<{ summary: RawFinalTestImportSummary }>(
+    `/api/admin/sections/${sectionId}/final-test/import?dry_run=true`,
+    { token, method: "POST", json: payload }
+  );
+  return mapFinalTestSummary(raw.summary);
+}
+
 export async function importFinalTest(
   token: string,
   sectionId: number,
   payload: unknown
-): Promise<{ questionCount: number }> {
-  const raw = await apiFetch<{ question_count: number }>(`/api/admin/sections/${sectionId}/final-test/import`, {
-    token,
-    method: "POST",
-    json: payload,
-  });
-  return { questionCount: raw.question_count };
+): Promise<FinalTestImportSummary> {
+  const raw = await apiFetch<{ summary: RawFinalTestImportSummary }>(
+    `/api/admin/sections/${sectionId}/final-test/import`,
+    { token, method: "POST", json: payload }
+  );
+  return mapFinalTestSummary(raw.summary);
 }
