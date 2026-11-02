@@ -133,7 +133,7 @@ export default function TimedScreen() {
               Ćwicz na czas
             </Text>
             <Text style={{ color: 'rgba(255,255,255,0.7)' }} className="text-base mb-8">
-              Masz {pluralize(set.durationSeconds, 'sekundę', 'sekundy', 'sekund')} na jak najwięcej zadań z tej podsekcji. Bez
+              Masz {pluralize(set.durationSeconds, 'sekundę', 'sekundy', 'sekund')}, żeby rozwiązać jak najwięcej zadań z tej podsekcji. Bez
               podpowiedzi — odpowiadasz i lecisz dalej.
             </Text>
             {empty && (
