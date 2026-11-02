@@ -6,6 +6,7 @@ import { Text } from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { InterestIcon, InterestId } from '../../components/student/InterestIcon';
+import { UnbrokenText } from '../../components/UnbrokenText';
 import { DEFAULT_INTEREST, INTERESTS } from '../../lib/interests';
 import { getMe, saveInterest } from '../../lib/student';
 import { NEUTRAL_THEME, ThemeTokens, useTheme, useThemeRefresh } from '../../lib/theme';
@@ -203,9 +204,9 @@ export default function InterestsScreen() {
                 >
                   <InterestIcon id={item.id} size={24} />
                 </View>
-                <Text style={{ color: palette.cardLabelColor }} className="font-manrope-extrabold text-[15px]">
+                <UnbrokenText style={{ color: palette.cardLabelColor }} className="font-manrope-extrabold text-[15px]">
                   {item.label}
-                </Text>
+                </UnbrokenText>
                 {isOn && (
                   <View
                     className="absolute top-3 right-3 items-center justify-center"

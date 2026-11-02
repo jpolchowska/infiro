@@ -7,6 +7,7 @@ type MathTextProps = {
   className?: string;
   color?: string;
   style?: TextStyle;
+  unbroken?: boolean;
 };
 
 const HAS_MARKUP = /\d+\/\d+|\*\*[^*]+\*\*/;
@@ -60,9 +61,13 @@ function renderWords(
   key: string,
   className: string | undefined,
   color: string,
-  style: TextStyle | undefined
+  style: TextStyle | undefined,
+  unbroken = false
 ) {
   const textStyle = { color, ...style };
+  const unbrokenProps = unbroken
+    ? { numberOfLines: 1, adjustsFontSizeToFit: true, style: { maxWidth: '100%' as const, ...textStyle } }
+    : {};
   const words = text.split(/\s+/).filter(Boolean);
   if (words.length === 0) {
     return /\s/.test(text)
@@ -84,7 +89,7 @@ function renderWords(
     const match = word.match(FRACTION_WORD);
     if (!match) {
       return (
-        <Text key={`${key}-${i}`} className={className} style={textStyle}>
+        <Text key={`${key}-${i}`} className={className} style={textStyle} {...unbrokenProps}>
           {prefix + word + space}
         </Text>
       );
@@ -111,8 +116,8 @@ function renderWords(
   });
 }
 
-export function MathText({ children, className, color = '#142284', style }: MathTextProps) {
-  if (!HAS_MARKUP.test(children)) {
+export function MathText({ children, className, color = '#142284', style, unbroken = false }: MathTextProps) {
+  if (!unbroken && !HAS_MARKUP.test(children)) {
     return (
       <Text className={className} style={{ color, ...style }}>
         {children}
@@ -124,12 +129,20 @@ export function MathText({ children, className, color = '#142284', style }: Math
   const boldClassName = textClass ? `${textClass} font-manrope-bold` : 'font-manrope-bold';
 
   return (
-    <View className={layoutClass} style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' }}>
+    <View
+      className={layoutClass}
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: unbroken ? 'center' : undefined,
+      }}
+    >
       {children.split(BOLD_SPAN).map((segment, i) => {
         const bold = segment.match(/^\*\*([^*]+)\*\*$/);
         return bold
-          ? renderWords(bold[1], `b${i}`, boldClassName, color, style)
-          : renderWords(segment, `s${i}`, textClass, color, style);
+          ? renderWords(bold[1], `b${i}`, boldClassName, color, style, unbroken)
+          : renderWords(segment, `s${i}`, textClass, color, style, unbroken);
       })}
     </View>
   );

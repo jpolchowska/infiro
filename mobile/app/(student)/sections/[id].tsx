@@ -6,7 +6,7 @@ import { Text } from '../../../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ErrorState } from '../../../components/student/ErrorState';
-import { pluralize } from '../../../lib/pluralize';
+import { outOf, pluralize } from '../../../lib/pluralize';
 import { SectionSummary, getSections } from '../../../lib/student';
 import { topicColor, useTheme, withAlpha } from '../../../lib/theme';
 
@@ -172,7 +172,8 @@ export default function SectionDetailScreen() {
                 Podsekcje
               </Text>
               <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs">
-                {doneCount} z {section.subsections.length} ukończonych
+                {doneCount} z {section.subsections.length}{' '}
+                {outOf(section.subsections.length, 'ukończonej', 'ukończonych')}
               </Text>
             </View>
 
@@ -183,7 +184,7 @@ export default function SectionDetailScreen() {
                 const meta = full
                   ? `Ukończone · ${pluralize(sub.totalTasks, 'zadanie', 'zadania', 'zadań')}`
                   : started
-                    ? `${sub.solvedTasks} z ${sub.totalTasks} zadań`
+                    ? `${sub.solvedTasks} z ${sub.totalTasks} ${outOf(sub.totalTasks, 'zadania', 'zadań')}`
                     : pluralize(sub.totalTasks, 'zadanie', 'zadania', 'zadań');
 
                 return (

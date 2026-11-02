@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../../components/student/BottomTabBar';
 import { ErrorState } from '../../../components/student/ErrorState';
-import { pluralize } from '../../../lib/pluralize';
+import { outOf, pluralize } from '../../../lib/pluralize';
 import { SectionSummary, getSections } from '../../../lib/student';
 import { topicColor, useTheme, withAlpha } from '../../../lib/theme';
 
@@ -193,7 +193,7 @@ export default function SectionsScreen() {
                       const meta = full
                         ? `Ukończone · ${pluralize(sub.totalTasks, 'zadanie', 'zadania', 'zadań')}`
                         : started
-                          ? `${sub.solvedTasks} z ${sub.totalTasks} zadań`
+                          ? `${sub.solvedTasks} z ${sub.totalTasks} ${outOf(sub.totalTasks, 'zadania', 'zadań')}`
                           : pluralize(sub.totalTasks, 'zadanie', 'zadania', 'zadań');
 
                       return (

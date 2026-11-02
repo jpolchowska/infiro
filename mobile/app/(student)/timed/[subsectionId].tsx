@@ -10,6 +10,7 @@ import { Text } from '../../../components/Text';
 import { ErrorState } from '../../../components/student/ErrorState';
 import { TimedShortAnswer } from '../../../components/student/TimedShortAnswer';
 import { TimedAnswer, TimedResult, TimedSet, getTimedSet, submitTimedSet } from '../../../lib/timed';
+import { outOf, pluralize } from '../../../lib/pluralize';
 import { useTheme, withAlpha } from '../../../lib/theme';
 
 const CORAL = '#ff5f55';
@@ -132,7 +133,7 @@ export default function TimedScreen() {
               Ćwicz na czas
             </Text>
             <Text style={{ color: 'rgba(255,255,255,0.7)' }} className="text-base mb-8">
-              Masz {set.durationSeconds} sekund na jak najwięcej zadań z tej podsekcji. Bez
+              Masz {pluralize(set.durationSeconds, 'sekundę', 'sekundy', 'sekund')} na jak najwięcej zadań z tej podsekcji. Bez
               podpowiedzi — odpowiadasz i lecisz dalej.
             </Text>
             {empty && (
@@ -264,7 +265,7 @@ export default function TimedScreen() {
         </Text>
         <Text style={{ color: 'rgba(255,255,255,0.8)' }} className="text-base mb-10">
           {result
-            ? `Poprawne odpowiedzi z ${result.answered} udzielonych (na ${result.total} zadań).`
+            ? `Poprawne odpowiedzi z ${result.answered} ${outOf(result.answered, 'udzielonej', 'udzielonych')} (na ${pluralize(result.total, 'zadanie', 'zadania', 'zadań')}).`
             : 'Nie udało się zapisać wyniku, ale ćwiczenie się liczy.'}
         </Text>
 

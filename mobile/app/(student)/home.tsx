@@ -2,20 +2,58 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { Text } from '../../components/Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../components/student/BottomTabBar';
 import { ErrorState } from '../../components/student/ErrorState';
+import { UnbrokenText } from '../../components/UnbrokenText';
 import { formatShortDate } from '../../lib/formatDate';
+import { outOf, pluralForm } from '../../lib/pluralize';
 import { DashboardStats, StudentMe, getMe, getStats } from '../../lib/student';
 import { ThemeTokens, topicColor, useTheme, withAlpha } from '../../lib/theme';
+
+const SCREEN_PADDING = 40;
+const TILE_GAP = 10;
+const TILE_INNER_PADDING = 34;
+const LABEL_FONT_SIZE = 12;
+const LETTER_WIDTH_EMS = 0.62;
+const MAX_FONT_SCALE = 1.3;
+const MIN_LABEL_FONT_SIZE = 8;
+
+type StatTileData = { value: string | number; label: string };
+
+function statTiles(stats: DashboardStats | null): StatTileData[] {
+  if (!stats) return [];
+  return [
+    {
+      value: stats.solvedTasks,
+      label: pluralForm(stats.solvedTasks, 'zrobione zadanie', 'zrobione zadania', 'zrobionych zadań'),
+    },
+    { value: stats.accuracy !== null ? `${stats.accuracy}%` : '—', label: 'dobrych odpowiedzi' },
+    {
+      value: stats.startedSections,
+      label: pluralForm(stats.startedSections, 'rozpoczęty dział', 'rozpoczęte działy', 'rozpoczętych działów'),
+    },
+  ];
+}
+
+function useTileLabelSize(tiles: StatTileData[]) {
+  const { width, fontScale } = useWindowDimensions();
+  const labelWidth = (width - SCREEN_PADDING - 2 * TILE_GAP) / 3 - TILE_INNER_PADDING;
+  const longestWord = Math.max(0, ...tiles.flatMap((tile) => tile.label.split(' ').map((word) => word.length)));
+  const neededWidth = longestWord * LETTER_WIDTH_EMS * LABEL_FONT_SIZE * Math.min(fontScale, MAX_FONT_SCALE);
+  const shrink = neededWidth > labelWidth ? labelWidth / neededWidth : 1;
+  return Math.max(MIN_LABEL_FONT_SIZE, Math.floor(LABEL_FONT_SIZE * shrink * 2) / 2);
+}
 
 export default function HomeScreen() {
   const theme = useTheme();
   const [me, setMe] = useState<StudentMe | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const tiles = statTiles(stats);
+  const tileLabelSize = useTileLabelSize(tiles);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
@@ -147,7 +185,8 @@ export default function HomeScreen() {
                   style={{ color: 'rgba(255,255,255,0.75)' }}
                   className="font-manrope-medium text-[13px] mt-1.5"
                 >
-                  {current.sectionTitle} · {current.solvedTasks} z {current.totalTasks} zadań
+                  {current.sectionTitle} · {current.solvedTasks} z {current.totalTasks}{' '}
+                  {outOf(current.totalTasks, 'zadania', 'zadań')}
                 </Text>
                 <View
                   style={{
@@ -181,14 +220,10 @@ export default function HomeScreen() {
             )}
 
             {hasActivity ? (
-              <View className="flex-row mb-[22px]" style={{ gap: 10 }}>
-                <StatTile theme={theme} value={stats!.solvedTasks} label="zrobionych zadań" />
-                <StatTile
-                  theme={theme}
-                  value={stats!.accuracy !== null ? `${stats!.accuracy}%` : '—'}
-                  label="dobrych odpowiedzi"
-                />
-                <StatTile theme={theme} value={stats!.startedSections} label="rozpoczęte działy" />
+              <View className="flex-row mb-[22px]" style={{ gap: TILE_GAP }}>
+                {tiles.map((tile) => (
+                  <StatTile key={tile.label} theme={theme} value={tile.value} label={tile.label} labelSize={tileLabelSize} />
+                ))}
               </View>
             ) : (
               <LinearGradient
@@ -322,7 +357,7 @@ export default function HomeScreen() {
                             style={{ color: theme.textSecondary }}
                             className="font-manrope-semibold text-xs mt-1"
                           >
-                            {section.solvedTasks} z {section.totalTasks} zadań
+                            {section.solvedTasks} z {section.totalTasks} {outOf(section.totalTasks, 'zadania', 'zadań')}
                           </Text>
                           <View
                             style={{
@@ -358,7 +393,17 @@ export default function HomeScreen() {
   );
 }
 
-function StatTile({ theme, value, label }: { theme: ThemeTokens; value: string | number; label: string }) {
+function StatTile({
+  theme,
+  value,
+  label,
+  labelSize,
+}: {
+  theme: ThemeTokens;
+  value: string | number;
+  label: string;
+  labelSize: number;
+}) {
   return (
     <View
       className="flex-1"
@@ -375,12 +420,22 @@ function StatTile({ theme, value, label }: { theme: ThemeTokens; value: string |
         elevation: 2,
       }}
     >
-      <Text className="font-manrope-extrabold text-[24px]" style={{ color: theme.textPrimary }}>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        className="font-manrope-extrabold text-[24px]"
+        style={{ color: theme.textPrimary }}
+      >
         {value}
       </Text>
-      <Text style={{ color: theme.textSecondary }} className="font-manrope-semibold text-xs mt-1.5">
-        {label}
-      </Text>
+      <View className="mt-1.5">
+        <UnbrokenText
+          className="font-manrope-semibold"
+          style={{ color: theme.textSecondary, fontSize: labelSize, lineHeight: Math.round(labelSize * 1.35) }}
+        >
+          {label}
+        </UnbrokenText>
+      </View>
     </View>
   );
 }
